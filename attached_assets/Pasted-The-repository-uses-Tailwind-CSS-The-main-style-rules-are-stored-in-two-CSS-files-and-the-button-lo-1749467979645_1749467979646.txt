@@ -1,0 +1,116 @@
+The repository uses Tailwind CSS. The main style rules are stored in two CSS files and the button logic lives in a small React component.
+
+1. Global Styles
+Main Tailwind variables and base colors
+
+styles/globals.css
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 3.9%;
+    --card: 0 0% 100%;
+    ...
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+  .dark {
+    --background: 0 0% 3.9%;
+    ...
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+@layer base {
+  * { @apply border-border; }
+  body { @apply bg-background text-foreground; }
+}
+
+Button classes and heading styles
+
+app/globals.css
+@layer components {
+  .container { @apply px-4 md:px-6 lg:px-8; }
+
+  /* Updated button styles */
+  .btn-primary {
+    position: relative;
+    height: 40px;
+    padding: 0 24px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background-color: #007bff;
+    color: white;
+    clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+  }
+
+  .btn-outline {
+    position: relative;
+    height: 40px;
+    padding: 0 24px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background-color: transparent;
+    color: #007bff;
+    border: 1px solid #007bff;
+    clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+  }
+  .btn-outline:hover { background-color: rgba(0, 123, 255, 0.1); }
+}
+
+2. Button Component
+components/ui/button.tsx
+import * as React from "react"
+import { cn } from "@/lib/utils"
+
+export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: "default" | "outline"
+  size?: "default" | "sm" | "lg"
+  asChild?: boolean
+}
+
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, variant = "default", size = "default", children, ...props }, ref) => {
+    return (
+      <button
+        className={cn(
+          "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
+          variant === "default" && "bg-primary text-primary-foreground shadow hover:bg-primary/90",
+          variant === "outline" &&
+            "border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground",
+          size === "sm" && "h-8 rounded-md px-3 text-xs",
+          size === "lg" && "h-10 rounded-md px-8",
+          className,
+        )}
+        ref={ref}
+        {...props}
+      >
+        {children}
+      </button>
+    )
+  },
+)
+Button.displayName = "Button"
+
+export { Button, type ButtonProps }
+
+The Button relies on the helper cn (class-name merger) defined in lib/utils.ts:
+
+import { type ClassValue, clsx } from "clsx"
+import { twMerge } from "tailwind-merge"
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}
+
+3. Keeping the Styles and Component
+Copy the CSS
+
+Save app/globals.css and styles/globals.css in your new project. These files hold the button classes (btn-primary, btn-outline), global colors and CSS variables.
+
+Copy the button component and utility
+
+Save components/ui/button.tsx and lib/utils.ts if you still use React.
+
+If you switch to plain HTML/PHP, you can ignore the React part and simply apply class="btn-primary" or class="btn-outline" on <button> tags using the CSS from app/globals.css
