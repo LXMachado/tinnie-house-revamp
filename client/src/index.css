@@ -1,0 +1,170 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: hsl(0, 0%, 100%);
+  --foreground: hsl(20, 14.3%, 4.1%);
+  --muted: hsl(60, 4.8%, 95.9%);
+  --muted-foreground: hsl(25, 5.3%, 44.7%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(20, 14.3%, 4.1%);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(20, 14.3%, 4.1%);
+  --border: hsl(20, 5.9%, 90%);
+  --input: hsl(20, 5.9%, 90%);
+  --primary: hsl(207, 90%, 54%);
+  --primary-foreground: hsl(211, 100%, 99%);
+  --secondary: hsl(60, 4.8%, 95.9%);
+  --secondary-foreground: hsl(24, 9.8%, 10%);
+  --accent: hsl(60, 4.8%, 95.9%);
+  --accent-foreground: hsl(24, 9.8%, 10%);
+  --destructive: hsl(0, 84.2%, 60.2%);
+  --destructive-foreground: hsl(60, 9.1%, 97.8%);
+  --ring: hsl(20, 14.3%, 4.1%);
+  --radius: 0.5rem;
+  --sidebar-background: hsl(0, 0%, 98%);
+  --sidebar-foreground: hsl(240, 5.3%, 26.1%);
+  --sidebar-primary: hsl(240, 5.9%, 10%);
+  --sidebar-primary-foreground: hsl(0, 0%, 98%);
+  --sidebar-accent: hsl(240, 4.8%, 95.9%);
+  --sidebar-accent-foreground: hsl(240, 5.9%, 10%);
+  --sidebar-border: hsl(220, 13%, 91%);
+  --sidebar-ring: hsl(217.2, 91.2%, 59.8%);
+}
+
+.dark {
+  --background: hsl(240, 10%, 3.9%);
+  --foreground: hsl(0, 0%, 98%);
+  --muted: hsl(240, 3.7%, 15.9%);
+  --muted-foreground: hsl(240, 5%, 64.9%);
+  --popover: hsl(240, 10%, 3.9%);
+  --popover-foreground: hsl(0, 0%, 98%);
+  --card: hsl(240, 10%, 3.9%);
+  --card-foreground: hsl(0, 0%, 98%);
+  --border: hsl(240, 3.7%, 15.9%);
+  --input: hsl(240, 3.7%, 15.9%);
+  --primary: hsl(207, 90%, 54%);
+  --primary-foreground: hsl(211, 100%, 99%);
+  --secondary: hsl(240, 3.7%, 15.9%);
+  --secondary-foreground: hsl(0, 0%, 98%);
+  --accent: hsl(240, 3.7%, 15.9%);
+  --accent-foreground: hsl(0, 0%, 98%);
+  --destructive: hsl(0, 62.8%, 30.6%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --ring: hsl(240, 4.9%, 83.9%);
+  --radius: 0.5rem;
+  --sidebar-background: hsl(240, 5.9%, 10%);
+  --sidebar-foreground: hsl(240, 4.8%, 95.9%);
+  --sidebar-primary: hsl(224.3, 76.3%, 94.1%);
+  --sidebar-primary-foreground: hsl(240, 5.9%, 10%);
+  --sidebar-accent: hsl(240, 3.7%, 15.9%);
+  --sidebar-accent-foreground: hsl(240, 4.8%, 95.9%);
+  --sidebar-border: hsl(240, 3.7%, 15.9%);
+  --sidebar-ring: hsl(217.2, 91.2%, 59.8%);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+  }
+}
+
+@layer components {
+  .container {
+    @apply px-4 md:px-6 lg:px-8;
+  }
+
+  /* Custom button styles with clip-path */
+  .btn-primary {
+    position: relative;
+    height: 40px;
+    padding: 0 24px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background-color: #007bff;
+    color: white;
+    clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+    border: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  .btn-primary:hover {
+    background-color: #0056b3;
+    transform: translateY(-1px);
+  }
+
+  .btn-outline {
+    position: relative;
+    height: 40px;
+    padding: 0 24px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background-color: transparent;
+    color: #007bff;
+    border: 1px solid #007bff;
+    clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+    font-weight: 500;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  .btn-outline:hover {
+    background-color: rgba(0, 123, 255, 0.1);
+    transform: translateY(-1px);
+  }
+
+  .dark .btn-outline {
+    color: #007bff;
+    border-color: #007bff;
+  }
+
+  .dark .btn-outline:hover {
+    background-color: rgba(0, 123, 255, 0.1);
+  }
+
+  /* Animation classes */
+  .animate-fade-in {
+    animation: fade-in 0.5s ease-out forwards;
+  }
+
+  /* Grid overlay effect */
+  .grid-overlay {
+    background-image: 
+      linear-gradient(rgba(0, 123, 255, 0.1) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 123, 255, 0.1) 1px, transparent 1px);
+    background-size: 50px 50px;
+  }
+
+  /* Glowing effect for releases */
+  .release-glow {
+    box-shadow: 0 0 20px rgba(0, 123, 255, 0.3);
+    transition: box-shadow 0.3s ease;
+  }
+
+  .release-glow:hover {
+    box-shadow: 0 0 30px rgba(0, 123, 255, 0.5);
+  }
+
+  /* Vinyl record animation */
+  .vinyl-spin {
+    animation: spin 3s linear infinite;
+  }
+
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+}

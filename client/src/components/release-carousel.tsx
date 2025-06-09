@@ -1,0 +1,127 @@
+import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { ChevronLeft, ChevronRight, Play, Star } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import type { Release } from "@shared/schema";
+
+export function ReleaseCarousel() {
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  const { data: releases = [], isLoading } = useQuery<Release[]>({
+    queryKey: ["/api/releases/featured"],
+  });
+
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % Math.max(1, releases.length));
+  };
+
+  const prevSlide = () => {
+    setCurrentSlide((prev) => (prev - 1 + releases.length) % Math.max(1, releases.length));
+  };
+
+  // Auto-advance carousel
+  useEffect(() => {
+    if (releases.length > 1) {
+      const interval = setInterval(nextSlide, 5000);
+      return () => clearInterval(interval);
+    }
+  }, [releases.length]);
+
+  if (isLoading) {
+    return (
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {[...Array(3)].map((_, i) => (
+          <div key={i} className="animate-pulse">
+            <div className="bg-muted rounded-2xl h-64 mb-4"></div>
+            <div className="h-4 bg-muted rounded mb-2"></div>
+            <div className="h-4 bg-muted rounded w-2/3"></div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  if (releases.length === 0) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-muted-foreground">No featured releases available at this time.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative">
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+        {releases.slice(currentSlide, currentSlide + 3).map((release) => (
+          <div key={release.id} className="group bg-card rounded-2xl overflow-hidden border hover:border-blue-500/50 transition-all duration-300 release-glow">
+            <div className="relative">
+              <img 
+                src={release.coverImageUrl || "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600"} 
+                alt={`${release.title} album cover`}
+                className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+              />
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center">
+                <Button
+                  variant="default"
+                  size="sm"
+                  className="opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                >
+                  <Play className="h-4 w-4 mr-2" />
+                  Play
+                </Button>
+              </div>
+            </div>
+            
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-medium text-blue-500 uppercase tracking-wider">
+                  {release.genre || "Electronic"}
+                </span>
+                <span className="text-xs text-muted-foreground">
+                  {release.releaseDate ? new Date(release.releaseDate).getFullYear() : "2024"}
+                </span>
+              </div>
+              <h3 className="font-orbitron font-semibold text-lg mb-2">{release.title}</h3>
+              <p className="text-sm text-muted-foreground mb-3">by Artist</p>
+              <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
+                {release.description || "An innovative electronic music release."}
+              </p>
+              
+              <div className="flex items-center justify-between">
+                <Button variant="default" size="sm">
+                  <Play className="h-3 w-3 mr-1" />
+                  Play Now
+                </Button>
+                <div className="flex items-center space-x-2 text-xs text-muted-foreground">
+                  <Star className="w-4 h-4 fill-current text-yellow-500" />
+                  <span>4.8</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {releases.length > 3 && (
+        <>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={prevSlide}
+            className="absolute left-4 top-1/2 -translate-y-1/2 bg-background/80 backdrop-blur-sm"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={nextSlide}
+            className="absolute right-4 top-1/2 -translate-y-1/2 bg-background/80 backdrop-blur-sm"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </>
+      )}
+    </div>
+  );
+}
