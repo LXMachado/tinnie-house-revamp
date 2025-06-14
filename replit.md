@@ -4,6 +4,14 @@
 A modern electronic music label website built with React/Vite frontend and PostgreSQL database backend. The site features a complete homepage with hero section, release carousel, featured artists, about section, and contact form. Includes dark/light theme toggle and responsive design.
 
 ## Recent Changes
+- **June 14, 2025**: Music player integration and content updates
+  - Added audio_file_url column to database schema for music file storage
+  - Integrated 5 authentic MP3 files (Rafa Kao, G.U.R.I tracks) with proper server routing
+  - Created full-featured music player component with play/pause, volume, and progress controls
+  - Implemented compact music player in release carousel hover overlay
+  - Updated "Rafa Kao & Gabriel Samy - Ritual" with new audio file
+  - Configured Express server to serve audio files from /assets/ endpoint
+  - Updated About Us section to emphasize global reach and specific electronic genres (techno, melodic techno, progressive house)
 - **June 14, 2025**: Implemented authentic releases section with CSV data
   - Added featured upcoming release "Rafa Kao - Stormdrifter" with May 2025 release date
   - Created carousel with authentic catalog releases using real cover art URLs

@@ -212,13 +212,7 @@ export default function Home() {
               <h2 className="font-orbitron text-3xl lg:text-4xl font-bold mb-6">About Tinnie House Records</h2>
               <div className="space-y-4 text-muted-foreground">
                 <p>
-                  Founded in 2020, Tinnie House Records emerged from the underground electronic music scene with a mission to champion innovative sound design and cutting-edge production techniques.
-                </p>
-                <p>
-                  Our roster features both emerging talent and established artists who push the boundaries of electronic music across genres including synthwave, techno, ambient, and experimental electronic.
-                </p>
-                <p>
-                  We believe in providing artists with complete creative freedom while offering professional support in production, distribution, and promotion through digital platforms worldwide.
+                  While we celebrate Australia's rich electronic heritage, we champion artists from every corner of the globe. Our passion spans techno, melodic techno, and progressive house, always seeking groundbreaking sounds that transcend borders and move both body and soul.
                 </p>
               </div>
               
