@@ -91,7 +91,7 @@ export function ReleaseCarousel() {
                     onClick={() => release.beatportSaleUrl && window.open(release.beatportSaleUrl!, '_blank')}
                   >
                     <Play className="h-3 w-3 mr-1" />
-                    Beatport
+                    Buy
                   </Button>
                 ) : (
                   <Button 
