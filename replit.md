@@ -12,6 +12,8 @@ A modern electronic music label website built with React/Vite frontend and Postg
   - Updated "Rafa Kao & Gabriel Samy - Ritual" with new audio file
   - Configured Express server to serve audio files from /assets/ endpoint
   - Updated About Us section to emphasize global reach and specific electronic genres (techno, melodic techno, progressive house)
+  - Hero section Listen button now plays "Stormdrifter" (upcoming release) with inline music player
+  - Replaced modal with inline player approach matching carousel implementation
 - **June 14, 2025**: Implemented authentic releases section with CSV data
   - Added featured upcoming release "Rafa Kao - Stormdrifter" with May 2025 release date
   - Created carousel with authentic catalog releases using real cover art URLs
