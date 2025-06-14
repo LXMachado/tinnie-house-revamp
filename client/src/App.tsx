@@ -108,8 +108,6 @@ function Footer() {
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li><a href="#releases" className="hover:text-blue-500 transition-colors">Latest Releases</a></li>
               <li><a href="#artists" className="hover:text-blue-500 transition-colors">Artists</a></li>
-              <li><a href="#" className="hover:text-blue-500 transition-colors">Compilations</a></li>
-              <li><a href="#" className="hover:text-blue-500 transition-colors">Playlists</a></li>
             </ul>
           </div>
 
@@ -119,7 +117,6 @@ function Footer() {
               <li><a href="#about" className="hover:text-blue-500 transition-colors">About Us</a></li>
               <li><a href="#contact" className="hover:text-blue-500 transition-colors">Contact</a></li>
               <li><a href="#" className="hover:text-blue-500 transition-colors">Demo Policy</a></li>
-              <li><a href="#" className="hover:text-blue-500 transition-colors">Press Kit</a></li>
             </ul>
           </div>
 

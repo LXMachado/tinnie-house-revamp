@@ -259,20 +259,7 @@ export default function Home() {
                 </p>
               </div>
               
-              <div className="grid grid-cols-3 gap-8 mt-8 pt-8 border-t">
-                <div className="text-center">
-                  <div className="text-2xl font-orbitron font-bold text-blue-500">50+</div>
-                  <div className="text-sm text-muted-foreground">Releases</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-orbitron font-bold text-blue-500">{artists.length || 15}</div>
-                  <div className="text-sm text-muted-foreground">Artists</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-orbitron font-bold text-blue-500">4</div>
-                  <div className="text-sm text-muted-foreground">Years</div>
-                </div>
-              </div>
+
             </div>
             
             <div className="relative">
