@@ -117,7 +117,7 @@ export default function Home() {
               <div className="grid lg:grid-cols-2 gap-8 items-center">
                 <div className="relative aspect-square">
                   <img 
-                    src="https://i.imgur.com/vDgJcJQ.jpg" 
+                    src="https://i.imgur.com/7HZNuFs_d.jpeg?maxwidth=520&shape=thumb&fidelity=high" 
                     alt="Rafa Kao - Stormdrifter"
                     className="w-full h-full object-cover rounded-lg blue-glow"
                   />
