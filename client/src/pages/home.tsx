@@ -93,7 +93,7 @@ export default function Home() {
                         TH019
                       </div>
                       <div className="bg-green-600/30 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-medium">
-                        May 2025
+                        June 2025
                       </div>
                     </div>
                   </div>
@@ -128,7 +128,7 @@ export default function Home() {
                   <div className="grid grid-cols-2 gap-4 pt-4 border-t border-border/50">
                     <div>
                       <div className="text-sm text-muted-foreground">Release Date</div>
-                      <div className="font-medium">May 27, 2025</div>
+                      <div className="font-medium">June 30, 2025</div>
                     </div>
                     <div>
                       <div className="text-sm text-muted-foreground">Catalog</div>
