@@ -53,48 +53,48 @@ export function ReleaseCarousel() {
     <div className="relative">
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
         {releases.slice(currentSlide, currentSlide + 3).map((release) => (
-          <div key={release.id} className="group bg-card rounded-2xl overflow-hidden border hover:border-blue-500/50 transition-all duration-300 release-glow">
+          <div key={release.id} className="group blur-card overflow-hidden transition-all duration-300">
             <div className="relative">
               <img 
                 src={release.coverImageUrl || "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600"} 
                 alt={`${release.title} album cover`}
                 className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
               />
-              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center">
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors duration-300 flex items-center justify-center">
                 <Button
                   variant="default"
                   size="sm"
                   className="opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                 >
                   <Play className="h-4 w-4 mr-2" />
-                  Play
+                  Listen
                 </Button>
               </div>
             </div>
             
             <div className="p-6">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-medium text-blue-500 uppercase tracking-wider">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs font-orbitron font-semibold text-blue-400 uppercase tracking-wider">
                   {release.genre || "Electronic"}
                 </span>
-                <span className="text-xs text-muted-foreground">
+                <span className="text-xs text-muted-foreground font-orbitron">
                   {release.releaseDate ? new Date(release.releaseDate).getFullYear() : "2024"}
                 </span>
               </div>
-              <h3 className="font-orbitron font-semibold text-lg mb-2">{release.title}</h3>
-              <p className="text-sm text-muted-foreground mb-3">by Artist</p>
+              <h3 className="font-orbitron font-bold text-lg mb-2">{release.title}</h3>
+              <p className="text-sm text-blue-400 mb-3 font-orbitron">by Artist</p>
               <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-                {release.description || "An innovative electronic music release."}
+                {release.description || "An innovative electronic music release pushing the boundaries of underground sound."}
               </p>
               
               <div className="flex items-center justify-between">
-                <Button variant="default" size="sm">
+                <Button variant="outline" size="sm">
                   <Play className="h-3 w-3 mr-1" />
-                  Play Now
+                  Explore Release
                 </Button>
                 <div className="flex items-center space-x-2 text-xs text-muted-foreground">
-                  <Star className="w-4 h-4 fill-current text-yellow-500" />
-                  <span>4.8</span>
+                  <Star className="w-4 h-4 fill-current text-blue-400" />
+                  <span className="font-orbitron">4.8</span>
                 </div>
               </div>
             </div>

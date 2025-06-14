@@ -22,7 +22,7 @@ function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 w-full border-b backdrop-blur-md bg-background/10 supports-[backdrop-filter]:bg-background/10">
       <div className="container flex h-16 items-center justify-between">
         <div className="flex items-center space-x-4">
           <div className="flex items-center space-x-3">
@@ -63,7 +63,7 @@ function Header() {
       </div>
 
       {mobileMenuOpen && (
-        <div className="md:hidden border-t bg-background">
+        <div className="md:hidden border-t backdrop-blur-md bg-background/10">
           <div className="container py-4 space-y-2">
             <button onClick={() => scrollToSection("releases")} className="block py-2 text-sm font-medium hover:text-blue-500 transition-colors w-full text-left">
               Releases

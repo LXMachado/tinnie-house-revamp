@@ -20,18 +20,23 @@ export default function Home() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-background via-background to-blue-50 dark:to-blue-950/20">
-        <div className="absolute inset-0 grid-overlay opacity-30"></div>
+      <section className="relative overflow-hidden min-h-screen flex items-center">
+        <div className="absolute inset-0 grid-overlay opacity-20"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-500/5 to-blue-500/20"></div>
         <div className="container relative py-24 lg:py-32">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-8 animate-fade-in">
-              <div className="space-y-4">
-                <h1 className="font-orbitron text-4xl lg:text-6xl font-bold tracking-tight">
-                  Electronic Music
-                  <span className="block text-blue-500">Redefined</span>
+              <div className="space-y-6">
+                <h1 className="font-orbitron text-5xl lg:text-7xl font-bold tracking-tight leading-tight">
+                  PUSHING THE
+                  <span className="block">BOUNDARIES OF</span>
+                  <span className="block text-transparent bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text">
+                    UNDERGROUND
+                  </span>
+                  <span className="block">ELECTRONIC MUSIC</span>
                 </h1>
-                <p className="text-xl text-muted-foreground max-w-md">
-                  Discover cutting-edge electronic music from emerging and established artists in the Tinnie House Records collective.
+                <p className="text-lg text-muted-foreground max-w-lg leading-relaxed">
+                  Tinnie House Records is an independent label dedicated to showcasing innovative techno, melodic techno, and progressive house from Australia and beyond.
                 </p>
               </div>
               
@@ -56,15 +61,38 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="relative animate-fade-in" style={{ animationDelay: "0.2s" }}>
+            <div className="relative animate-fade-in float-animation" style={{ animationDelay: "0.2s" }}>
               <div className="relative">
-                <img 
-                  src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=800" 
-                  alt="Featured electronic music album artwork" 
-                  className="w-full max-w-md mx-auto rounded-2xl release-glow"
-                />
-                <div className="absolute -top-4 -right-4 w-16 h-16 bg-blue-500/20 rounded-full blur-xl animate-pulse"></div>
-                <div className="absolute -bottom-4 -left-4 w-12 h-12 bg-purple-500/20 rounded-full blur-lg animate-pulse"></div>
+                <div className="blur-card p-8 text-center">
+                  <img 
+                    src="/logo.png" 
+                    alt="Tinnie House Records Logo" 
+                    className="w-32 h-32 mx-auto mb-6 blue-glow"
+                  />
+                  <h2 className="font-orbitron text-2xl font-bold mb-4">
+                    GOLD COAST'S
+                    <span className="block">PREMIER</span>
+                    <span className="block text-blue-400">UNDERGROUND</span>
+                    <span className="block">ELECTRONIC</span>
+                    <span className="block">LABEL</span>
+                  </h2>
+                  <p className="text-sm text-muted-foreground mb-6">
+                    Founded in the heart of Australia's Gold Coast, Tinnie House Records has grown from local passion project into a respected platform for electronic music innovation.
+                  </p>
+                  <div className="grid grid-cols-3 gap-4 text-center">
+                    <div>
+                      <div className="text-blue-400 font-orbitron font-bold">Techno</div>
+                    </div>
+                    <div>
+                      <div className="text-blue-400 font-orbitron font-bold">Melodic Techno</div>
+                    </div>
+                    <div>
+                      <div className="text-blue-400 font-orbitron font-bold">Progressive House</div>
+                    </div>
+                  </div>
+                </div>
+                <div className="absolute -top-4 -right-4 w-16 h-16 bg-blue-500/20 rounded-full blur-xl pulse-glow"></div>
+                <div className="absolute -bottom-4 -left-4 w-12 h-12 bg-blue-600/30 rounded-full blur-lg pulse-glow"></div>
               </div>
             </div>
           </div>
@@ -72,10 +100,11 @@ export default function Home() {
       </section>
 
       {/* Latest Releases Section */}
-      <section id="releases" className="py-16 lg:py-24 bg-muted/30">
-        <div className="container">
+      <section id="releases" className="py-16 lg:py-24 relative">
+        <div className="absolute inset-0 bg-gradient-to-b from-blue-500/5 to-transparent"></div>
+        <div className="container relative">
           <div className="text-center mb-12">
-            <h2 className="font-orbitron text-3xl lg:text-4xl font-bold mb-4">Latest Releases</h2>
+            <h2 className="font-orbitron text-3xl lg:text-4xl font-bold mb-4 tracking-wide">LATEST RELEASES</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               Explore our newest electronic music releases from talented artists around the globe.
             </p>
