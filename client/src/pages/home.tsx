@@ -355,6 +355,84 @@ export default function Home() {
               </div>
 
               <div className="blur-card p-8">
+                <h3 className="font-orbitron font-semibold text-lg mb-6 tracking-wide">Follow Us</h3>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <a 
+                    href="https://www.beatport.com/label/tinnie-house-records/50650"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center space-x-3 p-3 rounded-lg bg-background/20 hover:bg-background/30 transition-colors border border-white/10"
+                  >
+                    <div className="w-8 h-8 bg-gradient-to-r from-orange-500 to-pink-500 rounded flex items-center justify-center">
+                      <span className="text-white font-bold text-xs">B</span>
+                    </div>
+                    <span className="text-sm font-medium">Beatport</span>
+                  </a>
+
+                  <a 
+                    href="https://soundcloud.com/tinniehouserecords"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center space-x-3 p-3 rounded-lg bg-background/20 hover:bg-background/30 transition-colors border border-white/10"
+                  >
+                    <div className="w-8 h-8 bg-gradient-to-r from-orange-400 to-orange-600 rounded flex items-center justify-center">
+                      <span className="text-white font-bold text-xs">SC</span>
+                    </div>
+                    <span className="text-sm font-medium">SoundCloud</span>
+                  </a>
+
+                  <a 
+                    href="https://x.com/Tinnie_House"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center space-x-3 p-3 rounded-lg bg-background/20 hover:bg-background/30 transition-colors border border-white/10"
+                  >
+                    <div className="w-8 h-8 bg-gradient-to-r from-slate-700 to-slate-900 rounded flex items-center justify-center">
+                      <span className="text-white font-bold text-xs">X</span>
+                    </div>
+                    <span className="text-sm font-medium">Twitter</span>
+                  </a>
+
+                  <a 
+                    href="https://www.facebook.com/TinnieHouse/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center space-x-3 p-3 rounded-lg bg-background/20 hover:bg-background/30 transition-colors border border-white/10"
+                  >
+                    <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-blue-800 rounded flex items-center justify-center">
+                      <span className="text-white font-bold text-xs">f</span>
+                    </div>
+                    <span className="text-sm font-medium">Facebook</span>
+                  </a>
+
+                  <a 
+                    href="https://www.instagram.com/tinnie_house_records/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center space-x-3 p-3 rounded-lg bg-background/20 hover:bg-background/30 transition-colors border border-white/10"
+                  >
+                    <div className="w-8 h-8 bg-gradient-to-r from-pink-500 to-purple-600 rounded flex items-center justify-center">
+                      <span className="text-white font-bold text-xs">IG</span>
+                    </div>
+                    <span className="text-sm font-medium">Instagram</span>
+                  </a>
+
+                  <a 
+                    href="https://www.junodownload.com/labels/Tinnie+House/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center space-x-3 p-3 rounded-lg bg-background/20 hover:bg-background/30 transition-colors border border-white/10"
+                  >
+                    <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-emerald-600 rounded flex items-center justify-center">
+                      <span className="text-white font-bold text-xs">J</span>
+                    </div>
+                    <span className="text-sm font-medium">Juno Download</span>
+                  </a>
+                </div>
+              </div>
+
+              <div className="blur-card p-8">
                 <h3 className="font-orbitron font-semibold text-lg mb-4 tracking-wide">Demo Submissions</h3>
                 <p className="text-sm text-muted-foreground mb-4">
                   Ready to share your electronic music with us? Please include:

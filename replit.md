@@ -4,6 +4,11 @@
 A modern electronic music label website built with React/Vite frontend and PostgreSQL database backend. The site features a complete homepage with hero section, release carousel, featured artists, about section, and contact form. Includes dark/light theme toggle and responsive design.
 
 ## Recent Changes
+- **June 14, 2025**: Added official social media and platform links
+  - Integrated 6 authentic platform links (Beatport, SoundCloud, Twitter, Facebook, Instagram, Juno Download)
+  - Created "Follow Us" section in contact area with branded color gradients
+  - Added proper hover effects and security attributes for external links
+  - Maintained consistent blur card styling with grid layout
 - **June 14, 2025**: Music player integration and content updates
   - Added audio_file_url column to database schema for music file storage
   - Integrated 5 authentic MP3 files (Rafa Kao, G.U.R.I tracks) with proper server routing
