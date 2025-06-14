@@ -19,13 +19,7 @@ export function ReleaseCarousel() {
     setCurrentSlide((prev) => (prev - 1 + releases.length) % Math.max(1, releases.length));
   };
 
-  // Auto-advance carousel
-  useEffect(() => {
-    if (releases.length > 1) {
-      const interval = setInterval(nextSlide, 5000);
-      return () => clearInterval(interval);
-    }
-  }, [releases.length]);
+  // Auto-advance disabled
 
   if (isLoading) {
     return (
