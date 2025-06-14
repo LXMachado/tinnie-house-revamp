@@ -17,7 +17,6 @@ export default function Home() {
   const { data: stormdrifterRelease } = useQuery<Release>({
     queryKey: ["/api/releases/latest"],
     staleTime: 0, // Always refetch to get latest data
-    cacheTime: 0, // Don't cache this query
   });
 
   const scrollToSection = (sectionId: string) => {

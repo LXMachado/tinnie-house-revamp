@@ -18,6 +18,9 @@ export function MusicPlayer({ audioUrl, title, artist, compact = false }: MusicP
   const [isMuted, setIsMuted] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
 
+  // Add cache-busting parameter to ensure fresh audio load
+  const cacheBustedUrl = `${audioUrl}?v=${Date.now()}`;
+
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
@@ -89,7 +92,7 @@ export function MusicPlayer({ audioUrl, title, artist, compact = false }: MusicP
   if (compact) {
     return (
       <div className="flex items-center space-x-2">
-        <audio ref={audioRef} src={audioUrl} preload="metadata" />
+        <audio ref={audioRef} src={cacheBustedUrl} preload="metadata" />
         <Button
           size="sm"
           onClick={togglePlay}
@@ -106,7 +109,7 @@ export function MusicPlayer({ audioUrl, title, artist, compact = false }: MusicP
 
   return (
     <div className="blur-card p-4 space-y-4">
-      <audio ref={audioRef} src={audioUrl} preload="metadata" />
+      <audio ref={audioRef} src={cacheBustedUrl} preload="metadata" />
       
       <div className="text-center">
         <h4 className="font-orbitron font-bold">{title}</h4>
