@@ -29,6 +29,7 @@ export interface IStorage {
   // Releases
   getReleases(): Promise<Release[]>;
   getFeaturedReleases(): Promise<Release[]>;
+  getCatalogReleases(): Promise<Release[]>;
   getRelease(id: number): Promise<Release | undefined>;
   createRelease(release: InsertRelease): Promise<Release>;
   
@@ -82,6 +83,10 @@ export class DatabaseStorage implements IStorage {
 
   async getFeaturedReleases(): Promise<Release[]> {
     return await db.select().from(releases).where(eq(releases.featured, true)).orderBy(desc(releases.releaseDate));
+  }
+
+  async getCatalogReleases(): Promise<Release[]> {
+    return await db.select().from(releases).where(eq(releases.upcoming, false)).orderBy(desc(releases.digitalReleaseDate));
   }
 
   async getRelease(id: number): Promise<Release | undefined> {

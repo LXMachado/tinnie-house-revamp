@@ -8,7 +8,7 @@ export function ReleaseCarousel() {
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const { data: releases = [], isLoading } = useQuery<Release[]>({
-    queryKey: ["/api/releases/featured"],
+    queryKey: ["/api/releases/catalog"],
   });
 
   const nextSlide = () => {
@@ -56,8 +56,8 @@ export function ReleaseCarousel() {
           <div key={release.id} className="group blur-card overflow-hidden transition-all duration-300">
             <div className="relative">
               <img 
-                src={release.coverImageUrl || "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600"} 
-                alt={`${release.title} album cover`}
+                src={release.coverImageUrl || release.coverFileName || "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600"} 
+                alt={`${release.title} by ${release.artist}`}
                 className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
               />
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors duration-300 flex items-center justify-center">
@@ -75,14 +75,14 @@ export function ReleaseCarousel() {
             <div className="p-6">
               <div className="flex items-center justify-between mb-3">
                 <span className="text-xs font-orbitron font-semibold text-blue-400 uppercase tracking-wider">
-                  {release.genre || "Electronic"}
+                  {release.musicStyle || "Electronic"}
                 </span>
                 <span className="text-xs text-muted-foreground font-orbitron">
-                  {release.releaseDate ? new Date(release.releaseDate).getFullYear() : "2024"}
+                  {release.digitalReleaseDate ? new Date(release.digitalReleaseDate).getFullYear() : "2024"}
                 </span>
               </div>
               <h3 className="font-orbitron font-bold text-lg mb-2">{release.title}</h3>
-              <p className="text-sm text-blue-400 mb-3 font-orbitron">by Artist</p>
+              <p className="text-sm text-blue-400 mb-3 font-orbitron">by {release.artist}</p>
               <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
                 {release.description || "An innovative electronic music release pushing the boundaries of underground sound."}
               </p>

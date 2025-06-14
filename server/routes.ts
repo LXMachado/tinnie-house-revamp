@@ -25,6 +25,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get catalog releases (non-upcoming)
+  app.get("/api/releases/catalog", async (req, res) => {
+    try {
+      const releases = await storage.getCatalogReleases();
+      res.json(releases);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch catalog releases" });
+    }
+  });
+
   // Get single release
   app.get("/api/releases/:id", async (req, res) => {
     try {
