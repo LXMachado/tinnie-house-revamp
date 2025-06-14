@@ -264,8 +264,8 @@ export default function Home() {
             
             <div className="relative">
               <img 
-                src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600" 
-                alt="Professional electronic music studio"
+                src="/attached_assets/thr_1749900375517.png" 
+                alt="Tinnie House Records Logo"
                 className="rounded-2xl release-glow"
               />
               
