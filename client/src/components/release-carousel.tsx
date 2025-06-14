@@ -56,7 +56,7 @@ export function ReleaseCarousel() {
           <div key={release.id} className="group blur-card overflow-hidden transition-all duration-300">
             <div className="relative">
               <img 
-                src={release.coverImageUrl || release.coverFileName || "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600"} 
+                src={release.imgUrl || release.coverImageUrl || "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600"} 
                 alt={`${release.title} by ${release.artist}`}
                 className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
               />
