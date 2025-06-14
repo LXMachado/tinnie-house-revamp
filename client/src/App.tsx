@@ -31,7 +31,7 @@ function Header() {
               alt="Tinnie House Records Logo" 
               className="w-8 h-8 object-contain"
             />
-            <span className="font-orbitron font-bold text-xl">Tinnie House Records</span>
+            <span className="font-orbitron font-bold text-xl tracking-wide">Tinnie House Records</span>
           </div>
         </div>
         
@@ -96,7 +96,7 @@ function Footer() {
                 alt="Tinnie House Records Logo" 
                 className="w-6 h-6 object-contain"
               />
-              <span className="font-orbitron font-bold">Tinnie House Records</span>
+              <span className="font-orbitron font-bold tracking-wide">Tinnie House Records</span>
             </div>
             <p className="text-sm text-muted-foreground">
               Pushing the boundaries of electronic music since 2020.
