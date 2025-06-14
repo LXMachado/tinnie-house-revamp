@@ -24,7 +24,7 @@ export default function Home() {
         <div className="absolute inset-0 grid-overlay opacity-20"></div>
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-500/5 to-blue-500/20"></div>
         <div className="container relative py-24 lg:py-32">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+          <div className="max-w-4xl mx-auto text-center">
             <div className="space-y-8 animate-fade-in">
               <div className="space-y-6">
                 <h1 className="font-orbitron text-5xl lg:text-7xl font-bold tracking-tight leading-tight">
@@ -35,12 +35,12 @@ export default function Home() {
                   </span>
                   <span className="block">ELECTRONIC MUSIC</span>
                 </h1>
-                <p className="text-lg text-muted-foreground max-w-lg leading-relaxed">
+                <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
                   Tinnie House Records is an independent label dedicated to showcasing innovative techno, melodic techno, and progressive house from Australia and beyond.
                 </p>
               </div>
               
-              <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button onClick={() => scrollToSection("releases")}>
                   Explore Releases
                 </Button>
@@ -49,7 +49,7 @@ export default function Home() {
                 </Button>
               </div>
 
-              <div className="flex items-center space-x-8 text-sm text-muted-foreground">
+              <div className="flex items-center justify-center space-x-8 text-sm text-muted-foreground">
                 <div className="flex items-center space-x-2">
                   <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                   <span>50+ Active Releases</span>
@@ -58,41 +58,6 @@ export default function Home() {
                   <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
                   <span>{artists.length || 12} Artists</span>
                 </div>
-              </div>
-            </div>
-
-            <div className="relative animate-fade-in float-animation" style={{ animationDelay: "0.2s" }}>
-              <div className="relative">
-                <div className="blur-card p-8 text-center">
-                  <img 
-                    src="/logo.png" 
-                    alt="Tinnie House Records Logo" 
-                    className="w-32 h-32 mx-auto mb-6 blue-glow"
-                  />
-                  <h2 className="font-orbitron text-2xl font-bold mb-4">
-                    GOLD COAST'S
-                    <span className="block">PREMIER</span>
-                    <span className="block text-blue-400">UNDERGROUND</span>
-                    <span className="block">ELECTRONIC</span>
-                    <span className="block">LABEL</span>
-                  </h2>
-                  <p className="text-sm text-muted-foreground mb-6">
-                    Founded in the heart of Australia's Gold Coast, Tinnie House Records has grown from local passion project into a respected platform for electronic music innovation.
-                  </p>
-                  <div className="grid grid-cols-3 gap-4 text-center">
-                    <div>
-                      <div className="text-blue-400 font-orbitron font-bold">Techno</div>
-                    </div>
-                    <div>
-                      <div className="text-blue-400 font-orbitron font-bold">Melodic Techno</div>
-                    </div>
-                    <div>
-                      <div className="text-blue-400 font-orbitron font-bold">Progressive House</div>
-                    </div>
-                  </div>
-                </div>
-                <div className="absolute -top-4 -right-4 w-16 h-16 bg-blue-500/20 rounded-full blur-xl pulse-glow"></div>
-                <div className="absolute -bottom-4 -left-4 w-12 h-12 bg-blue-600/30 rounded-full blur-lg pulse-glow"></div>
               </div>
             </div>
           </div>
