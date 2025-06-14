@@ -217,12 +217,13 @@ export default function Home() {
       </section>
 
       {/* Contact Section */}
-      <section id="contact" className="py-16 lg:py-24">
-        <div className="container max-w-4xl">
+      <section id="contact" className="py-16 lg:py-24 relative">
+        <div className="absolute inset-0 bg-gradient-to-t from-blue-500/10 to-transparent"></div>
+        <div className="container max-w-6xl relative">
           <div className="text-center mb-12">
-            <h2 className="font-orbitron text-3xl lg:text-4xl font-bold mb-4">Get In Touch</h2>
+            <h2 className="font-orbitron text-3xl lg:text-4xl font-bold mb-4 tracking-wide">BECOME PART OF OUR LABEL FAMILY</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Interested in working with us? Send us your demo or get in touch for collaboration opportunities.
+              We're always on the lookout for fresh talent and innovative sounds that push the boundaries of electronic music.
             </p>
           </div>
 
@@ -230,8 +231,26 @@ export default function Home() {
             <ContactForm />
 
             <div className="space-y-8">
-              <div className="bg-card border rounded-2xl p-8">
-                <h3 className="font-orbitron font-semibold text-lg mb-6">Contact Information</h3>
+              <div className="blur-card p-8">
+                <h3 className="font-orbitron font-semibold text-lg mb-6 tracking-wide">JOIN OUR COMMUNITY</h3>
+                
+                <div className="space-y-4 mb-8">
+                  <p className="text-sm text-muted-foreground">
+                    Sign up for exclusive updates on releases, events, and special announcements.
+                  </p>
+                  <div className="flex gap-3">
+                    <input 
+                      type="email" 
+                      placeholder="Your Email"
+                      className="flex-1 px-4 py-3 rounded-md bg-background/20 border border-white/10 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors backdrop-blur-sm"
+                    />
+                    <Button variant="default">Subscribe</Button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="blur-card p-8">
+                <h3 className="font-orbitron font-semibold text-lg mb-6 tracking-wide">Contact Information</h3>
                 
                 <div className="space-y-4">
                   <div className="flex items-start space-x-3">
@@ -260,8 +279,8 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="bg-card border rounded-2xl p-8">
-                <h3 className="font-orbitron font-semibold text-lg mb-4">Demo Submissions</h3>
+              <div className="blur-card p-8">
+                <h3 className="font-orbitron font-semibold text-lg mb-4 tracking-wide">Demo Submissions</h3>
                 <p className="text-sm text-muted-foreground mb-4">
                   Ready to share your electronic music with us? Please include:
                 </p>

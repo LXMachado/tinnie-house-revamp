@@ -159,7 +159,7 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider defaultTheme="light" storageKey="tinnie-house-theme">
+      <ThemeProvider defaultTheme="dark" storageKey="tinnie-house-theme">
         <TooltipProvider>
           <div className="min-h-screen flex flex-col">
             <Header />
