@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ChevronLeft, ChevronRight, Play, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { MusicPlayer } from "@/components/music-player";
 import type { Release } from "@shared/schema";
 
 export function ReleaseCarousel() {
