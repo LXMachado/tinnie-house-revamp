@@ -21,15 +21,30 @@ export const artists = pgTable("artists", {
 
 export const releases = pgTable("releases", {
   id: serial("id").primaryKey(),
+  bundleId: text("bundle_id").unique(),
   title: text("title").notNull(),
+  artist: text("artist").notNull(),
   artistId: integer("artist_id").references(() => artists.id),
-  description: text("description"),
-  genre: text("genre"),
-  releaseDate: timestamp("release_date"),
-  coverImageUrl: text("cover_image_url"),
+  labelId: text("label_id"),
+  label: text("label").default("Tinnie House Records"),
+  ean: text("ean"),
+  bundleType: text("bundle_type").default("Maxi Single"),
+  musicStyle: text("music_style").default("Melodic House & Techno"),
+  digitalReleaseDate: text("digital_release_date"),
+  published: text("published").default("Y"),
+  coverFileName: text("cover_file_name"),
+  coverImageUrl: text("cover_image_url"), // Main cover URL from CSV
+  imgUrl: text("img_url"), // Additional image URL
+  internalReference: text("internal_reference"),
+  coverFileHash: text("cover_file_hash"),
   trackCount: integer("track_count").default(1),
+  beatportSaleUrl: text("beatport_sale_url"),
   featured: boolean("featured").default(false),
+  upcoming: boolean("upcoming").default(false),
+  description: text("description"),
+  releaseDate: timestamp("release_date"),
   createdAt: timestamp("created_at").defaultNow(),
+  updateDate: timestamp("update_date"),
 });
 
 export const contactSubmissions = pgTable("contact_submissions", {

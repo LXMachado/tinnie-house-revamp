@@ -99,14 +99,87 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Latest Releases Section */}
+      {/* Featured Upcoming Release Section */}
       <section id="releases" className="py-16 lg:py-24 relative">
         <div className="absolute inset-0 bg-gradient-to-b from-blue-500/5 to-transparent"></div>
         <div className="container relative">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/20 text-blue-400 text-sm font-medium mb-4">
+              <Clock className="w-4 h-4" />
+              Coming Soon
+            </div>
+            <h2 className="font-orbitron text-3xl lg:text-4xl font-bold mb-4 tracking-wide">UPCOMING RELEASE</h2>
+          </div>
+
+          {/* Featured Release - Rafa Kao - Stormdrifter */}
+          <div className="max-w-4xl mx-auto mb-20">
+            <div className="blur-card overflow-hidden">
+              <div className="grid lg:grid-cols-2 gap-8 items-center">
+                <div className="relative aspect-square">
+                  <img 
+                    src="https://d2k8y339bkfb24.cloudfront.net/cover/65/0/10341902_80.jpg?v=3b531ef52be7a2d8175b78a97cbe042f" 
+                    alt="Rafa Kao - Stormdrifter"
+                    className="w-full h-full object-cover rounded-lg blue-glow"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent rounded-lg"></div>
+                  <div className="absolute bottom-4 left-4 right-4">
+                    <div className="flex items-center justify-between">
+                      <div className="bg-blue-600/30 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-medium">
+                        TH019
+                      </div>
+                      <div className="bg-green-600/30 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-medium">
+                        May 2025
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="space-y-6 p-6 lg:p-8">
+                  <div>
+                    <h3 className="font-orbitron text-2xl lg:text-3xl font-bold mb-2">STORMDRIFTER</h3>
+                    <p className="text-lg text-blue-400 font-medium mb-4">Rafa Kao</p>
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      <span className="px-3 py-1 bg-blue-500/20 rounded-full text-sm">Melodic House & Techno</span>
+                      <span className="px-3 py-1 bg-blue-500/20 rounded-full text-sm">Maxi Single</span>
+                    </div>
+                  </div>
+                  
+                  <p className="text-muted-foreground leading-relaxed">
+                    Get ready for an immersive journey through atmospheric soundscapes and driving rhythms. 
+                    Rafa Kao's latest masterpiece "Stormdrifter" showcases the evolving sound of Tinnie House Records 
+                    with its deep melodic progressions and hypnotic techno elements.
+                  </p>
+                  
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <Button className="flex-1">
+                      <Music className="w-4 h-4 mr-2" />
+                      Pre-Order Now
+                    </Button>
+                    <Button variant="outline" className="flex-1">
+                      Add to Wishlist
+                    </Button>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4 pt-4 border-t border-border/50">
+                    <div>
+                      <div className="text-sm text-muted-foreground">Release Date</div>
+                      <div className="font-medium">May 27, 2025</div>
+                    </div>
+                    <div>
+                      <div className="text-sm text-muted-foreground">Catalog</div>
+                      <div className="font-medium">TH019</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Other Releases Carousel */}
           <div className="text-center mb-12">
-            <h2 className="font-orbitron text-3xl lg:text-4xl font-bold mb-4 tracking-wide">LATEST RELEASES</h2>
+            <h3 className="font-orbitron text-2xl lg:text-3xl font-bold mb-4 tracking-wide">CATALOG RELEASES</h3>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Explore our newest electronic music releases from talented artists around the globe.
+              Explore our complete catalog of electronic music releases from our talented roster of artists.
             </p>
           </div>
 
@@ -114,7 +187,7 @@ export default function Home() {
 
           <div className="text-center mt-12">
             <Button variant="outline">
-              View All Releases
+              View Complete Catalog
             </Button>
           </div>
         </div>
