@@ -126,10 +126,12 @@ function Footer() {
           <div>
             <h3 className="font-semibold mb-4">Connect</h3>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><a href="#" className="hover:text-blue-500 transition-colors">Spotify</a></li>
-              <li><a href="#" className="hover:text-blue-500 transition-colors">Bandcamp</a></li>
-              <li><a href="#" className="hover:text-blue-500 transition-colors">Instagram</a></li>
-              <li><a href="#" className="hover:text-blue-500 transition-colors">Twitter</a></li>
+              <li><a href="https://www.beatport.com/label/tinnie-house-records/50650" target="_blank" rel="noopener noreferrer" className="hover:text-blue-500 transition-colors">Beatport</a></li>
+              <li><a href="https://soundcloud.com/tinniehouserecords" target="_blank" rel="noopener noreferrer" className="hover:text-blue-500 transition-colors">SoundCloud</a></li>
+              <li><a href="https://www.instagram.com/tinnie_house_records/" target="_blank" rel="noopener noreferrer" className="hover:text-blue-500 transition-colors">Instagram</a></li>
+              <li><a href="https://x.com/Tinnie_House" target="_blank" rel="noopener noreferrer" className="hover:text-blue-500 transition-colors">Twitter</a></li>
+              <li><a href="https://www.facebook.com/TinnieHouse/" target="_blank" rel="noopener noreferrer" className="hover:text-blue-500 transition-colors">Facebook</a></li>
+              <li><a href="https://www.junodownload.com/labels/Tinnie+House/" target="_blank" rel="noopener noreferrer" className="hover:text-blue-500 transition-colors">Juno Download</a></li>
             </ul>
           </div>
         </div>
