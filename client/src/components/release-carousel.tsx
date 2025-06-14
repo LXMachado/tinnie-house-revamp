@@ -56,14 +56,16 @@ export function ReleaseCarousel() {
                 className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
               />
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors duration-300 flex items-center justify-center">
-                <Button
-                  variant="default"
-                  size="sm"
-                  className="opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                >
-                  <Play className="h-4 w-4 mr-2" />
-                  Listen
-                </Button>
+                {release.audioFileUrl && (
+                  <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <MusicPlayer 
+                      audioUrl={release.audioFileUrl}
+                      title={release.title}
+                      artist={release.artist}
+                      compact={true}
+                    />
+                  </div>
+                )}
               </div>
             </div>
             
