@@ -1,19 +1,35 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Play, Users, MapPin, Clock, Mail, Phone, Instagram, Twitter, Music } from "lucide-react";
+import { Play, Pause, Users, MapPin, Clock, Mail, Phone, Instagram, Twitter, Music } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ReleaseCarousel } from "@/components/release-carousel";
 import { ContactForm } from "@/components/contact-form";
-import type { Artist } from "@shared/schema";
+import { MusicPlayer } from "@/components/music-player";
+import type { Artist, Release } from "@shared/schema";
 
 export default function Home() {
+  const [showMusicPlayer, setShowMusicPlayer] = useState(false);
+  
   const { data: artists = [], isLoading: artistsLoading } = useQuery<Artist[]>({
     queryKey: ["/api/artists"],
+  });
+
+  const { data: latestRelease } = useQuery<Release>({
+    queryKey: ["/api/releases/latest"],
   });
 
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
       element.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
+  const handleListenClick = () => {
+    if (latestRelease?.audioFileUrl) {
+      setShowMusicPlayer(true);
+    } else {
+      scrollToSection("releases");
     }
   };
 

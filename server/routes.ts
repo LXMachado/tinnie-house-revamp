@@ -35,6 +35,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get latest release with audio
+  app.get("/api/releases/latest", async (req, res) => {
+    try {
+      const release = await storage.getLatestReleaseWithAudio();
+      res.json(release);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch latest release" });
+    }
+  });
+
   // Get single release
   app.get("/api/releases/:id", async (req, res) => {
     try {

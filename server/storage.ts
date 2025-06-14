@@ -30,6 +30,7 @@ export interface IStorage {
   getReleases(): Promise<Release[]>;
   getFeaturedReleases(): Promise<Release[]>;
   getCatalogReleases(): Promise<Release[]>;
+  getLatestReleaseWithAudio(): Promise<Release | undefined>;
   getRelease(id: number): Promise<Release | undefined>;
   createRelease(release: InsertRelease): Promise<Release>;
   
