@@ -250,29 +250,12 @@ export default function Home() {
       {/* About Section */}
       <section id="about" className="py-16 lg:py-24 bg-muted/30">
         <div className="container">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <h2 className="font-orbitron text-3xl lg:text-4xl font-bold mb-6">About Tinnie House Records</h2>
-              <div className="space-y-4 text-muted-foreground">
-                <p>
-                  While we celebrate Australia's rich electronic heritage, we champion artists from every corner of the globe. Our passion spans techno, melodic techno, and progressive house, always seeking groundbreaking sounds that transcend borders and move both body and soul.
-                </p>
-              </div>
-              
-
-            </div>
-            
-            <div className="relative">
-              <img 
-                src="/attached_assets/thr_1749900375517.png" 
-                alt="Tinnie House Records Logo"
-                className="rounded-2xl release-glow"
-              />
-              
-              <div className="absolute -bottom-6 -left-6 bg-card border rounded-lg p-4 shadow-lg">
-                <div className="text-sm font-medium text-blue-500">Latest Achievement</div>
-                <div className="text-xs text-muted-foreground mt-1">Top 10 on Beatport Charts</div>
-              </div>
+          <div className="text-center max-w-4xl mx-auto">
+            <h2 className="font-orbitron text-3xl lg:text-4xl font-bold mb-6">About Tinnie House Records</h2>
+            <div className="space-y-4 text-muted-foreground">
+              <p className="text-lg">
+                While we celebrate Australia's rich electronic heritage, we champion artists from every corner of the globe. Our passion spans techno, melodic techno, and progressive house, always seeking groundbreaking sounds that transcend borders and move both body and soul.
+              </p>
             </div>
           </div>
         </div>
