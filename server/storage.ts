@@ -13,7 +13,7 @@ import {
   type InsertContactSubmission
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, isNotNull } from "drizzle-orm";
 
 export interface IStorage {
   // Users
@@ -88,6 +88,15 @@ export class DatabaseStorage implements IStorage {
 
   async getCatalogReleases(): Promise<Release[]> {
     return await db.select().from(releases).where(eq(releases.upcoming, false)).orderBy(desc(releases.digitalReleaseDate));
+  }
+
+  async getLatestReleaseWithAudio(): Promise<Release | undefined> {
+    const releaseList = await db.select()
+      .from(releases)
+      .orderBy(desc(releases.digitalReleaseDate));
+    
+    const releaseWithAudio = releaseList.find(release => release.audioFileUrl);
+    return releaseWithAudio || undefined;
   }
 
   async getRelease(id: number): Promise<Release | undefined> {

@@ -57,13 +57,43 @@ export default function Home() {
               </div>
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button onClick={() => scrollToSection("releases")}>
-                  Listen
+                <Button onClick={handleListenClick}>
+                  {latestRelease?.audioFileUrl ? (
+                    <>
+                      <Play className="w-4 h-4 mr-2" />
+                      Listen
+                    </>
+                  ) : (
+                    "Explore Releases"
+                  )}
                 </Button>
                 <Button variant="outline" onClick={() => scrollToSection("releases")}>
                   Explore Releases
                 </Button>
               </div>
+              
+              {/* Music Player Modal */}
+              {showMusicPlayer && latestRelease?.audioFileUrl && (
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                  <div className="bg-card rounded-2xl p-6 max-w-md w-full shadow-2xl">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="font-orbitron font-bold text-lg">Now Playing</h3>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => setShowMusicPlayer(false)}
+                      >
+                        ✕
+                      </Button>
+                    </div>
+                    <MusicPlayer 
+                      audioUrl={latestRelease.audioFileUrl}
+                      title={latestRelease.title}
+                      artist={latestRelease.artist}
+                    />
+                  </div>
+                </div>
+              )}
 
               <div className="flex items-center justify-center space-x-8 text-sm text-muted-foreground">
                 <div className="flex items-center space-x-2">
