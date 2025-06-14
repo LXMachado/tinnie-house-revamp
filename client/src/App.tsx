@@ -25,10 +25,12 @@ function Header() {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
         <div className="flex items-center space-x-4">
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-blue-500 rounded-sm flex items-center justify-center vinyl-spin">
-              <span className="text-white font-orbitron font-bold text-sm">TH</span>
-            </div>
+          <div className="flex items-center space-x-3">
+            <img 
+              src="/logo.png" 
+              alt="Tinnie House Records Logo" 
+              className="w-8 h-8 object-contain"
+            />
             <span className="font-orbitron font-bold text-xl">Tinnie House Records</span>
           </div>
         </div>
@@ -88,10 +90,12 @@ function Footer() {
       <div className="container py-12">
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
           <div className="space-y-4">
-            <div className="flex items-center space-x-2">
-              <div className="w-6 h-6 bg-blue-500 rounded-sm flex items-center justify-center">
-                <span className="text-white font-orbitron font-bold text-xs">TH</span>
-              </div>
+            <div className="flex items-center space-x-3">
+              <img 
+                src="/logo.png" 
+                alt="Tinnie House Records Logo" 
+                className="w-6 h-6 object-contain"
+              />
               <span className="font-orbitron font-bold">Tinnie House Records</span>
             </div>
             <p className="text-sm text-muted-foreground">
