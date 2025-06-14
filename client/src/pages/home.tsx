@@ -14,7 +14,7 @@ export default function Home() {
     queryKey: ["/api/artists"],
   });
 
-  const { data: latestRelease } = useQuery<Release>({
+  const { data: stormdrifterRelease } = useQuery<Release>({
     queryKey: ["/api/releases/latest"],
   });
 
@@ -26,8 +26,8 @@ export default function Home() {
   };
 
   const handleListenClick = () => {
-    if (latestRelease?.audioFileUrl) {
-      setShowMusicPlayer(true);
+    if (stormdrifterRelease?.audioFileUrl) {
+      setShowMusicPlayer(!showMusicPlayer);
     } else {
       scrollToSection("releases");
     }
@@ -58,9 +58,9 @@ export default function Home() {
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button onClick={handleListenClick}>
-                  {latestRelease?.audioFileUrl ? (
+                  {stormdrifterRelease?.audioFileUrl ? (
                     <>
-                      <Play className="w-4 h-4 mr-2" />
+                      {showMusicPlayer ? <Pause className="w-4 h-4 mr-2" /> : <Play className="w-4 h-4 mr-2" />}
                       Listen
                     </>
                   ) : (
@@ -72,24 +72,20 @@ export default function Home() {
                 </Button>
               </div>
               
-              {/* Music Player Modal */}
-              {showMusicPlayer && latestRelease?.audioFileUrl && (
-                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-                  <div className="bg-card rounded-2xl p-6 max-w-md w-full shadow-2xl">
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="font-orbitron font-bold text-lg">Now Playing</h3>
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => setShowMusicPlayer(false)}
-                      >
-                        ✕
-                      </Button>
+              {/* Inline Music Player */}
+              {showMusicPlayer && stormdrifterRelease?.audioFileUrl && (
+                <div className="mt-8 max-w-md mx-auto">
+                  <div className="blur-card p-6 rounded-2xl">
+                    <div className="text-center mb-4">
+                      <h3 className="font-orbitron font-bold text-lg">{stormdrifterRelease.title}</h3>
+                      <p className="text-blue-400 font-orbitron">{stormdrifterRelease.artist}</p>
+                      <p className="text-xs text-muted-foreground">Upcoming Release - June 30, 2025</p>
                     </div>
                     <MusicPlayer 
-                      audioUrl={latestRelease.audioFileUrl}
-                      title={latestRelease.title}
-                      artist={latestRelease.artist}
+                      audioUrl={stormdrifterRelease.audioFileUrl}
+                      title={stormdrifterRelease.title}
+                      artist={stormdrifterRelease.artist}
+                      compact={true}
                     />
                   </div>
                 </div>

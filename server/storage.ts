@@ -91,12 +91,11 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getLatestReleaseWithAudio(): Promise<Release | undefined> {
-    const releaseList = await db.select()
+    // Get Stormdrifter specifically for hero section
+    const [stormdrifter] = await db.select()
       .from(releases)
-      .orderBy(desc(releases.digitalReleaseDate));
-    
-    const releaseWithAudio = releaseList.find(release => release.audioFileUrl);
-    return releaseWithAudio || undefined;
+      .where(eq(releases.bundleId, '10341902'));
+    return stormdrifter || undefined;
   }
 
   async getRelease(id: number): Promise<Release | undefined> {
