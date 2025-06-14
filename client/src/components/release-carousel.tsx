@@ -83,19 +83,40 @@ export function ReleaseCarousel() {
               </div>
               <h3 className="font-orbitron font-bold text-lg mb-2">{release.title}</h3>
               <p className="text-sm text-blue-400 mb-3 font-orbitron">by {release.artist}</p>
-              <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-                {release.description || "An innovative electronic music release pushing the boundaries of underground sound."}
-              </p>
+              <div className="flex items-center justify-between text-xs text-muted-foreground mb-4">
+                <span className="font-orbitron">{release.internalReference}</span>
+                <span>{release.trackCount} track{release.trackCount !== 1 ? 's' : ''}</span>
+              </div>
               
-              <div className="flex items-center justify-between">
-                <Button variant="outline" size="sm">
-                  <Play className="h-3 w-3 mr-1" />
-                  Explore Release
+              <div className="flex items-center space-x-2">
+                {release.beatportSaleUrl ? (
+                  <Button 
+                    variant="default" 
+                    size="sm"
+                    className="flex-1"
+                    onClick={() => release.beatportSaleUrl && window.open(release.beatportSaleUrl!, '_blank')}
+                  >
+                    <Play className="h-3 w-3 mr-1" />
+                    Beatport
+                  </Button>
+                ) : (
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    className="flex-1"
+                    disabled
+                  >
+                    Coming Soon
+                  </Button>
+                )}
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  className="flex-1"
+                >
+                  <Star className="h-3 w-3 mr-1" />
+                  Save
                 </Button>
-                <div className="flex items-center space-x-2 text-xs text-muted-foreground">
-                  <Star className="w-4 h-4 fill-current text-blue-400" />
-                  <span className="font-orbitron">4.8</span>
-                </div>
               </div>
             </div>
           </div>

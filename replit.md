@@ -4,6 +4,13 @@
 A modern electronic music label website built with React/Vite frontend and PostgreSQL database backend. The site features a complete homepage with hero section, release carousel, featured artists, about section, and contact form. Includes dark/light theme toggle and responsive design.
 
 ## Recent Changes
+- **June 14, 2025**: Implemented authentic releases section with CSV data
+  - Added featured upcoming release "Rafa Kao - Stormdrifter" with May 2025 release date
+  - Created carousel with authentic catalog releases using real cover art URLs
+  - Integrated Beatport purchase links for available releases
+  - Added catalog numbers (TH019, TH018, etc.) and track count information
+  - Updated database schema to match CSV structure with all release metadata
+  - Fixed theme toggle functionality for proper light/dark mode switching
 - **December 14, 2024**: Complete design transformation to match original aesthetic
   - Updated logo and favicon with actual Tinnie House Records ram skull design
   - Implemented dark theme with deep blue gradient background (hsl(217, 91%, 60%))
