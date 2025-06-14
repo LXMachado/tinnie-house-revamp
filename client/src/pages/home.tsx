@@ -42,10 +42,10 @@ export default function Home() {
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button onClick={() => scrollToSection("releases")}>
-                  Explore Releases
+                  Listen
                 </Button>
-                <Button variant="outline" onClick={() => scrollToSection("artists")}>
-                  View Artists
+                <Button variant="outline" onClick={() => scrollToSection("releases")}>
+                  Explore Releases
                 </Button>
               </div>
 
