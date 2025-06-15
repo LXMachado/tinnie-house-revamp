@@ -118,7 +118,11 @@ export default function Home() {
                     <div className="text-center mb-4">
                       <h3 className="font-orbitron font-bold text-lg">{stormdrifterRelease.title}</h3>
                       <p className="text-blue-400 font-orbitron">{stormdrifterRelease.artist}</p>
-                      <p className="text-xs text-muted-foreground">Upcoming Release - June 30, 2025</p>
+                      {stormdrifterRelease.digitalReleaseDate && (
+                        <p className="text-xs text-muted-foreground">
+                          {stormdrifterRelease.purchaseLink ? 'Available Now' : `Coming ${stormdrifterRelease.digitalReleaseDate}`}
+                        </p>
+                      )}
                     </div>
                     <MusicPlayer 
                       audioUrl={stormdrifterRelease.audioFileUrl}
