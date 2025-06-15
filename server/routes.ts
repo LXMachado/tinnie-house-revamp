@@ -200,7 +200,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         new Promise((_, reject) => 
           setTimeout(() => reject(new Error('Database timeout')), 15000)
         )
-      ]);
+      ]) as any;
       res.status(201).json({ message: "Contact form submitted successfully", id: submission.id });
     } catch (error) {
       if (error instanceof z.ZodError) {
