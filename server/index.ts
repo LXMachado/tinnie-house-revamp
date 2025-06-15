@@ -125,28 +125,44 @@ app.use((req, res, next) => {
   // Start server with timeout and error handling
   const startServer = () => {
     return new Promise<void>((resolve, reject) => {
+      let resolved = false;
+      
       const serverInstance = server.listen(port, "0.0.0.0", () => {
-        log(`serving on port ${port} (bound to 0.0.0.0)`);
-        resolve();
+        if (!resolved) {
+          resolved = true;
+          log(`serving on port ${port} (bound to 0.0.0.0)`);
+          resolve();
+        }
       });
 
       serverInstance.on('error', (error: any) => {
-        if (error.code === 'EADDRINUSE') {
-          log(`Port ${port} is already in use`, "error");
-          reject(new Error(`Port ${port} is already in use`));
-        } else if (error.code === 'EACCES') {
-          log(`Permission denied on port ${port}`, "error");
-          reject(new Error(`Permission denied on port ${port}`));
-        } else {
-          log(`Server error: ${error.message}`, "error");
-          reject(error);
+        if (!resolved) {
+          resolved = true;
+          if (error.code === 'EADDRINUSE') {
+            log(`Port ${port} is already in use`, "error");
+            reject(new Error(`Port ${port} is already in use`));
+          } else if (error.code === 'EACCES') {
+            log(`Permission denied on port ${port}`, "error");
+            reject(new Error(`Permission denied on port ${port}`));
+          } else {
+            log(`Server error: ${error.message}`, "error");
+            reject(error);
+          }
         }
       });
 
       // Set timeout for server startup
-      setTimeout(() => {
-        reject(new Error('Server startup timeout'));
-      }, 30000); // 30 second timeout
+      const timeout = setTimeout(() => {
+        if (!resolved) {
+          resolved = true;
+          reject(new Error('Server startup timeout after 30 seconds'));
+        }
+      }, 30000);
+
+      // Clear timeout on successful start
+      serverInstance.on('listening', () => {
+        clearTimeout(timeout);
+      });
     });
   };
 

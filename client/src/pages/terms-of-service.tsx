@@ -1,83 +1,72 @@
-import { Link } from "wouter";
-import { ArrowLeft } from "lucide-react";
-import { Button } from "@/components/ui/button";
-
 export default function TermsOfService() {
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container max-w-4xl py-12">
-        <div className="mb-8">
-          <Link href="/">
-            <Button variant="outline" className="mb-4">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Home
-            </Button>
-          </Link>
-          <h1 className="font-orbitron text-4xl font-bold mb-4">Terms of Service</h1>
-          <p className="text-muted-foreground">Last updated: June 15, 2025</p>
-        </div>
+    <div className="min-h-screen py-24">
+      <div className="container max-w-4xl">
+        <div className="blur-card p-8 lg:p-12">
+          <h1 className="font-orbitron text-3xl lg:text-4xl font-bold mb-8 text-center">Terms of Service</h1>
+          
+          <div className="space-y-8 text-muted-foreground">
+            <section>
+              <h2 className="font-orbitron text-xl font-semibold mb-4 text-foreground">Agreement to Terms</h2>
+              <p>
+                By accessing and using the Tinnie House Records website and services, you accept and agree to be bound by the terms and provision of this agreement.
+              </p>
+            </section>
 
-        <div className="prose prose-lg dark:prose-invert max-w-none">
-          <section className="mb-8">
-            <h2 className="font-orbitron text-2xl font-semibold mb-4">1. Acceptance of Terms</h2>
-            <p className="mb-4">
-              By accessing and using the Tinnie House Records website, you accept and agree to be bound by 
-              the terms and provision of this agreement.
-            </p>
-          </section>
+            <section>
+              <h2 className="font-orbitron text-xl font-semibold mb-4 text-foreground">Music Submissions</h2>
+              <p className="mb-4">When submitting music demos to Tinnie House Records:</p>
+              <ul className="list-disc list-inside space-y-2 ml-4">
+                <li>You retain ownership of your submitted material</li>
+                <li>You grant us permission to review and evaluate your submissions</li>
+                <li>You confirm that you have the right to submit the material</li>
+                <li>We are not obligated to respond to or release submitted material</li>
+              </ul>
+            </section>
 
-          <section className="mb-8">
-            <h2 className="font-orbitron text-2xl font-semibold mb-4">2. Use of Website</h2>
-            <p className="mb-4">
-              You may use our website for lawful purposes only. You agree not to use the website in any way 
-              that could damage, disable, overburden, or impair our services.
-            </p>
-          </section>
+            <section>
+              <h2 className="font-orbitron text-xl font-semibold mb-4 text-foreground">Intellectual Property</h2>
+              <p>
+                All content on this website, including but not limited to music, artwork, logos, and text, is the property of Tinnie House Records and our artists. Unauthorized use is prohibited.
+              </p>
+            </section>
 
-          <section className="mb-8">
-            <h2 className="font-orbitron text-2xl font-semibold mb-4">3. Intellectual Property</h2>
-            <p className="mb-4">
-              All content on this website, including but not limited to music, artwork, text, and logos, 
-              is the property of Tinnie House Records or its licensors and is protected by copyright laws.
-            </p>
-          </section>
+            <section>
+              <h2 className="font-orbitron text-xl font-semibold mb-4 text-foreground">Prohibited Uses</h2>
+              <p className="mb-4">You may not use our service:</p>
+              <ul className="list-disc list-inside space-y-2 ml-4">
+                <li>For any unlawful purpose or to solicit others to perform unlawful acts</li>
+                <li>To violate any international, federal, provincial, or state regulations, rules, laws, or local ordinances</li>
+                <li>To infringe upon or violate our intellectual property rights or the intellectual property rights of others</li>
+                <li>To harass, abuse, insult, harm, defame, slander, disparage, intimidate, or discriminate</li>
+              </ul>
+            </section>
 
-          <section className="mb-8">
-            <h2 className="font-orbitron text-2xl font-semibold mb-4">4. Music Submissions</h2>
-            <p className="mb-4">
-              When you submit music or other materials to us:
-            </p>
-            <ul className="list-disc pl-6 mb-4">
-              <li>You retain ownership of your original work</li>
-              <li>You grant us permission to review and consider your submission</li>
-              <li>You represent that you have the right to submit the material</li>
-              <li>We are not obligated to respond to or sign any submission</li>
-            </ul>
-          </section>
+            <section>
+              <h2 className="font-orbitron text-xl font-semibold mb-4 text-foreground">Disclaimer</h2>
+              <p>
+                The information on this website is provided on an "as is" basis. To the fullest extent permitted by law, this Company excludes all representations, warranties, and conditions relating to our website and the use of this website.
+              </p>
+            </section>
 
-          <section className="mb-8">
-            <h2 className="font-orbitron text-2xl font-semibold mb-4">5. Limitation of Liability</h2>
-            <p className="mb-4">
-              Tinnie House Records shall not be liable for any indirect, incidental, special, consequential, 
-              or punitive damages arising out of your use of the website.
-            </p>
-          </section>
+            <section>
+              <h2 className="font-orbitron text-xl font-semibold mb-4 text-foreground">Changes to Terms</h2>
+              <p>
+                We reserve the right to revise these terms of service at any time without notice. By using this website, you are agreeing to be bound by the then current version of these terms of service.
+              </p>
+            </section>
 
-          <section className="mb-8">
-            <h2 className="font-orbitron text-2xl font-semibold mb-4">6. Modifications</h2>
-            <p className="mb-4">
-              We reserve the right to modify these terms at any time. Changes will be posted on this page 
-              with an updated revision date.
-            </p>
-          </section>
+            <section>
+              <h2 className="font-orbitron text-xl font-semibold mb-4 text-foreground">Contact Information</h2>
+              <p>
+                If you have any questions about these Terms of Service, please contact us through our contact form.
+              </p>
+            </section>
 
-          <section className="mb-8">
-            <h2 className="font-orbitron text-2xl font-semibold mb-4">7. Contact Information</h2>
-            <p className="mb-4">
-              If you have any questions about these Terms of Service, please contact us through our 
-              website's contact form.
-            </p>
-          </section>
+            <section className="text-sm text-center border-t border-border/50 pt-6">
+              <p>Last updated: June 15, 2025</p>
+            </section>
+          </div>
         </div>
       </div>
     </div>
