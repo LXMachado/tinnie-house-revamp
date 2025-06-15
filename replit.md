@@ -5,15 +5,17 @@ A modern electronic music label website built with React/Vite frontend and Postg
 
 ## Recent Changes
 - **June 15, 2025**: Applied comprehensive deployment fixes for production readiness
-  - Fixed server interface binding to use 0.0.0.0 (already configured)
+  - Fixed server interface binding to use 0.0.0.0 with explicit port/host configuration
   - Added graceful shutdown handling with SIGTERM/SIGINT signal listeners
-  - Implemented comprehensive error handling wrapper without crash-inducing errors
-  - Added async operation timeouts (10s for reads, 15s for writes) across all API endpoints
-  - Created health check endpoint (/health) for deployment monitoring
-  - Added uncaught exception and unhandled rejection handlers
-  - Enhanced server startup with 30-second timeout and proper error logging
-  - Added input validation for numeric parameters (artist/release IDs)
-  - Improved error logging with detailed console output for debugging
+  - Implemented comprehensive async error handling wrapper (asyncHandler) for all API endpoints
+  - Added timeout wrapper (withTimeout) for all database operations (10s reads, 15s writes)
+  - Enhanced health check endpoint with detailed system information and error handling
+  - Modified uncaught exception handlers to not exit in production environment
+  - Enhanced server startup with 30-second timeout and comprehensive error logging
+  - Added input validation for all numeric parameters and improved error responses
+  - Created missing legal policy pages (Privacy Policy, Terms of Service, Cookie Policy)
+  - Updated all API endpoints to use standardized error handling and timeout mechanisms
+  - Added detailed error logging with timestamps and development stack traces
 - **June 15, 2025**: Added YouTube channel to social media links
   - Integrated YouTube channel (https://www.youtube.com/@tinniehouserecords3141) in footer
   - Positioned between SoundCloud and Instagram for logical platform flow

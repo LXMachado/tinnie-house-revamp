@@ -59,7 +59,11 @@ app.use((req, res, next) => {
 
     // Send error response if not already sent
     if (!res.headersSent) {
-      res.status(status).json({ message });
+      res.status(status).json({ 
+        error: message,
+        timestamp: new Date().toISOString(),
+        ...(process.env.NODE_ENV === "development" && { stack: err.stack })
+      });
     }
 
     // Don't throw the error in production to prevent crashes

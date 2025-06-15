@@ -104,85 +104,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
   }));
 
   // Get single artist
-  app.get("/api/artists/:id", async (req, res) => {
-    try {
-      const id = parseInt(req.params.id);
-      if (isNaN(id)) {
-        return res.status(400).json({ error: "Invalid artist ID" });
-      }
-      
-      const artist = await Promise.race([
-        storage.getArtist(id),
-        new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Database timeout')), 10000)
-        )
-      ]);
-      
-      if (!artist) {
-        return res.status(404).json({ error: "Artist not found" });
-      }
-      res.json(artist);
-    } catch (error) {
-      console.error('Error fetching artist:', error);
-      res.status(500).json({ error: "Failed to fetch artist" });
+  app.get("/api/artists/:id", asyncHandler(async (req, res) => {
+    const id = parseInt(req.params.id);
+    if (isNaN(id)) {
+      return res.status(400).json({ error: "Invalid artist ID" });
     }
-  });
+    
+    const artist = await withTimeout(storage.getArtist(id), 10000);
+    
+    if (!artist) {
+      return res.status(404).json({ error: "Artist not found" });
+    }
+    res.json(artist);
+  }));
 
   // Create new artist
-  app.post("/api/artists", async (req, res) => {
-    try {
-      const validatedData = insertArtistSchema.parse(req.body);
-      const artist = await Promise.race([
-        storage.createArtist(validatedData),
-        new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Database timeout')), 15000)
-        )
-      ]);
-      res.status(201).json(artist);
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        return res.status(400).json({ error: "Invalid data", details: error.errors });
-      }
-      console.error('Error creating artist:', error);
-      res.status(500).json({ error: "Failed to create artist" });
-    }
-  });
+  app.post("/api/artists", asyncHandler(async (req, res) => {
+    const validatedData = insertArtistSchema.parse(req.body);
+    const artist = await withTimeout(storage.createArtist(validatedData), 15000);
+    res.status(201).json(artist);
+  }));
 
   // Submit contact form
-  app.post("/api/contact", async (req, res) => {
-    try {
-      const validatedData = insertContactSubmissionSchema.parse(req.body);
-      const submission = await Promise.race([
-        storage.createContactSubmission(validatedData),
-        new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Database timeout')), 15000)
-        )
-      ]) as any;
-      res.status(201).json({ message: "Contact form submitted successfully", id: submission.id });
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        return res.status(400).json({ error: "Invalid data", details: error.errors });
-      }
-      console.error('Error submitting contact form:', error);
-      res.status(500).json({ error: "Failed to submit contact form" });
-    }
-  });
+  app.post("/api/contact", asyncHandler(async (req, res) => {
+    const validatedData = insertContactSubmissionSchema.parse(req.body);
+    const submission = await withTimeout(storage.createContactSubmission(validatedData), 15000);
+    res.status(201).json({ message: "Contact form submitted successfully", id: submission.id });
+  }));
 
   // Get contact submissions (admin only)
-  app.get("/api/contact", async (req, res) => {
-    try {
-      const submissions = await Promise.race([
-        storage.getContactSubmissions(),
-        new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Database timeout')), 10000)
-        )
-      ]);
-      res.json(submissions);
-    } catch (error) {
-      console.error('Error fetching contact submissions:', error);
-      res.status(500).json({ error: "Failed to fetch contact submissions" });
-    }
-  });
+  app.get("/api/contact", asyncHandler(async (req, res) => {
+    const submissions = await withTimeout(storage.getContactSubmissions(), 10000);
+    res.json(submissions);
+  }));
 
   const httpServer = createServer(app);
   return httpServer;
