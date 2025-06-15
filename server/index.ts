@@ -101,17 +101,21 @@ app.use((req, res, next) => {
   process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
   process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 
-  // Handle uncaught exceptions
+  // Handle uncaught exceptions - don't exit in production
   process.on('uncaughtException', (error) => {
     log(`Uncaught Exception: ${error.message}`, "error");
     console.error(error.stack);
-    process.exit(1);
+    if (process.env.NODE_ENV !== "production") {
+      process.exit(1);
+    }
   });
 
-  // Handle unhandled promise rejections
+  // Handle unhandled promise rejections - don't exit in production
   process.on('unhandledRejection', (reason, promise) => {
     log(`Unhandled Rejection at: ${promise}, reason: ${reason}`, "error");
-    process.exit(1);
+    if (process.env.NODE_ENV !== "production") {
+      process.exit(1);
+    }
   });
 
   // Start server with timeout and error handling
