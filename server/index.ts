@@ -47,12 +47,25 @@ app.use((req, res, next) => {
 (async () => {
   const server = await registerRoutes(app);
 
-  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+  app.use((err: any, _req: Request, res: Response, next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";
 
-    res.status(status).json({ message });
-    throw err;
+    // Log the error for debugging
+    log(`Error ${status}: ${message}`, "error");
+    if (err.stack) {
+      console.error(err.stack);
+    }
+
+    // Send error response if not already sent
+    if (!res.headersSent) {
+      res.status(status).json({ message });
+    }
+
+    // Don't throw the error in production to prevent crashes
+    if (process.env.NODE_ENV !== "production") {
+      next(err);
+    }
   });
 
   // importantly only setup vite in development and after
@@ -68,11 +81,80 @@ app.use((req, res, next) => {
   // this serves both the API and the client.
   // It is the only port that is not firewalled.
   const port = 5000;
-  server.listen({
-    port,
-    host: "0.0.0.0",
-    reusePort: true,
-  }, () => {
-    log(`serving on port ${port}`);
+  
+  // Add graceful shutdown handling
+  const gracefulShutdown = (signal: string) => {
+    log(`Received ${signal}. Graceful shutdown...`, "server");
+    server.close(() => {
+      log("HTTP server closed.", "server");
+      process.exit(0);
+    });
+    
+    // Force close after 10 seconds
+    setTimeout(() => {
+      log("Could not close connections in time, forcefully shutting down", "error");
+      process.exit(1);
+    }, 10000);
+  };
+
+  // Listen for termination signals
+  process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+  process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+
+  // Handle uncaught exceptions
+  process.on('uncaughtException', (error) => {
+    log(`Uncaught Exception: ${error.message}`, "error");
+    console.error(error.stack);
+    process.exit(1);
   });
-})();
+
+  // Handle unhandled promise rejections
+  process.on('unhandledRejection', (reason, promise) => {
+    log(`Unhandled Rejection at: ${promise}, reason: ${reason}`, "error");
+    process.exit(1);
+  });
+
+  // Start server with timeout and error handling
+  const startServer = () => {
+    return new Promise<void>((resolve, reject) => {
+      const serverInstance = server.listen({
+        port,
+        host: "0.0.0.0",
+        reusePort: true,
+      }, () => {
+        log(`serving on port ${port}`);
+        resolve();
+      });
+
+      serverInstance.on('error', (error: any) => {
+        if (error.code === 'EADDRINUSE') {
+          log(`Port ${port} is already in use`, "error");
+          reject(new Error(`Port ${port} is already in use`));
+        } else {
+          log(`Server error: ${error.message}`, "error");
+          reject(error);
+        }
+      });
+
+      // Set timeout for server startup
+      setTimeout(() => {
+        reject(new Error('Server startup timeout'));
+      }, 30000); // 30 second timeout
+    });
+  };
+
+  try {
+    await startServer();
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    log(`Failed to start server: ${errorMessage}`, "error");
+    process.exit(1);
+  }
+})().catch((error) => {
+  const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+  log(`Application startup failed: ${errorMessage}`, "error");
+  if (error instanceof Error && error.stack) {
+    console.error(error.stack);
+  }
+  process.exit(1);
+});

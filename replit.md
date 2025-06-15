@@ -4,6 +4,16 @@
 A modern electronic music label website built with React/Vite frontend and PostgreSQL database backend. The site features a complete homepage with hero section, release carousel, featured artists, about section, and contact form. Includes dark/light theme toggle and responsive design.
 
 ## Recent Changes
+- **June 15, 2025**: Applied comprehensive deployment fixes for production readiness
+  - Fixed server interface binding to use 0.0.0.0 (already configured)
+  - Added graceful shutdown handling with SIGTERM/SIGINT signal listeners
+  - Implemented comprehensive error handling wrapper without crash-inducing errors
+  - Added async operation timeouts (10s for reads, 15s for writes) across all API endpoints
+  - Created health check endpoint (/health) for deployment monitoring
+  - Added uncaught exception and unhandled rejection handlers
+  - Enhanced server startup with 30-second timeout and proper error logging
+  - Added input validation for numeric parameters (artist/release IDs)
+  - Improved error logging with detailed console output for debugging
 - **June 15, 2025**: Added YouTube channel to social media links
   - Integrated YouTube channel (https://www.youtube.com/@tinniehouserecords3141) in footer
   - Positioned between SoundCloud and Instagram for logical platform flow
