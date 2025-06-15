@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { ChevronLeft, ChevronRight, Play, Star } from "lucide-react";
+import { ChevronLeft, ChevronRight, Play, Share } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MusicPlayer } from "@/components/music-player";
 import type { Release } from "@shared/schema";
@@ -11,6 +11,31 @@ export function ReleaseCarousel() {
   const { data: releases = [], isLoading } = useQuery<Release[]>({
     queryKey: ["/api/releases/catalog"],
   });
+
+  const handleShare = async (release: Release) => {
+    const shareData = {
+      title: `${release.title} by ${release.artist}`,
+      text: `Check out this release from Tinnie House Records`,
+      url: release.beatportSaleUrl || window.location.href,
+    };
+
+    try {
+      if (navigator.share && navigator.canShare(shareData)) {
+        await navigator.share(shareData);
+      } else {
+        // Fallback: copy to clipboard
+        await navigator.clipboard.writeText(shareData.url);
+        // Could add a toast notification here
+      }
+    } catch (error) {
+      // Fallback: copy to clipboard
+      try {
+        await navigator.clipboard.writeText(shareData.url);
+      } catch (clipboardError) {
+        console.error('Failed to share or copy to clipboard');
+      }
+    }
+  };
 
   const nextSlide = () => {
     setCurrentSlide((prev) => (prev + 1) % Math.max(1, releases.length));
@@ -110,9 +135,10 @@ export function ReleaseCarousel() {
                   variant="outline" 
                   size="sm"
                   className="flex-1"
+                  onClick={() => handleShare(release)}
                 >
-                  <Star className="h-3 w-3 mr-1" />
-                  Save
+                  <Share className="h-3 w-3 mr-1" />
+                  Share
                 </Button>
               </div>
             </div>
