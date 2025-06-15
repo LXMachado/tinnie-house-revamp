@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Play, Pause, Users, MapPin, Clock, Mail, Phone, Instagram, Twitter, Music } from "lucide-react";
+import { Play, Pause, Users, MapPin, Clock, Mail, Phone, Instagram, Twitter, Music, Share, Calendar } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ReleaseCarousel } from "@/components/release-carousel";
 import { ContactForm } from "@/components/contact-form";
@@ -9,6 +10,7 @@ import type { Artist, Release } from "@shared/schema";
 
 export default function Home() {
   const [showMusicPlayer, setShowMusicPlayer] = useState(false);
+  const [showUpcomingModal, setShowUpcomingModal] = useState(false);
   
   const { data: artists = [], isLoading: artistsLoading } = useQuery<Artist[]>({
     queryKey: ["/api/artists"],
@@ -22,6 +24,64 @@ export default function Home() {
   // Check if the latest release is upcoming or current/past
   const isUpcoming = stormdrifterRelease?.releaseDate ? 
     new Date(stormdrifterRelease.releaseDate) > new Date() : true;
+
+  const isReleaseAvailable = () => {
+    if (!stormdrifterRelease) return false;
+    const releaseDate = stormdrifterRelease.releaseDate || stormdrifterRelease.digitalReleaseDate;
+    if (!releaseDate) return true;
+    return new Date(releaseDate) <= new Date();
+  };
+
+  const formatReleaseDate = () => {
+    if (!stormdrifterRelease) return "soon";
+    const releaseDate = stormdrifterRelease.releaseDate || stormdrifterRelease.digitalReleaseDate;
+    if (!releaseDate) return "soon";
+    return new Date(releaseDate).toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    });
+  };
+
+  const handleBuyClick = () => {
+    if (!isReleaseAvailable()) {
+      setShowUpcomingModal(true);
+      return;
+    }
+    
+    if (stormdrifterRelease?.beatportSaleUrl) {
+      window.open(stormdrifterRelease.beatportSaleUrl, '_blank');
+    }
+  };
+
+  const handleShareClick = async () => {
+    if (!isReleaseAvailable()) {
+      setShowUpcomingModal(true);
+      return;
+    }
+
+    if (!stormdrifterRelease) return;
+
+    const shareData = {
+      title: `${stormdrifterRelease.title} by ${stormdrifterRelease.artist}`,
+      text: `Check out this release from Tinnie House Records`,
+      url: stormdrifterRelease.beatportSaleUrl || window.location.href,
+    };
+
+    try {
+      if (navigator.share && navigator.canShare(shareData)) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(shareData.url);
+      }
+    } catch (error) {
+      try {
+        await navigator.clipboard.writeText(shareData.url);
+      } catch (clipboardError) {
+        console.error('Failed to share or copy to clipboard');
+      }
+    }
+  };
 
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
@@ -167,12 +227,13 @@ export default function Home() {
                   </p>
                   
                   <div className="flex flex-col sm:flex-row gap-4">
-                    <Button className="flex-1">
-                      <Music className="w-4 h-4 mr-2" />
-                      Pre-Order Now
+                    <Button className="flex-1" onClick={handleBuyClick}>
+                      <Play className="w-4 h-4 mr-2" />
+                      BUY
                     </Button>
-                    <Button variant="outline" className="flex-1">
-                      Add to Wishlist
+                    <Button variant="outline" className="flex-1" onClick={handleShareClick}>
+                      <Share className="w-4 h-4 mr-2" />
+                      SHARE
                     </Button>
                   </div>
                   
@@ -361,6 +422,41 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Upcoming Release Modal */}
+      <Dialog open={showUpcomingModal} onOpenChange={setShowUpcomingModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Calendar className="h-5 w-5 text-blue-500" />
+              Coming Soon
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            {stormdrifterRelease && (
+              <>
+                <div className="text-center">
+                  <h3 className="font-semibold text-lg">{stormdrifterRelease.title}</h3>
+                  <p className="text-sm text-muted-foreground">by {stormdrifterRelease.artist}</p>
+                </div>
+                <div className="text-center p-4 bg-muted/50 rounded-lg">
+                  <p className="text-sm">
+                    This release will be available on{" "}
+                    <span className="font-semibold text-blue-500">
+                      {formatReleaseDate()}
+                    </span>
+                  </p>
+                </div>
+                <div className="flex justify-center">
+                  <Button onClick={() => setShowUpcomingModal(false)}>
+                    Got it
+                  </Button>
+                </div>
+              </>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

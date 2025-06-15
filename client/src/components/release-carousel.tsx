@@ -1,55 +1,18 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { ChevronLeft, ChevronRight, Play, Share, Calendar } from "lucide-react";
+import { ChevronLeft, ChevronRight, Play, Share } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { MusicPlayer } from "@/components/music-player";
 import type { Release } from "@shared/schema";
 
 export function ReleaseCarousel() {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [showUpcomingModal, setShowUpcomingModal] = useState(false);
-  const [selectedRelease, setSelectedRelease] = useState<Release | null>(null);
 
   const { data: releases = [], isLoading } = useQuery<Release[]>({
     queryKey: ["/api/releases/catalog"],
   });
 
-  const isReleaseAvailable = (release: Release) => {
-    const releaseDate = release.releaseDate || release.digitalReleaseDate;
-    if (!releaseDate) return true; // If no date specified, assume available
-    return new Date(releaseDate) <= new Date();
-  };
-
-  const formatReleaseDate = (release: Release) => {
-    const releaseDate = release.releaseDate || release.digitalReleaseDate;
-    if (!releaseDate) return "soon";
-    return new Date(releaseDate).toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    });
-  };
-
-  const handleBuyClick = (release: Release) => {
-    if (!isReleaseAvailable(release)) {
-      setSelectedRelease(release);
-      setShowUpcomingModal(true);
-      return;
-    }
-    
-    if (release.beatportSaleUrl) {
-      window.open(release.beatportSaleUrl, '_blank');
-    }
-  };
-
   const handleShare = async (release: Release) => {
-    if (!isReleaseAvailable(release)) {
-      setSelectedRelease(release);
-      setShowUpcomingModal(true);
-      return;
-    }
-
     const shareData = {
       title: `${release.title} by ${release.artist}`,
       text: `Check out this release from Tinnie House Records`,
@@ -148,15 +111,26 @@ export function ReleaseCarousel() {
               </div>
               
               <div className="flex items-center space-x-2">
-                <Button 
-                  variant="default" 
-                  size="sm"
-                  className="flex-1"
-                  onClick={() => handleBuyClick(release)}
-                >
-                  <Play className="h-3 w-3 mr-1" />
-                  Buy
-                </Button>
+                {release.beatportSaleUrl ? (
+                  <Button 
+                    variant="default" 
+                    size="sm"
+                    className="flex-1"
+                    onClick={() => release.beatportSaleUrl && window.open(release.beatportSaleUrl!, '_blank')}
+                  >
+                    <Play className="h-3 w-3 mr-1" />
+                    Buy
+                  </Button>
+                ) : (
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    className="flex-1"
+                    disabled
+                  >
+                    Coming Soon
+                  </Button>
+                )}
                 <Button 
                   variant="outline" 
                   size="sm"
@@ -193,40 +167,7 @@ export function ReleaseCarousel() {
         </>
       )}
 
-      {/* Upcoming Release Modal */}
-      <Dialog open={showUpcomingModal} onOpenChange={setShowUpcomingModal}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Calendar className="h-5 w-5 text-blue-500" />
-              Coming Soon
-            </DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            {selectedRelease && (
-              <>
-                <div className="text-center">
-                  <h3 className="font-semibold text-lg">{selectedRelease.title}</h3>
-                  <p className="text-sm text-muted-foreground">by {selectedRelease.artist}</p>
-                </div>
-                <div className="text-center p-4 bg-muted/50 rounded-lg">
-                  <p className="text-sm">
-                    This release will be available on{" "}
-                    <span className="font-semibold text-blue-500">
-                      {formatReleaseDate(selectedRelease)}
-                    </span>
-                  </p>
-                </div>
-                <div className="flex justify-center">
-                  <Button onClick={() => setShowUpcomingModal(false)}>
-                    Got it
-                  </Button>
-                </div>
-              </>
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
+
     </div>
   );
 }
