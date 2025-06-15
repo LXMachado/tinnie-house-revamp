@@ -121,12 +121,8 @@ app.use((req, res, next) => {
   // Start server with timeout and error handling
   const startServer = () => {
     return new Promise<void>((resolve, reject) => {
-      const serverInstance = server.listen({
-        port,
-        host: "0.0.0.0",
-        reusePort: true,
-      }, () => {
-        log(`serving on port ${port}`);
+      const serverInstance = server.listen(port, "0.0.0.0", () => {
+        log(`serving on port ${port} (bound to 0.0.0.0)`);
         resolve();
       });
 
@@ -134,6 +130,9 @@ app.use((req, res, next) => {
         if (error.code === 'EADDRINUSE') {
           log(`Port ${port} is already in use`, "error");
           reject(new Error(`Port ${port} is already in use`));
+        } else if (error.code === 'EACCES') {
+          log(`Permission denied on port ${port}`, "error");
+          reject(new Error(`Permission denied on port ${port}`));
         } else {
           log(`Server error: ${error.message}`, "error");
           reject(error);

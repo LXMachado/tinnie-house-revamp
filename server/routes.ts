@@ -4,16 +4,41 @@ import { storage } from "./storage";
 import { insertContactSubmissionSchema, insertArtistSchema, insertReleaseSchema } from "@shared/schema";
 import { z } from "zod";
 
+// Async timeout wrapper for deployment readiness
+const withTimeout = <T>(promise: Promise<T>, timeoutMs: number): Promise<T> => {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) => 
+      setTimeout(() => reject(new Error(`Operation timeout after ${timeoutMs}ms`)), timeoutMs)
+    )
+  ]);
+};
+
+// Enhanced error handler for async operations
+const asyncHandler = (fn: (req: any, res: any, next: any) => Promise<any>) => {
+  return (req: any, res: any, next: any) => {
+    Promise.resolve(fn(req, res, next)).catch(next);
+  };
+};
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // Health check endpoint for deployment monitoring
   app.get("/health", (req, res) => {
-    res.status(200).json({ 
-      status: "healthy", 
-      timestamp: new Date().toISOString(),
-      uptime: process.uptime(),
-      memory: process.memoryUsage(),
-      version: process.version
-    });
+    try {
+      res.status(200).json({ 
+        status: "healthy", 
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime(),
+        memory: process.memoryUsage(),
+        version: process.version,
+        env: process.env.NODE_ENV || 'development'
+      });
+    } catch (error) {
+      res.status(500).json({ 
+        status: "unhealthy",
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
   });
 
   // Root endpoint
@@ -22,129 +47,61 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get all releases
-  app.get("/api/releases", async (req, res) => {
-    try {
-      const releases = await Promise.race([
-        storage.getReleases(),
-        new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Database timeout')), 10000)
-        )
-      ]);
-      res.json(releases);
-    } catch (error) {
-      console.error('Error fetching releases:', error);
-      res.status(500).json({ error: "Failed to fetch releases" });
-    }
-  });
+  app.get("/api/releases", asyncHandler(async (req, res) => {
+    const releases = await withTimeout(storage.getReleases(), 10000);
+    res.json(releases);
+  }));
 
   // Get featured releases
-  app.get("/api/releases/featured", async (req, res) => {
-    try {
-      const releases = await Promise.race([
-        storage.getFeaturedReleases(),
-        new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Database timeout')), 10000)
-        )
-      ]);
-      res.json(releases);
-    } catch (error) {
-      console.error('Error fetching featured releases:', error);
-      res.status(500).json({ error: "Failed to fetch featured releases" });
-    }
-  });
+  app.get("/api/releases/featured", asyncHandler(async (req, res) => {
+    const releases = await withTimeout(storage.getFeaturedReleases(), 10000);
+    res.json(releases);
+  }));
 
   // Get catalog releases (non-upcoming)
-  app.get("/api/releases/catalog", async (req, res) => {
-    try {
-      const releases = await Promise.race([
-        storage.getCatalogReleases(),
-        new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Database timeout')), 10000)
-        )
-      ]);
-      res.json(releases);
-    } catch (error) {
-      console.error('Error fetching catalog releases:', error);
-      res.status(500).json({ error: "Failed to fetch catalog releases" });
-    }
-  });
+  app.get("/api/releases/catalog", asyncHandler(async (req, res) => {
+    const releases = await withTimeout(storage.getCatalogReleases(), 10000);
+    res.json(releases);
+  }));
 
   // Get latest release with audio
-  app.get("/api/releases/latest", async (req, res) => {
-    try {
-      const release = await Promise.race([
-        storage.getLatestReleaseWithAudio(),
-        new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Database timeout')), 10000)
-        )
-      ]);
-      res.json(release);
-    } catch (error) {
-      console.error('Error fetching latest release:', error);
-      res.status(500).json({ error: "Failed to fetch latest release" });
+  app.get("/api/releases/latest", asyncHandler(async (req, res) => {
+    const release = await withTimeout(storage.getLatestReleaseWithAudio(), 10000);
+    
+    if (!release) {
+      return res.status(404).json({ error: "No latest release found" });
     }
-  });
+    
+    res.json(release);
+  }));
 
   // Get single release
-  app.get("/api/releases/:id", async (req, res) => {
-    try {
-      const id = parseInt(req.params.id);
-      if (isNaN(id)) {
-        return res.status(400).json({ error: "Invalid release ID" });
-      }
-      
-      const release = await Promise.race([
-        storage.getRelease(id),
-        new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Database timeout')), 10000)
-        )
-      ]);
-      
-      if (!release) {
-        return res.status(404).json({ error: "Release not found" });
-      }
-      res.json(release);
-    } catch (error) {
-      console.error('Error fetching release:', error);
-      res.status(500).json({ error: "Failed to fetch release" });
+  app.get("/api/releases/:id", asyncHandler(async (req, res) => {
+    const id = parseInt(req.params.id);
+    if (isNaN(id)) {
+      return res.status(400).json({ error: "Invalid release ID" });
     }
-  });
+    
+    const release = await withTimeout(storage.getRelease(id), 10000);
+    
+    if (!release) {
+      return res.status(404).json({ error: "Release not found" });
+    }
+    res.json(release);
+  }));
 
   // Create new release
-  app.post("/api/releases", async (req, res) => {
-    try {
-      const validatedData = insertReleaseSchema.parse(req.body);
-      const release = await Promise.race([
-        storage.createRelease(validatedData),
-        new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Database timeout')), 15000)
-        )
-      ]);
-      res.status(201).json(release);
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        return res.status(400).json({ error: "Invalid data", details: error.errors });
-      }
-      console.error('Error creating release:', error);
-      res.status(500).json({ error: "Failed to create release" });
-    }
-  });
+  app.post("/api/releases", asyncHandler(async (req, res) => {
+    const validatedData = insertReleaseSchema.parse(req.body);
+    const release = await withTimeout(storage.createRelease(validatedData), 15000);
+    res.status(201).json(release);
+  }));
 
   // Get all artists
-  app.get("/api/artists", async (req, res) => {
-    try {
-      const artists = await Promise.race([
-        storage.getArtists(),
-        new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Database timeout')), 10000)
-        )
-      ]);
-      res.json(artists);
-    } catch (error) {
-      console.error('Error fetching artists:', error);
-      res.status(500).json({ error: "Failed to fetch artists" });
-    }
-  });
+  app.get("/api/artists", asyncHandler(async (req, res) => {
+    const artists = await withTimeout(storage.getArtists(), 10000);
+    res.json(artists);
+  }));
 
   // Get single artist
   app.get("/api/artists/:id", async (req, res) => {
