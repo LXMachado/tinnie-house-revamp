@@ -232,7 +232,10 @@ export default function Home() {
           <ReleaseCarousel />
 
           <div className="text-center mt-12">
-            <Button variant="outline">
+            <Button 
+              variant="outline"
+              onClick={() => window.open('https://www.beatport.com/label/tinnie-house-records/50650', '_blank')}
+            >
               View Complete Catalog
             </Button>
           </div>
