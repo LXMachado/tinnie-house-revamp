@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Play, Pause, Users, MapPin, Clock, Mail, Phone, Instagram, Twitter, Music, Share, Calendar } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ReleaseCarousel } from "@/components/release-carousel";
 import { ContactForm } from "@/components/contact-form";
@@ -400,6 +400,9 @@ export default function Home() {
               <Calendar className="h-5 w-5 text-blue-500" />
               Coming Soon
             </DialogTitle>
+            <DialogDescription>
+              This release is not yet available for purchase or sharing.
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             {stormdrifterRelease && (
