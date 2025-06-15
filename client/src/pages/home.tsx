@@ -19,6 +19,10 @@ export default function Home() {
     staleTime: 0, // Always refetch to get latest data
   });
 
+  // Check if the latest release is upcoming or current/past
+  const isUpcoming = stormdrifterRelease?.releaseDate ? 
+    new Date(stormdrifterRelease.releaseDate) > new Date() : true;
+
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
@@ -112,11 +116,15 @@ export default function Home() {
         <div className="absolute inset-0 bg-gradient-to-b from-blue-500/5 to-transparent"></div>
         <div className="container relative">
           <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/20 text-blue-400 text-sm font-medium mb-4">
-              <Clock className="w-4 h-4" />
-              Coming Soon
-            </div>
-            <h2 className="font-orbitron text-3xl lg:text-4xl font-bold mb-4 tracking-wide">UPCOMING RELEASE</h2>
+            {isUpcoming && (
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/20 text-blue-400 text-sm font-medium mb-4">
+                <Clock className="w-4 h-4" />
+                Coming Soon
+              </div>
+            )}
+            <h2 className="font-orbitron text-3xl lg:text-4xl font-bold mb-4 tracking-wide">
+              {isUpcoming ? "UPCOMING RELEASE" : "SPOTLIGHT"}
+            </h2>
           </div>
 
           {/* Featured Release - Rafa Kao - Stormdrifter */}
@@ -345,7 +353,7 @@ export default function Home() {
                   </li>
                   <li className="flex items-center space-x-2">
                     <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
-                    <span>High-quality WAV or FLAC files</span>
+                    <span>SoundCloud links to get started – if your tracks catch our attention, we'll reach out for WAV files</span>
                   </li>
                 </ul>
               </div>
