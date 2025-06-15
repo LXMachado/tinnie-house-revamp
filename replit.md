@@ -4,6 +4,12 @@
 A modern electronic music label website built with React/Vite frontend and PostgreSQL database backend. The site features a complete homepage with hero section, release carousel, featured artists, about section, and contact form. Includes dark/light theme toggle and responsive design.
 
 ## Recent Changes
+- **June 14, 2025**: Final About section content and layout updates
+  - Updated About text to final version emphasizing Gold Coast roots and global reach
+  - Added demo submission call-to-action in About section
+  - Removed stats section (50+ Releases, 15 Artists, 4 Years)
+  - Removed logo image and achievement badge for cleaner layout
+  - Centered text-only layout for better readability
 - **June 14, 2025**: Added official social media and platform links
   - Integrated 6 authentic platform links (Beatport, SoundCloud, Twitter, Facebook, Instagram, Juno Download)
   - Created "Follow Us" section in contact area with branded color gradients

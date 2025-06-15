@@ -254,7 +254,13 @@ export default function Home() {
             <h2 className="font-orbitron text-3xl lg:text-4xl font-bold mb-6">About Tinnie House Records</h2>
             <div className="space-y-4 text-muted-foreground">
               <p className="text-lg">
+                Tinnie House Records is a cutting-edge electronic music label rooted in Australia's vibrant Gold Coast scene, championing the underground sounds that define tomorrow's dancefloors.
+              </p>
+              <p className="text-lg">
                 While we celebrate Australia's rich electronic heritage, we champion artists from every corner of the globe. Our passion spans techno, melodic techno, and progressive house, always seeking groundbreaking sounds that transcend borders and move both body and soul.
+              </p>
+              <p className="text-lg">
+                At Tinnie House Records, we're always hunting for the next breakthrough artist. Whether you're an established producer or just starting your journey, we want to hear what you've created. Send us your demos – your sound could be exactly what the world needs to hear next.
               </p>
             </div>
           </div>
