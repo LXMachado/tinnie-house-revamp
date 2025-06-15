@@ -4,6 +4,18 @@
 A modern electronic music label website built with React/Vite frontend and PostgreSQL database backend. The site features a complete homepage with hero section, release carousel, featured artists, about section, and contact form. Includes dark/light theme toggle and responsive design.
 
 ## Recent Changes
+- **June 15, 2025**: Added legal policy pages
+  - Created Privacy Policy, Terms of Service, and Cookie Policy pages
+  - Implemented proper routing with wouter Link components
+  - Added navigation links in footer with hover effects
+  - Included comprehensive legal coverage for data protection, copyright, and user rights
+  - All pages feature consistent styling with Orbitron font and dark theme support
+- **June 15, 2025**: Simplified release button logic to database-driven approach
+  - Added purchaseLink and shareLink fields to database schema
+  - Removed complex date checking logic completely
+  - BUY/SHARE buttons now check database fields instead of dates
+  - Shows "Coming Soon" modal when links are null/empty
+  - Made music player fully database-driven using actual latest release data
 - **June 14, 2025**: Final About section content and layout updates
   - Updated About text to final version emphasizing Gold Coast roots and global reach
   - Added demo submission call-to-action in About section
