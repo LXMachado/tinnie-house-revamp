@@ -21,51 +21,25 @@ export default function Home() {
     staleTime: 0, // Always refetch to get latest data
   });
 
-  // Check if the latest release is upcoming or current/past
-  const isUpcoming = stormdrifterRelease?.releaseDate ? 
-    new Date(stormdrifterRelease.releaseDate) > new Date() : true;
-
-  const isReleaseAvailable = () => {
-    if (!stormdrifterRelease) return false;
-    const releaseDate = stormdrifterRelease.releaseDate || stormdrifterRelease.digitalReleaseDate;
-    if (!releaseDate) return true;
-    return new Date(releaseDate) <= new Date();
-  };
-
-  const formatReleaseDate = () => {
-    if (!stormdrifterRelease) return "soon";
-    const releaseDate = stormdrifterRelease.releaseDate || stormdrifterRelease.digitalReleaseDate;
-    if (!releaseDate) return "soon";
-    return new Date(releaseDate).toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    });
-  };
-
   const handleBuyClick = () => {
-    if (!isReleaseAvailable()) {
+    if (!stormdrifterRelease?.purchaseLink) {
       setShowUpcomingModal(true);
       return;
     }
     
-    if (stormdrifterRelease?.beatportSaleUrl) {
-      window.open(stormdrifterRelease.beatportSaleUrl, '_blank');
-    }
+    window.open(stormdrifterRelease.purchaseLink, '_blank');
   };
 
   const handleShareClick = async () => {
-    if (!isReleaseAvailable()) {
+    if (!stormdrifterRelease?.shareLink) {
       setShowUpcomingModal(true);
       return;
     }
 
-    if (!stormdrifterRelease) return;
-
     const shareData = {
       title: `${stormdrifterRelease.title} by ${stormdrifterRelease.artist}`,
       text: `Check out this release from Tinnie House Records`,
-      url: stormdrifterRelease.beatportSaleUrl || window.location.href,
+      url: stormdrifterRelease.shareLink,
     };
 
     try {
@@ -176,14 +150,14 @@ export default function Home() {
         <div className="absolute inset-0 bg-gradient-to-b from-blue-500/5 to-transparent"></div>
         <div className="container relative">
           <div className="text-center mb-16">
-            {isUpcoming && (
+            {stormdrifterRelease && !stormdrifterRelease.purchaseLink && (
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/20 text-blue-400 text-sm font-medium mb-4">
                 <Clock className="w-4 h-4" />
                 Coming Soon
               </div>
             )}
             <h2 className="font-orbitron text-3xl lg:text-4xl font-bold mb-4 tracking-wide">
-              {isUpcoming ? "UPCOMING RELEASE" : "SPOTLIGHT"}
+              {stormdrifterRelease && !stormdrifterRelease.purchaseLink ? "UPCOMING RELEASE" : "SPOTLIGHT"}
             </h2>
           </div>
 
@@ -441,10 +415,7 @@ export default function Home() {
                 </div>
                 <div className="text-center p-4 bg-muted/50 rounded-lg">
                   <p className="text-sm">
-                    This release will be available on{" "}
-                    <span className="font-semibold text-blue-500">
-                      {formatReleaseDate()}
-                    </span>
+                    This release will be available soon
                   </p>
                 </div>
                 <div className="flex justify-center">

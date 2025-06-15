@@ -39,6 +39,8 @@ export const releases = pgTable("releases", {
   coverFileHash: text("cover_file_hash"),
   trackCount: integer("track_count").default(1),
   beatportSaleUrl: text("beatport_sale_url"),
+  purchaseLink: text("purchase_link"), // Link for purchasing (null/empty for upcoming)
+  shareLink: text("share_link"), // Link for sharing (null/empty for upcoming)
   audioFileUrl: text("audio_file_url"), // Path to the music file
   featured: boolean("featured").default(false),
   upcoming: boolean("upcoming").default(false),
