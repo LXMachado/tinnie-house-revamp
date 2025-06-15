@@ -1,4 +1,4 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, Link } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -9,6 +9,9 @@ import { Menu } from "lucide-react";
 import { useState } from "react";
 import Home from "@/pages/home";
 import NotFound from "@/pages/not-found";
+import PrivacyPolicy from "@/pages/privacy-policy";
+import TermsOfService from "@/pages/terms-of-service";
+import CookiePolicy from "@/pages/cookie-policy";
 
 function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -136,9 +139,9 @@ function Footer() {
         <div className="flex flex-col md:flex-row justify-between items-center pt-8 mt-8 border-t text-sm text-muted-foreground">
           <p>&copy; 2024 Tinnie House Records. All rights reserved.</p>
           <div className="flex space-x-6 mt-4 md:mt-0">
-            <a href="#" className="hover:text-blue-500 transition-colors">Privacy Policy</a>
-            <a href="#" className="hover:text-blue-500 transition-colors">Terms of Service</a>
-            <a href="#" className="hover:text-blue-500 transition-colors">Cookie Policy</a>
+            <Link href="/privacy-policy" className="hover:text-blue-500 transition-colors">Privacy Policy</Link>
+            <Link href="/terms-of-service" className="hover:text-blue-500 transition-colors">Terms of Service</Link>
+            <Link href="/cookie-policy" className="hover:text-blue-500 transition-colors">Cookie Policy</Link>
           </div>
         </div>
       </div>
@@ -150,6 +153,9 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={Home} />
+      <Route path="/privacy-policy" component={PrivacyPolicy} />
+      <Route path="/terms-of-service" component={TermsOfService} />
+      <Route path="/cookie-policy" component={CookiePolicy} />
       <Route component={NotFound} />
     </Switch>
   );
