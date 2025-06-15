@@ -4,6 +4,15 @@
 A modern electronic music label website built with React/Vite frontend and PostgreSQL database backend. The site features a complete homepage with hero section, release carousel, featured artists, about section, and contact form. Includes dark/light theme toggle and responsive design.
 
 ## Recent Changes
+- **June 15, 2025**: Created comprehensive README.md documentation
+  - Added complete project overview with feature descriptions
+  - Documented full technology stack and architecture
+  - Included setup instructions and API endpoint documentation
+  - Added troubleshooting guide and deployment guidelines
+  - Provided security features and performance optimization details
+- **June 15, 2025**: Added Beatport catalog link to "View Complete Catalog" button
+  - Button now opens official Tinnie House Records Beatport page in new tab
+  - Uses window.open() with _blank target for proper external linking
 - **June 15, 2025**: Applied comprehensive deployment fixes for production readiness
   - Fixed server interface binding to use 0.0.0.0 with explicit port/host configuration
   - Added graceful shutdown handling with SIGTERM/SIGINT signal listeners
