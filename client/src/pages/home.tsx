@@ -259,9 +259,7 @@ export default function Home() {
               <p className="text-lg">
                 While we celebrate Australia's rich electronic heritage, we champion artists from every corner of the globe. Our passion spans techno, melodic techno, and progressive house, always seeking groundbreaking sounds that transcend borders and move both body and soul.
               </p>
-              <p className="text-lg">
-                At Tinnie House Records, we're always hunting for the next breakthrough artist. Whether you're an established producer or just starting your journey, we want to hear what you've created. Send us your demos – your sound could be exactly what the world needs to hear next.
-              </p>
+
             </div>
           </div>
         </div>
@@ -274,7 +272,7 @@ export default function Home() {
           <div className="text-center mb-12">
             <h2 className="font-orbitron text-3xl lg:text-4xl font-bold mb-4 tracking-wide">BECOME PART OF OUR LABEL FAMILY</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              We're always on the lookout for fresh talent and innovative sounds that push the boundaries of electronic music.
+              At Tinnie House Records, we're always hunting for the next breakthrough artist. Whether you're an established producer or just starting your journey, we want to hear what you've created. Send us your demos – your sound could be exactly what the world needs to hear next.
             </p>
           </div>
 
