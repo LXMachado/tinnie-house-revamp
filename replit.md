@@ -4,6 +4,13 @@
 A modern electronic music label website built with React/Vite frontend and PostgreSQL database backend. The site features a complete homepage with hero section, release carousel, featured artists, about section, and contact form. Includes dark/light theme toggle and responsive design.
 
 ## Recent Changes
+- **June 15, 2025**: Added YouTube channel to social media links
+  - Integrated YouTube channel (https://www.youtube.com/@tinniehouserecords3141) in footer
+  - Positioned between SoundCloud and Instagram for logical platform flow
+  - Maintains consistent styling with hover effects and external link security
+- **June 15, 2025**: Cleaned up hero section statistics
+  - Removed "50+ Active Releases" and "12 Artists" statistics display
+  - Streamlined hero section for cleaner presentation
 - **June 15, 2025**: Added legal policy pages
   - Created Privacy Policy, Terms of Service, and Cookie Policy pages
   - Implemented proper routing with wouter Link components

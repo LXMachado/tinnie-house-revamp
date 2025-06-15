@@ -128,6 +128,7 @@ function Footer() {
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li><a href="https://www.beatport.com/label/tinnie-house-records/50650" target="_blank" rel="noopener noreferrer" className="hover:text-blue-500 transition-colors">Beatport</a></li>
               <li><a href="https://soundcloud.com/tinniehouserecords" target="_blank" rel="noopener noreferrer" className="hover:text-blue-500 transition-colors">SoundCloud</a></li>
+              <li><a href="https://www.youtube.com/@tinniehouserecords3141" target="_blank" rel="noopener noreferrer" className="hover:text-blue-500 transition-colors">YouTube</a></li>
               <li><a href="https://www.instagram.com/tinnie_house_records/" target="_blank" rel="noopener noreferrer" className="hover:text-blue-500 transition-colors">Instagram</a></li>
               <li><a href="https://x.com/Tinnie_House" target="_blank" rel="noopener noreferrer" className="hover:text-blue-500 transition-colors">Twitter</a></li>
               <li><a href="https://www.facebook.com/TinnieHouse/" target="_blank" rel="noopener noreferrer" className="hover:text-blue-500 transition-colors">Facebook</a></li>

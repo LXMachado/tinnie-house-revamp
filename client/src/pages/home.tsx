@@ -134,16 +134,7 @@ export default function Home() {
                 </div>
               )}
 
-              <div className="flex items-center justify-center space-x-8 text-sm text-muted-foreground">
-                <div className="flex items-center space-x-2">
-                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                  <span>50+ Active Releases</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-                  <span>{artists.length || 12} Artists</span>
-                </div>
-              </div>
+
             </div>
           </div>
         </div>
@@ -361,7 +352,7 @@ export default function Home() {
                     <MapPin className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
                     <div>
                       <div className="font-medium">Location</div>
-                      <div className="text-sm text-muted-foreground">Berlin, Germany</div>
+                      <div className="text-sm text-muted-foreground">Gold Coast, Australia</div>
                     </div>
                   </div>
 
