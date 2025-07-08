@@ -145,14 +145,14 @@ export default function Home() {
         <div className="absolute inset-0 bg-gradient-to-b from-blue-500/5 to-transparent"></div>
         <div className="container relative">
           <div className="text-center mb-16">
-            {stormdrifterRelease && !stormdrifterRelease.purchaseLink && (
+            {stormdrifterRelease && stormdrifterRelease.upcoming && (
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/20 text-blue-400 text-sm font-medium mb-4">
                 <Clock className="w-4 h-4" />
                 Coming Soon
               </div>
             )}
             <h2 className="font-orbitron text-3xl lg:text-4xl font-bold mb-4 tracking-wide">
-              {stormdrifterRelease && !stormdrifterRelease.purchaseLink ? "UPCOMING RELEASE" : "SPOTLIGHT"}
+              {stormdrifterRelease && stormdrifterRelease.upcoming ? "UPCOMING RELEASE" : "SPOTLIGHT"}
             </h2>
           </div>
 
