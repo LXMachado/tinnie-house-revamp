@@ -4,7 +4,7 @@ A modern, full-stack electronic music label website built with React, Express.js
 
 ## 🎵 Live Website
 
-Visit the live website: [Tinnie House Records](https://www.beatport.com/label/tinnie-house-records/50650)
+Visit the live website: [Tinnie House Records](https://www.tinniehouserecords.com.au)
 
 ## 🚀 Features
 
