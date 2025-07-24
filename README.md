@@ -4,7 +4,7 @@ A modern, full-stack electronic music label website built with React, Express.js
 
 ## 🎵 Live Website
 
-Visit the live website: [Tinnie House Records](https://www.tinniehouserecords.com.au)
+Visit the live website: [Tinnie House Records](http://tinniehouserecords.com.au/)
 
 ## 🚀 Features
 
