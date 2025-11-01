@@ -7,7 +7,7 @@ Frontend (React)     → Netlify (Static Hosting)
                     ↓
 Backend API (Node.js) → Railway (Free tier)
                     ↓
-Database (PostgreSQL) → Neon (Free tier)
+Database (PostgreSQL) → Supabase (Free tier)
 ```
 
 ## 💰 Cost Breakdown (Monthly)
@@ -16,16 +16,17 @@ Database (PostgreSQL) → Neon (Free tier)
 |---------|------------------|------|
 | **Netlify** | 100GB bandwidth, 300 build minutes | $0 |
 | **Railway** | $5 credit/month (~10M requests) | $0 |
-| **Neon** | 500MB storage, 1M reads/day | $0 |
+| **Supabase** | 500MB storage, 50K reads/day | $0 |
 | **Total** | **Perfect for <1,000 visitors** | **$0** |
 
 ## 🚀 Why This Combination?
 
-### ✅ Neon Database (Already Integrated!)
-- **Perfect fit**: You're already using `@neondatabase/serverless`
+### ✅ Supabase Database (Already Integrated!)
+- **Perfect fit**: You're already using `@supabase/supabase-js`
 - **Cost**: Completely free for your use case
 - **Performance**: Serverless PostgreSQL with instant scaling
 - **Connection pooling**: Built-in WebSocket support
+- **Additional features**: Built-in Auth, Storage, and Edge Functions
 
 ### ✅ Netlify Frontend Hosting
 - **Zero configuration**: Works perfectly with Vite + React
@@ -43,14 +44,14 @@ Database (PostgreSQL) → Neon (Free tier)
 
 **Free tier supports:**
 - ~10,000 monthly visitors
-- ~100MB database reads/day (Neon)
+- ~50K database reads/day (Supabase)
 - ~100GB bandwidth/month (Netlify)
 - Perfect for music label website with limited initial traffic
 
 ## 🔄 Migration Path
 
 When you grow beyond free tiers:
-1. **Neon**: $19/month for Pro (5GB storage)
+1. **Supabase**: $25/month for Pro (8GB storage)
 2. **Railway**: $5/month for Hobby tier
 3. **Netlify**: $19/month for Pro (unlimited bandwidth)
 
@@ -61,16 +62,20 @@ Total cost: $43/month vs $0 initially = **1000% ROI before paying!**
 - GitHub account (for code repository)
 - Accounts on [Railway](https://railway.app) and [Netlify](https://netlify.com)
 
-### Step 1: Set Up Neon Database (5 minutes)
+### Step 1: Set Up Supabase Database (5 minutes)
 
-1. **Create Neon account** at [neon.tech](https://neon.tech)
+1. **Create Supabase account** at [supabase.com](https://supabase.com)
 2. **Create new project**: 
    - Name: `tinnie-house-db`
    - Choose closest region (Sydney for AU)
    - Select "Free plan"
 3. **Get connection string**: 
+   - Go to Settings → Database
    - Copy the connection string from dashboard
-   - Format: `postgresql://username:password@ep-xxx-yyy.us-east-1.aws.neon.tech/tinnie-house?sslmode=require`
+   - Format: `postgresql://postgres:password@db.xxx.supabase.co:5432/postgres?sslmode=require`
+4. **Get API keys**: 
+   - Go to Settings → API
+   - Copy the anon/public key and service_role key
 
 ### Step 2: Deploy Backend to Railway (10 minutes)
 
@@ -78,7 +83,9 @@ Total cost: $43/month vs $0 initially = **1000% ROI before paying!**
 2. **Create new project**: Choose "Deploy from GitHub repo"
 3. **Add environment variables**:
    ```
-   DATABASE_URL=postgresql://username:password@ep-xxx-yyy.us-east-1.aws.neon.tech/tinnie-house?sslmode=require
+   DATABASE_URL=postgresql://postgres:password@db.xxx.supabase.co:5432/postgres?sslmode=require
+   SUPABASE_URL=https://xxx.supabase.co
+   SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
    NODE_ENV=production
    PORT=3000
    ```
@@ -131,17 +138,18 @@ npm run deploy:netlify  # Deploy only frontend
 ### Current Setup ($0/month)
 | Service | Usage | Cost |
 |---------|-------|------|
-| **Neon Database** | 500MB storage, 1M reads/day | $0 |
+| **Supabase Database** | 500MB storage, 50K reads/day | $0 |
 | **Railway Backend** | $5 credit/month (~10M requests) | $0 |
 | **Netlify Frontend** | 100GB bandwidth, 300 builds | $0 |
 | **Total** | | **$0** |
 
 ### When to Upgrade (Traffic Triggers)
 
-**Neon Upgrade Triggers:**
-- Storage > 500MB ($19/month for 5GB)
-- Reads > 1M/day ($19/month for 100M reads)
+**Supabase Upgrade Triggers:**
+- Storage > 500MB ($25/month for 8GB)
+- Reads > 50K/day ($25/month for 500K reads)
 - Need more concurrent connections
+- Need Auth/Storage/Edge Functions
 
 **Railway Upgrade Triggers:**
 - Using > $5 credit/month ($5/month for Hobby)
@@ -165,7 +173,7 @@ For simpler deployment, consider **Vercel** for everything:
 
 ## ✅ Final Checklist
 
-- [ ] Database deployed on Neon
+- [ ] Database deployed on Supabase
 - [ ] Backend deployed on Railway
 - [ ] Frontend deployed on Netlify
 - [ ] Environment variables configured
@@ -182,9 +190,10 @@ For simpler deployment, consider **Vercel** for everything:
 - Verify environment variables are set
 
 **Database connection issues:**
-- Double-check Neon connection string
+- Double-check Supabase connection string
 - Ensure SSL mode is 'require'
 - Test connection from local environment first
+- Verify SUPABASE_URL and SUPABASE_ANON_KEY are correct
 
 **Frontend not connecting to backend:**
 - Verify VITE_API_URL environment variable
