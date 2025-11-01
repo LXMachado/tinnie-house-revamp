@@ -11,9 +11,6 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// Serve audio files from attached_assets directory
-app.use('/assets', express.static(path.join(__dirname, '../attached_assets')));
-
 app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;

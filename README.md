@@ -169,22 +169,16 @@ The application will be available at `http://localhost:5000`
 - Tablet: `768px - 1024px`  
 - Desktop: `> 1024px`
 
-## 🔌 API Endpoints
+## 🔌 Data & Integrations
 
-### Releases
-- `GET /api/releases/latest` - Get the latest/featured release
-- `GET /api/releases/catalog` - Get all catalog releases
-- `GET /api/releases/featured` - Get featured releases
+### Static Releases & Artists
+- `/data/releases.json` - Catalog releases with CDN-backed audio paths
+- `/data/artists.json` - Featured artist roster metadata
 
-### Artists
-- `GET /api/artists` - Get all artists
-- `GET /api/artists/:id` - Get specific artist
+> Both files live in `client/public/data` and are deployed alongside the static bundle.
 
 ### Contact
-- `POST /api/contact` - Submit contact form
-
-### Audio Streaming
-- `GET /assets/:filename` - Stream audio files
+- `POST /api/contact` - Submit contact form (optional server/service integration)
 
 ## 🔐 Security Features
 
@@ -203,9 +197,9 @@ npm run build
 
 ### Environment Setup
 - Set `NODE_ENV=production`
-- Configure production database URL
-- Set up proper CORS origins
-- Configure session secrets
+- Configure `VITE_AUDIO_BASE=https://media.tinniehouserecords.com/audio`
+- Update object storage CORS to allow your domains
+- Configure session/contact secrets if a server-side contact handler is used
 
 ### Replit Deployment
 The project is configured for Replit Deployments with:
@@ -217,10 +211,9 @@ The project is configured for Replit Deployments with:
 
 ## 🎵 Audio Integration
 
-### Supported Formats
-- MP3 (primary)
-- WAV (fallback)
-- OGG (web optimization)
+### Delivery
+- Cloudflare R2-backed CDN (or compatible object storage)
+- `VITE_AUDIO_BASE` env var controls the audio host used by the player
 
 ### Audio Features
 - **Streaming**: Progressive loading for large files

@@ -6,20 +6,21 @@ import { Button } from "@/components/ui/button";
 import { ReleaseCarousel } from "@/components/release-carousel";
 import { ContactForm } from "@/components/contact-form";
 import { MusicPlayer } from "@/components/music-player";
-import type { Artist, Release } from "@shared/schema";
+import type { Artist, Release } from "@/types/content";
 
 export default function Home() {
   const [showMusicPlayer, setShowMusicPlayer] = useState(false);
   const [showUpcomingModal, setShowUpcomingModal] = useState(false);
   
   const { data: artists = [], isLoading: artistsLoading } = useQuery<Artist[]>({
-    queryKey: ["/api/artists"],
+    queryKey: ["/data/artists.json"],
   });
 
-  const { data: stormdrifterRelease } = useQuery<Release>({
-    queryKey: ["/api/releases/latest"],
-    staleTime: 0, // Always refetch to get latest data
+  const { data: releases = [] } = useQuery<Release[]>({
+    queryKey: ["/data/releases.json"],
   });
+
+  const stormdrifterRelease = releases.find((release) => release.isLatest) ?? releases[0];
 
   const handleBuyClick = () => {
     if (!stormdrifterRelease?.purchaseLink) {
@@ -65,7 +66,7 @@ export default function Home() {
   };
 
   const handleListenClick = () => {
-    if (stormdrifterRelease?.audioFileUrl) {
+    if (stormdrifterRelease?.audioFilePath) {
       setShowMusicPlayer(!showMusicPlayer);
     } else {
       scrollToSection("releases");
@@ -97,7 +98,7 @@ export default function Home() {
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button onClick={handleListenClick}>
-                  {stormdrifterRelease?.audioFileUrl ? (
+                  {stormdrifterRelease?.audioFilePath ? (
                     <>
                       {showMusicPlayer ? <Pause className="w-4 h-4 mr-2" /> : <Play className="w-4 h-4 mr-2" />}
                       Listen
@@ -112,7 +113,7 @@ export default function Home() {
               </div>
               
               {/* Inline Music Player */}
-              {showMusicPlayer && stormdrifterRelease?.audioFileUrl && (
+              {showMusicPlayer && stormdrifterRelease?.audioFilePath && (
                 <div className="mt-8 max-w-md mx-auto">
                   <div className="blur-card p-6 rounded-2xl">
                     <div className="text-center mb-4">
@@ -125,7 +126,7 @@ export default function Home() {
                       )}
                     </div>
                     <MusicPlayer 
-                      audioUrl={stormdrifterRelease.audioFileUrl}
+                      audioPath={stormdrifterRelease.audioFilePath}
                       title={stormdrifterRelease.title}
                       artist={stormdrifterRelease.artist}
                       compact={true}

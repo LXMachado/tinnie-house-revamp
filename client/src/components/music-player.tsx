@@ -3,20 +3,45 @@ import { Play, Pause, Volume2, VolumeX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 
+const audioBase = import.meta.env.VITE_AUDIO_BASE || "";
+
+const buildAudioSource = (audioPath: string): string => {
+  if (!audioPath) {
+    return "";
+  }
+
+  if (/^https?:\/\//i.test(audioPath)) {
+    return audioPath;
+  }
+
+  if (!audioBase) {
+    return audioPath;
+  }
+
+  const normalizedBase = audioBase.replace(/\/$/, "");
+  const encodedPath = audioPath
+    .split("/")
+    .map((segment) => encodeURIComponent(segment))
+    .join("/");
+
+  return `${normalizedBase}/${encodedPath}`;
+};
+
 interface MusicPlayerProps {
-  audioUrl: string;
+  audioPath: string;
   title: string;
   artist: string;
   compact?: boolean;
 }
 
-export function MusicPlayer({ audioUrl, title, artist, compact = false }: MusicPlayerProps) {
+export function MusicPlayer({ audioPath, title, artist, compact = false }: MusicPlayerProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(1);
   const [isMuted, setIsMuted] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
+  const audioUrl = buildAudioSource(audioPath);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -101,7 +126,9 @@ export function MusicPlayer({ audioUrl, title, artist, compact = false }: MusicP
   if (compact) {
     return (
       <div className="flex items-center space-x-2">
-        <audio ref={audioRef} src={audioUrl} preload="metadata" />
+        <audio ref={audioRef} preload="metadata">
+          {audioUrl && <source src={audioUrl} type="audio/mpeg" />}
+        </audio>
         <Button
           size="sm"
           onClick={togglePlay}
@@ -118,7 +145,9 @@ export function MusicPlayer({ audioUrl, title, artist, compact = false }: MusicP
 
   return (
     <div className="blur-card p-4 space-y-4">
-      <audio ref={audioRef} src={audioUrl} preload="metadata" />
+      <audio ref={audioRef} preload="metadata">
+        {audioUrl && <source src={audioUrl} type="audio/mpeg" />}
+      </audio>
       
       <div className="text-center">
         <h4 className="font-orbitron font-bold">{title}</h4>
