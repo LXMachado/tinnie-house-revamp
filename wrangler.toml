@@ -1,0 +1,36 @@
+name = "tinnie-house-records"
+main = "src/worker.ts"
+compatibility_date = "2023-12-18"
+
+[vars]
+NODE_ENV = "production"
+
+# Database configuration
+# Uncomment and configure based on your database setup
+# SUPABASE_URL = "your-supabase-url"
+# SUPABASE_ANON_KEY = "your-supabase-anon-key"
+# DATABASE_URL = "your-database-url"
+
+# API configuration
+API_VERSION = "1.0.0"
+
+# Comment out site configuration for now to avoid build errors
+# [site]
+# If you want to serve static files from Workers
+# bucket = "./client/dist"
+
+[build]
+command = "npm run build:worker"
+
+[build.environment]
+NODE_VERSION = "18"
+
+# Environment-specific configuration
+[env.production.vars]
+NODE_ENV = "production"
+
+[env.staging.vars]
+NODE_ENV = "staging"
+
+[env.development.vars]
+NODE_ENV = "development"
