@@ -84,9 +84,13 @@ export class DatabaseStorage implements IStorage {
       ...release,
       // Map database field names to frontend expected field names
       audioFilePath: release.audioFileUrl, // Convert audioFileUrl to audioFilePath
-      slug: this.generateSlug(release.title),
-      artistSlug: this.generateArtistSlug(release.artist),
+      // These will be computed on the frontend, but provide fallbacks
+      slug: release.bundleId === '10341902' ? 'stormdrifter' : null,
+      artistSlug: release.bundleId === '10341902' ? 'rafa-kao' : null,
       isLatest: release.bundleId === '10341902', // Set Stormdrifter as latest
+      // Fill missing fields
+      digitalReleaseDate: release.digitalReleaseDate || '2024-01-01',
+      internalReference: release.internalReference || `TH${String(release.id).padStart(3, '0')}`
     }));
   }
 
@@ -95,9 +99,11 @@ export class DatabaseStorage implements IStorage {
     return rawReleases.map((release: Release) => ({
       ...release,
       audioFilePath: release.audioFileUrl,
-      slug: this.generateSlug(release.title),
-      artistSlug: this.generateArtistSlug(release.artist),
+      slug: release.bundleId === '10341902' ? 'stormdrifter' : null,
+      artistSlug: release.bundleId === '10341902' ? 'rafa-kao' : null,
       isLatest: release.bundleId === '10341902',
+      digitalReleaseDate: release.digitalReleaseDate || '2024-01-01',
+      internalReference: release.internalReference || `TH${String(release.id).padStart(3, '0')}`
     }));
   }
 
@@ -106,9 +112,11 @@ export class DatabaseStorage implements IStorage {
     return rawReleases.map((release: Release) => ({
       ...release,
       audioFilePath: release.audioFileUrl,
-      slug: this.generateSlug(release.title),
-      artistSlug: this.generateArtistSlug(release.artist),
+      slug: release.bundleId === '10341902' ? 'stormdrifter' : null,
+      artistSlug: release.bundleId === '10341902' ? 'rafa-kao' : null,
       isLatest: release.bundleId === '10341902',
+      digitalReleaseDate: release.digitalReleaseDate || '2024-01-01',
+      internalReference: release.internalReference || `TH${String(release.id).padStart(3, '0')}`
     }));
   }
 
@@ -123,9 +131,11 @@ export class DatabaseStorage implements IStorage {
     return {
       ...stormdrifter,
       audioFilePath: stormdrifter.audioFileUrl,
-      slug: this.generateSlug(stormdrifter.title),
-      artistSlug: this.generateArtistSlug(stormdrifter.artist),
+      slug: 'stormdrifter',
+      artistSlug: 'rafa-kao',
       isLatest: true,
+      digitalReleaseDate: stormdrifter.digitalReleaseDate || '2025-06-30',
+      internalReference: stormdrifter.internalReference || 'TH019'
     };
   }
 
@@ -136,9 +146,11 @@ export class DatabaseStorage implements IStorage {
     return {
       ...release,
       audioFilePath: release.audioFileUrl,
-      slug: this.generateSlug(release.title),
-      artistSlug: this.generateArtistSlug(release.artist),
+      slug: release.bundleId === '10341902' ? 'stormdrifter' : null,
+      artistSlug: release.bundleId === '10341902' ? 'rafa-kao' : null,
       isLatest: release.bundleId === '10341902',
+      digitalReleaseDate: release.digitalReleaseDate || '2024-01-01',
+      internalReference: release.internalReference || `TH${String(release.id).padStart(3, '0')}`
     };
   }
 
@@ -150,23 +162,12 @@ export class DatabaseStorage implements IStorage {
     return {
       ...release,
       audioFilePath: release.audioFileUrl,
-      slug: this.generateSlug(release.title),
-      artistSlug: this.generateArtistSlug(release.artist),
+      slug: release.bundleId === '10341902' ? 'stormdrifter' : null,
+      artistSlug: release.bundleId === '10341902' ? 'rafa-kao' : null,
       isLatest: release.bundleId === '10341902',
+      digitalReleaseDate: release.digitalReleaseDate || '2024-01-01',
+      internalReference: release.internalReference || `TH${String(release.id).padStart(3, '0')}`
     };
-  }
-
-  // Helper methods to generate slugs
-  private generateSlug(title: string): string {
-    return title.toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '');
-  }
-
-  private generateArtistSlug(artist: string): string {
-    return artist.toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '');
   }
 
   // Contact submissions

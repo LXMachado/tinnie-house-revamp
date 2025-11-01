@@ -48,11 +48,6 @@ export const releases = pgTable("releases", {
   releaseDate: timestamp("release_date"),
   createdAt: timestamp("created_at").defaultNow(),
   updateDate: timestamp("update_date"),
-  // Frontend-specific fields
-  slug: text("slug"), // URL slug for routing
-  artistSlug: text("artist_slug"), // Artist URL slug
-  isLatest: boolean("is_latest").default(false), // Flag for latest release
-  audioFilePath: text("audio_file_path"), // Path for frontend audio player
 });
 
 export const contactSubmissions = pgTable("contact_submissions", {
