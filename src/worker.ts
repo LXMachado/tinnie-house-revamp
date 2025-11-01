@@ -1,8 +1,9 @@
 import { mapSupabaseArtists, mapSupabaseReleases, type Artist, type Release } from '../shared/data-mapper';
+import { STATIC_ARTISTS, STATIC_RELEASES } from '../shared/static-content';
 
 export interface Env {
-  SUPABASE_URL: string;
-  SUPABASE_ANON_KEY: string;
+  SUPABASE_URL?: string;
+  SUPABASE_ANON_KEY?: string;
   DATABASE_URL: string;
   NODE_ENV: string;
   API_VERSION: string;
@@ -10,6 +11,12 @@ export interface Env {
     fetch(request: Request): Promise<Response>;
   };
 }
+
+const hasSupabaseConfig = (env: Env): boolean =>
+  Boolean(env.SUPABASE_URL && env.SUPABASE_ANON_KEY);
+
+const cloneReleases = (): Release[] => STATIC_RELEASES.map((release) => ({ ...release }));
+const cloneArtists = (): Artist[] => STATIC_ARTISTS.map((artist) => ({ ...artist }));
 
 // Contact submission type
 interface ContactSubmission {
@@ -59,9 +66,13 @@ function errorResponse(message: string, status: number = 500, origin: string = '
 
 // Database helpers (using Supabase HTTP API)
 async function supabaseQuery(env: Env, table: string, operation: 'select' | 'insert' | 'update', data?: any, filters?: Record<string, any>) {
+  if (!env.SUPABASE_URL || !env.SUPABASE_ANON_KEY) {
+    throw new Error('Supabase configuration is missing');
+  }
+
   const supabaseUrl = env.SUPABASE_URL;
   const supabaseKey = env.SUPABASE_ANON_KEY;
-  
+
   let url = `${supabaseUrl.replace(/\/$/, '')}/rest/v1/${table}`;
   
   // Add filters for select operations
@@ -114,74 +125,148 @@ async function supabaseQuery(env: Env, table: string, operation: 'select' | 'ins
 // Storage operations (simplified for Workers)
 const Storage = {
   async getArtists(env: Env): Promise<Artist[]> {
-    const supabaseData = await supabaseQuery(env, 'artists', 'select');
-    // Return artists as-is since the frontend types don't have createdAt
-    return mapSupabaseArtists(supabaseData);
+    if (!hasSupabaseConfig(env)) {
+      return cloneArtists();
+    }
+
+    try {
+      const supabaseData = await supabaseQuery(env, 'artists', 'select');
+      return mapSupabaseArtists(supabaseData);
+    } catch (error) {
+      console.warn('Supabase artists query failed, using static data.', error);
+      return cloneArtists();
+    }
   },
 
   async getArtist(env: Env, id: number): Promise<Artist | null> {
-    const supabaseData = await supabaseQuery(env, 'artists', 'select', undefined, { id: id.toString() });
-    const mappedData = mapSupabaseArtists(supabaseData);
-    return mappedData[0] || null;
+    if (!hasSupabaseConfig(env)) {
+      return cloneArtists().find((artist) => artist.id === id) ?? null;
+    }
+
+    try {
+      const supabaseData = await supabaseQuery(env, 'artists', 'select', undefined, { id: id.toString() });
+      const mappedData = mapSupabaseArtists(supabaseData);
+      return mappedData[0] || null;
+    } catch (error) {
+      console.warn('Supabase artist query failed, using static data.', error);
+      return cloneArtists().find((artist) => artist.id === id) ?? null;
+    }
   },
 
   async createArtist(env: Env, artist: Omit<Artist, 'id'>): Promise<Artist> {
+    if (!hasSupabaseConfig(env)) {
+      throw new Error('Supabase configuration missing - cannot create artist.');
+    }
     const supabaseData = await supabaseQuery(env, 'artists', 'insert', artist);
     const mappedData = mapSupabaseArtists(supabaseData);
     return mappedData[0];
   },
 
   async getReleases(env: Env): Promise<Release[]> {
-    const supabaseData = await supabaseQuery(env, 'releases', 'select');
-    return mapSupabaseReleases(supabaseData).sort((a: Release, b: Release) => {
-      const dateA = new Date(a.digitalReleaseDate || 0).getTime();
-      const dateB = new Date(b.digitalReleaseDate || 0).getTime();
-      return dateB - dateA;
-    });
+    if (!hasSupabaseConfig(env)) {
+      return cloneReleases();
+    }
+
+    try {
+      const supabaseData = await supabaseQuery(env, 'releases', 'select');
+      return mapSupabaseReleases(supabaseData).sort((a: Release, b: Release) => {
+        const dateA = new Date(a.digitalReleaseDate || 0).getTime();
+        const dateB = new Date(b.digitalReleaseDate || 0).getTime();
+        return dateB - dateA;
+      });
+    } catch (error) {
+      console.warn('Supabase releases query failed, using static data.', error);
+      return cloneReleases();
+    }
   },
 
   async getFeaturedReleases(env: Env): Promise<Release[]> {
-    const supabaseData = await supabaseQuery(env, 'releases', 'select', undefined, { featured: 'true' });
-    return mapSupabaseReleases(supabaseData).sort((a: Release, b: Release) => {
-      const dateA = new Date(a.digitalReleaseDate || 0).getTime();
-      const dateB = new Date(b.digitalReleaseDate || 0).getTime();
-      return dateB - dateA;
-    });
+    if (!hasSupabaseConfig(env)) {
+      return cloneReleases().filter((release) => release.featured);
+    }
+
+    try {
+      const supabaseData = await supabaseQuery(env, 'releases', 'select', undefined, { featured: 'true' });
+      return mapSupabaseReleases(supabaseData).sort((a: Release, b: Release) => {
+        const dateA = new Date(a.digitalReleaseDate || 0).getTime();
+        const dateB = new Date(b.digitalReleaseDate || 0).getTime();
+        return dateB - dateA;
+      });
+    } catch (error) {
+      console.warn('Supabase featured releases query failed, using static data.', error);
+      return cloneReleases().filter((release) => release.featured);
+    }
   },
 
   async getCatalogReleases(env: Env): Promise<Release[]> {
-    const supabaseData = await supabaseQuery(env, 'releases', 'select', undefined, { upcoming: 'false' });
-    return mapSupabaseReleases(supabaseData).sort((a: Release, b: Release) => {
-      const dateA = new Date(a.digitalReleaseDate || 0).getTime();
-      const dateB = new Date(b.digitalReleaseDate || 0).getTime();
-      return dateB - dateA;
-    });
+    if (!hasSupabaseConfig(env)) {
+      return cloneReleases().filter((release) => !release.upcoming);
+    }
+
+    try {
+      const supabaseData = await supabaseQuery(env, 'releases', 'select', undefined, { upcoming: 'false' });
+      return mapSupabaseReleases(supabaseData).sort((a: Release, b: Release) => {
+        const dateA = new Date(a.digitalReleaseDate || 0).getTime();
+        const dateB = new Date(b.digitalReleaseDate || 0).getTime();
+        return dateB - dateA;
+      });
+    } catch (error) {
+      console.warn('Supabase catalog releases query failed, using static data.', error);
+      return cloneReleases().filter((release) => !release.upcoming);
+    }
   },
 
   async getLatestReleaseWithAudio(env: Env): Promise<Release | null> {
-    const supabaseData = await supabaseQuery(env, 'releases', 'select', undefined, { bundle_id: '10341902' });
-    const mappedData = mapSupabaseReleases(supabaseData);
-    return mappedData[0] || null;
+    if (!hasSupabaseConfig(env)) {
+      return cloneReleases().find((release) => release.isLatest) ?? null;
+    }
+
+    try {
+      const supabaseData = await supabaseQuery(env, 'releases', 'select', undefined, { bundle_id: '10341902' });
+      const mappedData = mapSupabaseReleases(supabaseData);
+      return mappedData[0] || null;
+    } catch (error) {
+      console.warn('Supabase latest release query failed, using static data.', error);
+      return cloneReleases().find((release) => release.isLatest) ?? null;
+    }
   },
 
   async getRelease(env: Env, id: number): Promise<Release | null> {
-    const supabaseData = await supabaseQuery(env, 'releases', 'select', undefined, { id: id.toString() });
-    const mappedData = mapSupabaseReleases(supabaseData);
-    return mappedData[0] || null;
+    if (!hasSupabaseConfig(env)) {
+      return cloneReleases().find((release) => release.id === id) ?? null;
+    }
+
+    try {
+      const supabaseData = await supabaseQuery(env, 'releases', 'select', undefined, { id: id.toString() });
+      const mappedData = mapSupabaseReleases(supabaseData);
+      return mappedData[0] || null;
+    } catch (error) {
+      console.warn('Supabase release query failed, using static data.', error);
+      return cloneReleases().find((release) => release.id === id) ?? null;
+    }
   },
 
   async createRelease(env: Env, release: Omit<Release, 'id'>): Promise<Release> {
+    if (!hasSupabaseConfig(env)) {
+      throw new Error('Supabase configuration missing - cannot create release.');
+    }
     const supabaseData = await supabaseQuery(env, 'releases', 'insert', release);
     const mappedData = mapSupabaseReleases(supabaseData);
     return mappedData[0];
   },
 
   async createContactSubmission(env: Env, submission: Omit<ContactSubmission, 'id' | 'createdAt' | 'status'>): Promise<ContactSubmission> {
+    if (!hasSupabaseConfig(env)) {
+      throw new Error('Supabase configuration missing - cannot create contact submission.');
+    }
     const supabaseData = await supabaseQuery(env, 'contact_submissions', 'insert', submission);
     return supabaseData[0];
   },
 
   async getContactSubmissions(env: Env): Promise<ContactSubmission[]> {
+    if (!hasSupabaseConfig(env)) {
+      return [];
+    }
     const supabaseData = await supabaseQuery(env, 'contact_submissions', 'select');
     return supabaseData.sort((a: ContactSubmission, b: ContactSubmission) =>
       new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
