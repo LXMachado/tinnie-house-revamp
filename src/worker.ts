@@ -1,3 +1,5 @@
+import { mapSupabaseArtists, mapSupabaseReleases, type Artist, type Release } from '../shared/data-mapper';
+
 export interface Env {
   SUPABASE_URL: string;
   SUPABASE_ANON_KEY: string;
@@ -9,48 +11,7 @@ export interface Env {
   };
 }
 
-// Types matching the existing schema
-interface Artist {
-  id: number;
-  name: string;
-  bio?: string;
-  genre?: string;
-  imageUrl?: string;
-  socialLinks?: string;
-  createdAt: string;
-}
-
-interface Release {
-  id: number;
-  bundleId?: string;
-  title: string;
-  artist: string;
-  artistId?: number;
-  labelId?: string;
-  label: string;
-  ean?: string;
-  bundleType: string;
-  musicStyle: string;
-  digitalReleaseDate?: string;
-  published: string;
-  coverFileName?: string;
-  coverImageUrl?: string;
-  imgUrl?: string;
-  internalReference?: string;
-  coverFileHash?: string;
-  trackCount: number;
-  beatportSaleUrl?: string;
-  purchaseLink?: string;
-  shareLink?: string;
-  audioFileUrl?: string;
-  featured: boolean;
-  upcoming: boolean;
-  description?: string;
-  releaseDate?: string;
-  createdAt: string;
-  updateDate?: string;
-}
-
+// Contact submission type
 interface ContactSubmission {
   id: number;
   name: string;
@@ -152,70 +113,76 @@ async function supabaseQuery(env: Env, table: string, operation: 'select' | 'ins
 // Storage operations (simplified for Workers)
 const Storage = {
   async getArtists(env: Env): Promise<Artist[]> {
-    const data = await supabaseQuery(env, 'artists', 'select');
-    return data.sort((a: Artist, b: Artist) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    const supabaseData = await supabaseQuery(env, 'artists', 'select');
+    // Return artists as-is since the frontend types don't have createdAt
+    return mapSupabaseArtists(supabaseData);
   },
 
   async getArtist(env: Env, id: number): Promise<Artist | null> {
-    const data = await supabaseQuery(env, 'artists', 'select', undefined, { id: id.toString() });
-    return data[0] || null;
+    const supabaseData = await supabaseQuery(env, 'artists', 'select', undefined, { id: id.toString() });
+    const mappedData = mapSupabaseArtists(supabaseData);
+    return mappedData[0] || null;
   },
 
-  async createArtist(env: Env, artist: Omit<Artist, 'id' | 'createdAt'>): Promise<Artist> {
-    const data = await supabaseQuery(env, 'artists', 'insert', artist);
-    return data[0];
+  async createArtist(env: Env, artist: Omit<Artist, 'id'>): Promise<Artist> {
+    const supabaseData = await supabaseQuery(env, 'artists', 'insert', artist);
+    const mappedData = mapSupabaseArtists(supabaseData);
+    return mappedData[0];
   },
 
   async getReleases(env: Env): Promise<Release[]> {
-    const data = await supabaseQuery(env, 'releases', 'select');
-    return data.sort((a: Release, b: Release) => {
-      const dateA = new Date(a.digitalReleaseDate || a.createdAt).getTime();
-      const dateB = new Date(b.digitalReleaseDate || b.createdAt).getTime();
+    const supabaseData = await supabaseQuery(env, 'releases', 'select');
+    return mapSupabaseReleases(supabaseData).sort((a: Release, b: Release) => {
+      const dateA = new Date(a.digitalReleaseDate || 0).getTime();
+      const dateB = new Date(b.digitalReleaseDate || 0).getTime();
       return dateB - dateA;
     });
   },
 
   async getFeaturedReleases(env: Env): Promise<Release[]> {
-    const data = await supabaseQuery(env, 'releases', 'select', undefined, { featured: 'true' });
-    return data.sort((a: Release, b: Release) => {
-      const dateA = new Date(a.digitalReleaseDate || a.createdAt).getTime();
-      const dateB = new Date(b.digitalReleaseDate || b.createdAt).getTime();
+    const supabaseData = await supabaseQuery(env, 'releases', 'select', undefined, { featured: 'true' });
+    return mapSupabaseReleases(supabaseData).sort((a: Release, b: Release) => {
+      const dateA = new Date(a.digitalReleaseDate || 0).getTime();
+      const dateB = new Date(b.digitalReleaseDate || 0).getTime();
       return dateB - dateA;
     });
   },
 
   async getCatalogReleases(env: Env): Promise<Release[]> {
-    const data = await supabaseQuery(env, 'releases', 'select', undefined, { upcoming: 'false' });
-    return data.sort((a: Release, b: Release) => {
-      const dateA = new Date(a.digitalReleaseDate || a.createdAt).getTime();
-      const dateB = new Date(b.digitalReleaseDate || b.createdAt).getTime();
+    const supabaseData = await supabaseQuery(env, 'releases', 'select', undefined, { upcoming: 'false' });
+    return mapSupabaseReleases(supabaseData).sort((a: Release, b: Release) => {
+      const dateA = new Date(a.digitalReleaseDate || 0).getTime();
+      const dateB = new Date(b.digitalReleaseDate || 0).getTime();
       return dateB - dateA;
     });
   },
 
   async getLatestReleaseWithAudio(env: Env): Promise<Release | null> {
-    const data = await supabaseQuery(env, 'releases', 'select', undefined, { bundle_id: '10341902' });
-    return data[0] || null;
+    const supabaseData = await supabaseQuery(env, 'releases', 'select', undefined, { bundle_id: '10341902' });
+    const mappedData = mapSupabaseReleases(supabaseData);
+    return mappedData[0] || null;
   },
 
   async getRelease(env: Env, id: number): Promise<Release | null> {
-    const data = await supabaseQuery(env, 'releases', 'select', undefined, { id: id.toString() });
-    return data[0] || null;
+    const supabaseData = await supabaseQuery(env, 'releases', 'select', undefined, { id: id.toString() });
+    const mappedData = mapSupabaseReleases(supabaseData);
+    return mappedData[0] || null;
   },
 
-  async createRelease(env: Env, release: Omit<Release, 'id' | 'createdAt'>): Promise<Release> {
-    const data = await supabaseQuery(env, 'releases', 'insert', release);
-    return data[0];
+  async createRelease(env: Env, release: Omit<Release, 'id'>): Promise<Release> {
+    const supabaseData = await supabaseQuery(env, 'releases', 'insert', release);
+    const mappedData = mapSupabaseReleases(supabaseData);
+    return mappedData[0];
   },
 
   async createContactSubmission(env: Env, submission: Omit<ContactSubmission, 'id' | 'createdAt' | 'status'>): Promise<ContactSubmission> {
-    const data = await supabaseQuery(env, 'contact_submissions', 'insert', submission);
-    return data[0];
+    const supabaseData = await supabaseQuery(env, 'contact_submissions', 'insert', submission);
+    return supabaseData[0];
   },
 
   async getContactSubmissions(env: Env): Promise<ContactSubmission[]> {
-    const data = await supabaseQuery(env, 'contact_submissions', 'select');
-    return data.sort((a: ContactSubmission, b: ContactSubmission) => 
+    const supabaseData = await supabaseQuery(env, 'contact_submissions', 'select');
+    return supabaseData.sort((a: ContactSubmission, b: ContactSubmission) =>
       new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
   },
