@@ -79,15 +79,37 @@ export class DatabaseStorage implements IStorage {
 
   // Releases
   async getReleases(): Promise<Release[]> {
-    return await db.select().from(releases).orderBy(desc(releases.releaseDate));
+    const rawReleases = await db.select().from(releases).orderBy(desc(releases.releaseDate));
+    return rawReleases.map((release: Release) => ({
+      ...release,
+      // Map database field names to frontend expected field names
+      audioFilePath: release.audioFileUrl, // Convert audioFileUrl to audioFilePath
+      slug: this.generateSlug(release.title),
+      artistSlug: this.generateArtistSlug(release.artist),
+      isLatest: release.bundleId === '10341902', // Set Stormdrifter as latest
+    }));
   }
 
   async getFeaturedReleases(): Promise<Release[]> {
-    return await db.select().from(releases).where(eq(releases.featured, true)).orderBy(desc(releases.releaseDate));
+    const rawReleases = await db.select().from(releases).where(eq(releases.featured, true)).orderBy(desc(releases.releaseDate));
+    return rawReleases.map((release: Release) => ({
+      ...release,
+      audioFilePath: release.audioFileUrl,
+      slug: this.generateSlug(release.title),
+      artistSlug: this.generateArtistSlug(release.artist),
+      isLatest: release.bundleId === '10341902',
+    }));
   }
 
   async getCatalogReleases(): Promise<Release[]> {
-    return await db.select().from(releases).where(eq(releases.upcoming, false)).orderBy(desc(releases.digitalReleaseDate));
+    const rawReleases = await db.select().from(releases).where(eq(releases.upcoming, false)).orderBy(desc(releases.digitalReleaseDate));
+    return rawReleases.map((release: Release) => ({
+      ...release,
+      audioFilePath: release.audioFileUrl,
+      slug: this.generateSlug(release.title),
+      artistSlug: this.generateArtistSlug(release.artist),
+      isLatest: release.bundleId === '10341902',
+    }));
   }
 
   async getLatestReleaseWithAudio(): Promise<Release | undefined> {
@@ -95,12 +117,29 @@ export class DatabaseStorage implements IStorage {
     const [stormdrifter] = await db.select()
       .from(releases)
       .where(eq(releases.bundleId, '10341902'));
-    return stormdrifter || undefined;
+    
+    if (!stormdrifter) return undefined;
+    
+    return {
+      ...stormdrifter,
+      audioFilePath: stormdrifter.audioFileUrl,
+      slug: this.generateSlug(stormdrifter.title),
+      artistSlug: this.generateArtistSlug(stormdrifter.artist),
+      isLatest: true,
+    };
   }
 
   async getRelease(id: number): Promise<Release | undefined> {
     const [release] = await db.select().from(releases).where(eq(releases.id, id));
-    return release || undefined;
+    if (!release) return undefined;
+    
+    return {
+      ...release,
+      audioFilePath: release.audioFileUrl,
+      slug: this.generateSlug(release.title),
+      artistSlug: this.generateArtistSlug(release.artist),
+      isLatest: release.bundleId === '10341902',
+    };
   }
 
   async createRelease(insertRelease: InsertRelease): Promise<Release> {
@@ -108,7 +147,26 @@ export class DatabaseStorage implements IStorage {
       .insert(releases)
       .values(insertRelease)
       .returning();
-    return release;
+    return {
+      ...release,
+      audioFilePath: release.audioFileUrl,
+      slug: this.generateSlug(release.title),
+      artistSlug: this.generateArtistSlug(release.artist),
+      isLatest: release.bundleId === '10341902',
+    };
+  }
+
+  // Helper methods to generate slugs
+  private generateSlug(title: string): string {
+    return title.toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+  }
+
+  private generateArtistSlug(artist: string): string {
+    return artist.toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
   }
 
   // Contact submissions
