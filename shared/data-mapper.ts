@@ -1,4 +1,5 @@
 // Shared data mapping utilities to transform between Supabase snake_case and frontend camelCase
+import { STATIC_ARTISTS, STATIC_RELEASES } from "./static-content";
 
 // Frontend types
 export interface Artist {
@@ -78,6 +79,40 @@ interface SupabaseRelease {
   update_date?: string;
 }
 
+const artistOverridesBySlug = new Map(
+  STATIC_ARTISTS.map((artist) => [artist.slug, artist]),
+);
+
+const artistOverridesByName = new Map(
+  STATIC_ARTISTS.map((artist) => [artist.name.toLowerCase(), artist]),
+);
+
+const releaseOverridesBySlug = new Map(
+  STATIC_RELEASES.map((release) => [release.slug, release]),
+);
+
+const releaseOverridesByBundleId = new Map(
+  STATIC_RELEASES.filter((release) => Boolean(release.bundleId)).map((release) => [release.bundleId as string, release]),
+);
+
+const releaseOverridesByNormalizedTitle = new Map(
+  STATIC_RELEASES.map((release) => [generateSlug(release.title), release]),
+);
+
+function findLooseReleaseOverride(slug: string): Release | undefined {
+  const lowerSlug = slug.toLowerCase();
+  return STATIC_RELEASES.find((release) => {
+    const overrideSlug = (release.slug ?? generateSlug(release.title)).toLowerCase();
+    return overrideSlug.includes(lowerSlug) || lowerSlug.includes(overrideSlug);
+  });
+}
+
+const omitId = <T extends { id?: unknown }>(value?: T): Omit<T, "id"> | undefined => {
+  if (!value) return undefined;
+  const { id: _omit, ...rest } = value;
+  return rest;
+};
+
 // Parse social links from JSON string
 function parseSocialLinks(socialLinksStr?: string): Record<string, string> | undefined {
   if (!socialLinksStr) return undefined;
@@ -90,27 +125,28 @@ function parseSocialLinks(socialLinksStr?: string): Record<string, string> | und
 
 // Generate audio file path from audio URL
 function generateAudioFilePath(audioFileUrl?: string, artist?: string, title?: string): string | undefined {
+  const normalized = normalizeAudioPath(audioFileUrl);
+  if (normalized) {
+    return normalized;
+  }
+
   if (!audioFileUrl) return undefined;
-  
-  // Extract filename from URL
+
+  // Fallback: build a path based on artist + title when we lack explicit folder structure
   const urlParts = audioFileUrl.split('/');
   const filename = urlParts[urlParts.length - 1];
-  
-  if (filename && filename.includes('.mp3')) {
-    // Remove .mp3 extension and use as path
-    const baseName = filename.replace('.mp3', '');
-    
-    if (artist && title) {
-      // Convert artist name to slug format
-      const artistSlug = generateSlug(artist);
-      
-      return `${artistSlug}/${baseName}.mp3`;
-    }
-    
-    return `${baseName}.mp3`;
+
+  if (!filename || !filename.includes('.mp3')) {
+    return undefined;
   }
-  
-  return undefined;
+
+  const safeFilename = filename.replace(/^\//, '');
+
+  if (artist) {
+    return `${generateSlug(artist)}/${safeFilename}`;
+  }
+
+  return safeFilename;
 }
 
 // Helper function to safely generate slug from string
@@ -118,12 +154,99 @@ function generateSlug(text?: string): string {
   if (!text) return 'untitled';
   return text.toLowerCase()
     .replace(/[^a-z0-9\s]/g, '')
-    .replace(/\s+/g, '-');
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+}
+
+function normalizeAudioPath(audioFileUrl?: string): string | undefined {
+  if (!audioFileUrl) return undefined;
+
+  // Remove protocol + host if present
+  const withoutOrigin = audioFileUrl.replace(/^https?:\/\/[^/]+/i, '');
+  const trimmed = withoutOrigin.replace(/^\/+/, '');
+
+  if (!trimmed) {
+    return undefined;
+  }
+
+  // If the path already includes audio/, strip the prefix so the frontend can reapply it consistently
+  if (trimmed.startsWith('audio/')) {
+    return trimmed.replace(/^audio\//, '');
+  }
+
+  return trimmed;
+}
+
+function mergeArtistWithOverrides(mappedArtist: Artist): Artist {
+  const override = omitId(
+    artistOverridesBySlug.get(mappedArtist.slug) ??
+      artistOverridesByName.get(mappedArtist.name.toLowerCase()),
+  );
+
+  if (!override) {
+    return mappedArtist;
+  }
+
+  return {
+    ...mappedArtist,
+    ...override,
+    slug: override?.slug ?? mappedArtist.slug,
+    name: override?.name ?? mappedArtist.name,
+    genre: override?.genre ?? mappedArtist.genre,
+    imageUrl: override?.imageUrl ?? mappedArtist.imageUrl,
+    bio: override?.bio ?? mappedArtist.bio,
+    socialLinks: override?.socialLinks ?? mappedArtist.socialLinks,
+  };
+}
+
+function mergeReleaseWithOverrides(mappedRelease: Release, supabaseSource: SupabaseRelease): Release {
+  const slug = mappedRelease.slug;
+  const override = omitId(
+    releaseOverridesBySlug.get(slug) ??
+      releaseOverridesByNormalizedTitle.get(slug) ??
+      findLooseReleaseOverride(slug) ??
+      (supabaseSource.bundle_id ? releaseOverridesByBundleId.get(supabaseSource.bundle_id) : undefined),
+  );
+
+  const audioFilePath =
+    override?.audioFilePath ??
+    mappedRelease.audioFilePath ??
+    normalizeAudioPath(supabaseSource.audio_file_url);
+
+  const artistName = override?.artist ?? mappedRelease.artist;
+  const artistSlug =
+    override?.artistSlug ??
+    mappedRelease.artistSlug ??
+    (artistName ? generateSlug(artistName) : undefined);
+
+  const merged: Release = {
+    ...mappedRelease,
+    ...(override ?? {}),
+    artist: artistName,
+    artistSlug,
+    audioFilePath: audioFilePath,
+    bundleId: override?.bundleId ?? mappedRelease.bundleId ?? supabaseSource.bundle_id ?? undefined,
+    digitalReleaseDate: override?.digitalReleaseDate ?? mappedRelease.digitalReleaseDate,
+    internalReference: override?.internalReference ?? mappedRelease.internalReference ?? undefined,
+    trackCount: override?.trackCount ?? mappedRelease.trackCount ?? supabaseSource.track_count,
+    featured: override?.featured ?? mappedRelease.featured ?? supabaseSource.featured,
+    upcoming: override?.upcoming ?? mappedRelease.upcoming ?? supabaseSource.upcoming,
+    isLatest: override?.isLatest ?? mappedRelease.isLatest ?? false,
+    description: override?.description ?? mappedRelease.description ?? supabaseSource.description,
+    coverImageUrl: override?.coverImageUrl ?? mappedRelease.coverImageUrl ?? supabaseSource.cover_image_url,
+    imgUrl: override?.imgUrl ?? mappedRelease.imgUrl ?? supabaseSource.img_url ?? override?.coverImageUrl ?? mappedRelease.coverImageUrl,
+    purchaseLink: override?.purchaseLink ?? mappedRelease.purchaseLink ?? supabaseSource.purchase_link ?? undefined,
+    shareLink: override?.shareLink ?? mappedRelease.shareLink ?? supabaseSource.share_link ?? undefined,
+    beatportSaleUrl: override?.beatportSaleUrl ?? mappedRelease.beatportSaleUrl ?? supabaseSource.beatport_sale_url ?? undefined,
+  };
+
+  return merged;
 }
 
 // Map Supabase artist to frontend format
 export function mapSupabaseArtist(supabaseArtist: SupabaseArtist): Artist {
-  return {
+  const mappedArtist: Artist = {
     id: supabaseArtist.id,
     slug: generateSlug(supabaseArtist.name),
     name: supabaseArtist.name || 'Unknown Artist',
@@ -132,11 +255,13 @@ export function mapSupabaseArtist(supabaseArtist: SupabaseArtist): Artist {
     bio: supabaseArtist.bio,
     socialLinks: parseSocialLinks(supabaseArtist.social_links),
   };
+
+  return mergeArtistWithOverrides(mappedArtist);
 }
 
 // Map Supabase release to frontend format
 export function mapSupabaseRelease(supabaseRelease: SupabaseRelease): Release {
-  return {
+  const mappedRelease: Release = {
     id: supabaseRelease.id,
     slug: generateSlug(supabaseRelease.title),
     title: supabaseRelease.title || 'Untitled Release',
@@ -164,6 +289,8 @@ export function mapSupabaseRelease(supabaseRelease: SupabaseRelease): Release {
     isLatest: supabaseRelease.bundle_id === '10341902', // Stormdrifter
     description: supabaseRelease.description,
   };
+
+  return mergeReleaseWithOverrides(mappedRelease, supabaseRelease);
 }
 
 // Batch map arrays

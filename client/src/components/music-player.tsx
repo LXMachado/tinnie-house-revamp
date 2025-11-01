@@ -15,14 +15,15 @@ const buildAudioSource = (audioPath: string): string => {
     return audioPath;
   }
 
-  // Handle local audio files with multiple possible paths
-  // Try direct audio directory first
-  const directPath = `/audio/${audioPath}`;
-  
-  // Also try audio root directory
-  const rootAudioPath = `/audio/${audioPath.split('/').pop()}`;
-  
-  return directPath; // Use direct path by default
+  const trimmedPath = audioPath.replace(/^\/+/, "");
+  const hasAudioPrefix = trimmedPath.startsWith("audio/");
+  const relativePath = hasAudioPrefix ? trimmedPath.replace(/^audio\//, "") : trimmedPath;
+
+  if (audioBase) {
+    return `${audioBase.replace(/\/$/, "")}/${relativePath}`;
+  }
+
+  return `/audio/${relativePath}`;
 };
 
 interface MusicPlayerProps {
