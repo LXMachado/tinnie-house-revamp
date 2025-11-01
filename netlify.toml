@@ -1,6 +1,6 @@
 [build]
-  # Build command for the frontend
-  command = "npm run build"
+  # Build command for the frontend (client-only build for static hosting)
+  command = "npm run build:client"
   # Directory where the built files are located
   publish = "client/dist"
 
