@@ -107,19 +107,17 @@ export default function Home() {
               </div>
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button onClick={handleListenClick}>
-                  {stormdrifterRelease?.audioFilePath ? (
-                    <>
-                      {showMusicPlayer ? <Pause className="w-4 h-4 mr-2" /> : <Play className="w-4 h-4 mr-2" />}
-                      Listen
-                    </>
-                  ) : (
-                    <>
-                      <Play className="w-4 h-4 mr-2" />
-                      Explore Releases
-                    </>
-                  )}
-                </Button>
+                {stormdrifterRelease?.audioFilePath ? (
+                  <Button onClick={handleListenClick}>
+                    {showMusicPlayer ? <Pause className="w-4 h-4 mr-2" /> : <Play className="w-4 h-4 mr-2" />}
+                    Listen
+                  </Button>
+                ) : (
+                  <Button onClick={() => scrollToSection("releases")}>
+                    <Play className="w-4 h-4 mr-2" />
+                    Explore Releases
+                  </Button>
+                )}
               </div>
               
               {/* Inline Music Player */}
