@@ -267,21 +267,48 @@ export default function Home() {
             </div>
           ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {artists.slice(0, 4).map((artist) => (
-                <div key={artist.id} className="group text-center">
-                  <div className="relative mb-4">
-                    <img
-                      src={artist.imageUrl || "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=400"}
-                      alt={`${artist.name} artist photo`}
-                      className="w-32 h-32 rounded-full mx-auto object-cover border-4 border-blue-500/20 group-hover:border-blue-500/50 transition-colors"
-                    />
-                    <div className="absolute inset-0 w-32 h-32 rounded-full mx-auto bg-blue-500/0 group-hover:bg-blue-500/10 transition-colors"></div>
+              {artists.slice(0, 4).map((artist) => {
+                const soundcloudLink = artist.socialLinks?.soundcloud;
+                return (
+                  <div key={artist.id} className="group text-center">
+                    <div className="relative mb-4">
+                      {soundcloudLink ? (
+                        <button
+                          onClick={() => window.open(soundcloudLink, '_blank')}
+                          className="relative focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-background rounded-full"
+                          aria-label={`Visit ${artist.name} on SoundCloud`}
+                        >
+                          <img
+                            src={artist.imageUrl || "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=400"}
+                            alt={`${artist.name} artist photo`}
+                            className="w-32 h-32 rounded-full mx-auto object-cover border-4 border-blue-500/20 group-hover:border-blue-500/50 transition-all duration-300 hover:scale-105 cursor-pointer"
+                          />
+                          <div className="absolute inset-0 w-32 h-32 rounded-full mx-auto bg-blue-500/0 group-hover:bg-blue-500/20 transition-colors duration-300"></div>
+                          <div className="absolute inset-0 w-32 h-32 rounded-full mx-auto flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <div className="bg-black/50 rounded-full p-2">
+                              <Music className="w-5 h-5 text-white" />
+                            </div>
+                          </div>
+                        </button>
+                      ) : (
+                        <img
+                          src={artist.imageUrl || "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=400"}
+                          alt={`${artist.name} artist photo`}
+                          className="w-32 h-32 rounded-full mx-auto object-cover border-4 border-blue-500/20"
+                        />
+                      )}
+                    </div>
+                    <h3 className="font-orbitron font-semibold text-lg mb-1">{artist.name}</h3>
+                    <p className="text-sm text-muted-foreground mb-2">{artist.genre || "Electronic"}</p>
+                    <p className="text-xs text-muted-foreground">{artist.bio || "Innovative electronic music artist"}</p>
+                    {soundcloudLink && (
+                      <p className="text-xs text-blue-400 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        Click image to visit SoundCloud
+                      </p>
+                    )}
                   </div>
-                  <h3 className="font-orbitron font-semibold text-lg mb-1">{artist.name}</h3>
-                  <p className="text-sm text-muted-foreground mb-2">{artist.genre || "Electronic"}</p>
-                  <p className="text-xs text-muted-foreground">{artist.bio || "Innovative electronic music artist"}</p>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
