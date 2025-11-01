@@ -15,9 +15,14 @@ const buildAudioSource = (audioPath: string): string => {
     return audioPath;
   }
 
-  // Check for local audio files first (for development)
-  const localPath = `/audio/${audioPath}`;
-  return localPath;
+  // Handle local audio files with multiple possible paths
+  // Try direct audio directory first
+  const directPath = `/audio/${audioPath}`;
+  
+  // Also try audio root directory
+  const rootAudioPath = `/audio/${audioPath.split('/').pop()}`;
+  
+  return directPath; // Use direct path by default
 };
 
 interface MusicPlayerProps {
@@ -33,6 +38,8 @@ export function MusicPlayer({ audioPath, title, artist, compact = false }: Music
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(1);
   const [isMuted, setIsMuted] = useState(false);
+  const [audioError, setAudioError] = useState(false);
+  const [audioLoading, setAudioLoading] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
   const audioUrl = buildAudioSource(audioPath);
   // Create a unique player ID based on title, artist and audioPath
@@ -45,15 +52,28 @@ export function MusicPlayer({ audioPath, title, artist, compact = false }: Music
     const updateTime = () => setCurrentTime(audio.currentTime);
     const updateDuration = () => setDuration(audio.duration);
     const handleEnded = () => setIsPlaying(false);
+    const handleLoadStart = () => setAudioLoading(true);
+    const handleCanPlay = () => setAudioLoading(false);
+    const handleError = (e: any) => {
+      console.warn('Audio loading error:', e);
+      setAudioError(true);
+      setAudioLoading(false);
+    };
 
     audio.addEventListener('timeupdate', updateTime);
     audio.addEventListener('loadedmetadata', updateDuration);
     audio.addEventListener('ended', handleEnded);
+    audio.addEventListener('loadstart', handleLoadStart);
+    audio.addEventListener('canplay', handleCanPlay);
+    audio.addEventListener('error', handleError);
 
     return () => {
       audio.removeEventListener('timeupdate', updateTime);
       audio.removeEventListener('loadedmetadata', updateDuration);
       audio.removeEventListener('ended', handleEnded);
+      audio.removeEventListener('loadstart', handleLoadStart);
+      audio.removeEventListener('canplay', handleCanPlay);
+      audio.removeEventListener('error', handleError);
     };
   }, []);
 
@@ -103,10 +123,16 @@ export function MusicPlayer({ audioPath, title, artist, compact = false }: Music
     const audio = audioRef.current;
     if (!audio) return;
 
+    if (audioError) {
+      console.warn('Audio file not available');
+      return;
+    }
+
     try {
       await audioManager.playAudio(audio, playerId);
     } catch (error) {
       console.error('Failed to toggle audio playback:', error);
+      setAudioError(true);
     }
   };
 
@@ -188,11 +214,22 @@ export function MusicPlayer({ audioPath, title, artist, compact = false }: Music
           size="sm"
           onClick={togglePlay}
           className="w-8 h-8 p-0"
+          disabled={audioError || audioLoading}
         >
-          {isPlaying ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3" />}
+          {audioLoading ? (
+            <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin" />
+          ) : isPlaying ? (
+            <Pause className="w-3 h-3" />
+          ) : audioError ? (
+            <VolumeX className="w-3 h-3" />
+          ) : (
+            <Play className="w-3 h-3" />
+          )}
         </Button>
         <span className="text-xs text-muted-foreground font-orbitron">
-          {formatTime(currentTime)} / {formatTime(duration)}
+          {audioError ? 'Audio unavailable' :
+           audioLoading ? 'Loading...' :
+           `${formatTime(currentTime)} / ${formatTime(duration)}`}
         </span>
       </div>
     );
@@ -207,6 +244,9 @@ export function MusicPlayer({ audioPath, title, artist, compact = false }: Music
       <div className="text-center">
         <h4 className="font-orbitron font-bold">{title}</h4>
         <p className="text-sm text-blue-400">{artist}</p>
+        {audioError && (
+          <p className="text-xs text-red-400 mt-1">Audio file not available</p>
+        )}
       </div>
 
       <div className="flex items-center justify-center space-x-4">
@@ -214,8 +254,17 @@ export function MusicPlayer({ audioPath, title, artist, compact = false }: Music
           size="lg"
           onClick={togglePlay}
           className="w-12 h-12 rounded-full"
+          disabled={audioError || audioLoading}
         >
-          {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
+          {audioLoading ? (
+            <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
+          ) : isPlaying ? (
+            <Pause className="w-5 h-5" />
+          ) : audioError ? (
+            <VolumeX className="w-5 h-5" />
+          ) : (
+            <Play className="w-5 h-5" />
+          )}
         </Button>
       </div>
 
@@ -226,10 +275,11 @@ export function MusicPlayer({ audioPath, title, artist, compact = false }: Music
           step={1}
           onValueChange={handleSeek}
           className="w-full"
+          disabled={audioError || audioLoading}
         />
         <div className="flex justify-between text-xs text-muted-foreground font-orbitron">
-          <span>{formatTime(currentTime)}</span>
-          <span>{formatTime(duration)}</span>
+          <span>{audioError ? 'Unavailable' : audioLoading ? 'Loading...' : formatTime(currentTime)}</span>
+          <span>{audioError || audioLoading ? 'N/A' : formatTime(duration)}</span>
         </div>
       </div>
 
@@ -239,6 +289,7 @@ export function MusicPlayer({ audioPath, title, artist, compact = false }: Music
           size="sm"
           onClick={toggleMute}
           className="p-2"
+          disabled={audioError || audioLoading}
         >
           {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
         </Button>
@@ -248,6 +299,7 @@ export function MusicPlayer({ audioPath, title, artist, compact = false }: Music
           step={0.1}
           onValueChange={handleVolumeChange}
           className="flex-1"
+          disabled={audioError || audioLoading}
         />
       </div>
     </div>
