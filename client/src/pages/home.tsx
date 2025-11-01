@@ -76,11 +76,11 @@ export default function Home() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative overflow-hidden min-h-screen flex items-center">
+      <section className="hero-section relative overflow-hidden min-h-screen">
         <div className="absolute inset-0 grid-overlay opacity-20"></div>
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-500/5 to-blue-500/20"></div>
-        <div className="container relative py-24 lg:py-32">
-          <div className="max-w-4xl mx-auto text-center">
+        <div className="content-wrapper container relative py-24 lg:py-32">
+          <div className="max-w-4xl mx-auto text-center fullscreen-fix">
             <div className="space-y-8 animate-fade-in">
               <div className="space-y-6">
                 <h1 className="font-orbitron text-5xl lg:text-7xl font-bold tracking-tight leading-tight">
@@ -125,7 +125,7 @@ export default function Home() {
                         </p>
                       )}
                     </div>
-                    <MusicPlayer 
+                    <MusicPlayer
                       audioPath={stormdrifterRelease.audioFilePath}
                       title={stormdrifterRelease.title}
                       artist={stormdrifterRelease.artist}
@@ -134,8 +134,6 @@ export default function Home() {
                   </div>
                 </div>
               )}
-
-
             </div>
           </div>
         </div>
@@ -144,7 +142,7 @@ export default function Home() {
       {/* Featured Upcoming Release Section */}
       <section id="releases" className="py-16 lg:py-24 relative">
         <div className="absolute inset-0 bg-gradient-to-b from-blue-500/5 to-transparent"></div>
-        <div className="container relative">
+        <div className="content-wrapper container relative fullscreen-fix">
           <div className="text-center mb-16">
             {stormdrifterRelease && stormdrifterRelease.upcoming && (
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/20 text-blue-400 text-sm font-medium mb-4">
@@ -158,12 +156,12 @@ export default function Home() {
           </div>
 
           {/* Featured Release - Rafa Kao - Stormdrifter */}
-          <div className="max-w-4xl mx-auto mb-20">
+          <div className="max-w-4xl mx-auto mb-20 fullscreen-fix">
             <div className="blur-card overflow-hidden">
               <div className="grid lg:grid-cols-2 gap-8 items-center">
                 <div className="relative aspect-square">
-                  <img 
-                    src="https://i.imgur.com/7HZNuFs_d.jpeg?maxwidth=520&shape=thumb&fidelity=high" 
+                  <img
+                    src="https://i.imgur.com/7HZNuFs_d.jpeg?maxwidth=520&shape=thumb&fidelity=high"
                     alt="Rafa Kao - Stormdrifter"
                     className="w-full h-full object-cover rounded-lg blue-glow"
                   />
@@ -191,8 +189,8 @@ export default function Home() {
                   </div>
                   
                   <p className="text-muted-foreground leading-relaxed">
-                    Get ready for an immersive journey through atmospheric soundscapes and driving rhythms. 
-                    Rafa Kao's latest masterpiece "Stormdrifter" showcases the evolving sound of Tinnie House Records 
+                    Get ready for an immersive journey through atmospheric soundscapes and driving rhythms.
+                    Rafa Kao's latest masterpiece "Stormdrifter" showcases the evolving sound of Tinnie House Records
                     with its deep melodic progressions and hypnotic techno elements.
                   </p>
                   
@@ -233,7 +231,7 @@ export default function Home() {
           <ReleaseCarousel />
 
           <div className="text-center mt-12">
-            <Button 
+            <Button
               variant="outline"
               onClick={() => window.open('https://www.beatport.com/label/tinnie-house-records/50650', '_blank')}
             >
@@ -245,7 +243,7 @@ export default function Home() {
 
       {/* Featured Artists Section */}
       <section id="artists" className="py-16 lg:py-24">
-        <div className="container">
+        <div className="content-wrapper container relative fullscreen-fix">
           <div className="text-center mb-12">
             <h2 className="font-orbitron text-3xl lg:text-4xl font-bold mb-4">Featured Artists</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
@@ -272,8 +270,8 @@ export default function Home() {
               {artists.slice(0, 4).map((artist) => (
                 <div key={artist.id} className="group text-center">
                   <div className="relative mb-4">
-                    <img 
-                      src={artist.imageUrl || "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=400"} 
+                    <img
+                      src={artist.imageUrl || "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=400"}
                       alt={`${artist.name} artist photo`}
                       className="w-32 h-32 rounded-full mx-auto object-cover border-4 border-blue-500/20 group-hover:border-blue-500/50 transition-colors"
                     />
@@ -291,8 +289,8 @@ export default function Home() {
 
       {/* About Section */}
       <section id="about" className="py-16 lg:py-24 bg-muted/30">
-        <div className="container">
-          <div className="text-center max-w-4xl mx-auto">
+        <div className="content-wrapper container relative fullscreen-fix">
+          <div className="text-center max-w-4xl mx-auto fullscreen-fix">
             <h2 className="font-orbitron text-3xl lg:text-4xl font-bold mb-6">About Tinnie House Records</h2>
             <div className="space-y-4 text-muted-foreground">
               <p className="text-lg">
@@ -310,7 +308,7 @@ export default function Home() {
       {/* Contact Section */}
       <section id="contact" className="py-16 lg:py-24 relative">
         <div className="absolute inset-0 bg-gradient-to-t from-blue-500/10 to-transparent"></div>
-        <div className="container max-w-6xl relative">
+        <div className="content-wrapper container max-w-6xl relative fullscreen-fix">
           <div className="text-center mb-12">
             <h2 className="font-orbitron text-3xl lg:text-4xl font-bold mb-4 tracking-wide">BECOME PART OF OUR LABEL FAMILY</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
@@ -330,8 +328,8 @@ export default function Home() {
                     Sign up for exclusive updates on releases, events, and special announcements.
                   </p>
                   <div className="flex gap-3">
-                    <input 
-                      type="email" 
+                    <input
+                      type="email"
                       placeholder="Your Email"
                       className="flex-1 px-4 py-3 rounded-md bg-background/20 border border-white/10 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors backdrop-blur-sm"
                     />
