@@ -1,5 +1,17 @@
 [
   {
+    "id": 103,
+    "slug": "guri",
+    "name": "G.U.R.I",
+    "genre": "Progressive-House, Melodic-Techno",
+    "imageUrl": "/images/artists/guri/guri.png",
+    "bio": "G.U.R.I delivers deep hypnotic grooves anchored by shimmering pads and percussive detail.",
+    "socialLinks": {
+      "instagram": "https://instagram.com/guri.music",
+      "soundcloud": "https://soundcloud.com/guri"
+    }
+  },
+  {
     "id": 101,
     "slug": "rafa-kao",
     "name": "Rafa Kao",
@@ -16,35 +28,11 @@
     "slug": "gabriel-samy",
     "name": "Gabriel Samy",
     "genre": "Progressive House",
-    "imageUrl": "/images/artists/rafa-kao/rafa-kao.webp",
+    "imageUrl": "/images/artists/gabriel-samy/gabriel-samy.png",
     "bio": "A fixture of the Brazilian underground scene, Gabriel Samy integrates organic instrumentation with modern club sonics.",
     "socialLinks": {
       "instagram": "https://instagram.com/gabrielsamy",
       "spotify": "https://open.spotify.com/artist/0Jjg998wVzQv"
     }
-  },
-  {
-    "id": 103,
-    "slug": "guri",
-    "name": "G.U.R.I",
-    "genre": "Deep Tech",
-    "imageUrl": "/images/artists/guri/guri.png",
-    "bio": "G.U.R.I delivers deep hypnotic grooves anchored by shimmering pads and percussive detail.",
-    "socialLinks": {
-      "instagram": "https://instagram.com/guri.music",
-      "bandcamp": "https://guri.bandcamp.com"
-    }
-  },
-  {
-    "id": 104,
-    "slug": "storme",
-    "name": "STORME",
-    "genre": "Techno",
-    "imageUrl": "/images/artists/guri/guri.png",
-    "bio": "STORME blurs the line between rave energy and avant-garde sound design.",
-    "socialLinks": {
-      "instagram": "https://instagram.com/storme.audio",
-      "soundcloud": "https://soundcloud.com/storme-audio"
-    }
-  }
+  } 
 ]
