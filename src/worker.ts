@@ -36,24 +36,25 @@ function validateRequired(value: any, field: string): void {
 }
 
 // Response helpers
-function jsonResponse(data: any, status: number = 200, headers: Record<string, string> = {}): Response {
+function jsonResponse(data: any, status: number = 200, headers: Record<string, string> = {}, origin: string = '*'): Response {
   return new Response(JSON.stringify(data), {
     status,
     headers: {
       'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Origin': origin,
       'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      'Access-Control-Allow-Credentials': 'true',
       ...headers,
     },
   });
 }
 
-function errorResponse(message: string, status: number = 500): Response {
+function errorResponse(message: string, status: number = 500, origin: string = '*'): Response {
   return jsonResponse({
     error: message,
     timestamp: new Date().toISOString(),
-  }, status);
+  }, status, {}, origin);
 }
 
 // Database helpers (using Supabase HTTP API)
@@ -192,6 +193,7 @@ const Storage = {
 async function handleAPI(req: Request, env: Env, url: URL): Promise<Response> {
   const path = url.pathname;
   const method = req.method;
+  const origin = req.headers.get('Origin') || '*';
 
   // Health check
   if (path === '/health') {
@@ -200,7 +202,7 @@ async function handleAPI(req: Request, env: Env, url: URL): Promise<Response> {
       timestamp: new Date().toISOString(),
       env: env.NODE_ENV,
       version: env.API_VERSION || '1.0.0',
-    });
+    }, 200, {}, origin);
   }
 
   // Root API endpoint
@@ -208,32 +210,32 @@ async function handleAPI(req: Request, env: Env, url: URL): Promise<Response> {
     return jsonResponse({
       message: 'Tinnie House Records API',
       version: env.API_VERSION || '1.0.0',
-    });
+    }, 200, {}, origin);
   }
 
   // Releases routes
   if (path.startsWith('/api/releases')) {
     if (path === '/api/releases' && method === 'GET') {
       const releases = await Storage.getReleases(env);
-      return jsonResponse(releases);
+      return jsonResponse(releases, 200, {}, origin);
     }
 
     if (path === '/api/releases/featured' && method === 'GET') {
       const releases = await Storage.getFeaturedReleases(env);
-      return jsonResponse(releases);
+      return jsonResponse(releases, 200, {}, origin);
     }
 
     if (path === '/api/releases/catalog' && method === 'GET') {
       const releases = await Storage.getCatalogReleases(env);
-      return jsonResponse(releases);
+      return jsonResponse(releases, 200, {}, origin);
     }
 
     if (path === '/api/releases/latest' && method === 'GET') {
       const release = await Storage.getLatestReleaseWithAudio(env);
       if (!release) {
-        return errorResponse('No latest release found', 404);
+        return errorResponse('No latest release found', 404, origin);
       }
-      return jsonResponse(release);
+      return jsonResponse(release, 200, {}, origin);
     }
 
     // GET /api/releases/:id
@@ -241,13 +243,13 @@ async function handleAPI(req: Request, env: Env, url: URL): Promise<Response> {
     if (releaseIdMatch && method === 'GET') {
       const id = parseInt(releaseIdMatch[1]);
       if (isNaN(id)) {
-        return errorResponse('Invalid release ID', 400);
+        return errorResponse('Invalid release ID', 400, origin);
       }
       const release = await Storage.getRelease(env, id);
       if (!release) {
-        return errorResponse('Release not found', 404);
+        return errorResponse('Release not found', 404, origin);
       }
-      return jsonResponse(release);
+      return jsonResponse(release, 200, {}, origin);
     }
 
     // POST /api/releases
@@ -255,9 +257,9 @@ async function handleAPI(req: Request, env: Env, url: URL): Promise<Response> {
       try {
         const body = await req.json();
         const release = await Storage.createRelease(env, body);
-        return jsonResponse(release, 201);
+        return jsonResponse(release, 201, {}, origin);
       } catch (error) {
-        return errorResponse(error instanceof Error ? error.message : 'Failed to create release', 400);
+        return errorResponse(error instanceof Error ? error.message : 'Failed to create release', 400, origin);
       }
     }
   }
@@ -266,7 +268,7 @@ async function handleAPI(req: Request, env: Env, url: URL): Promise<Response> {
   if (path.startsWith('/api/artists')) {
     if (path === '/api/artists' && method === 'GET') {
       const artists = await Storage.getArtists(env);
-      return jsonResponse(artists);
+      return jsonResponse(artists, 200, {}, origin);
     }
 
     // GET /api/artists/:id
@@ -274,13 +276,13 @@ async function handleAPI(req: Request, env: Env, url: URL): Promise<Response> {
     if (artistIdMatch && method === 'GET') {
       const id = parseInt(artistIdMatch[1]);
       if (isNaN(id)) {
-        return errorResponse('Invalid artist ID', 400);
+        return errorResponse('Invalid artist ID', 400, origin);
       }
       const artist = await Storage.getArtist(env, id);
       if (!artist) {
-        return errorResponse('Artist not found', 404);
+        return errorResponse('Artist not found', 404, origin);
       }
-      return jsonResponse(artist);
+      return jsonResponse(artist, 200, {}, origin);
     }
 
     // POST /api/artists
@@ -288,9 +290,9 @@ async function handleAPI(req: Request, env: Env, url: URL): Promise<Response> {
       try {
         const body = await req.json();
         const artist = await Storage.createArtist(env, body);
-        return jsonResponse(artist, 201);
+        return jsonResponse(artist, 201, {}, origin);
       } catch (error) {
-        return errorResponse(error instanceof Error ? error.message : 'Failed to create artist', 400);
+        return errorResponse(error instanceof Error ? error.message : 'Failed to create artist', 400, origin);
       }
     }
   }
@@ -308,42 +310,44 @@ async function handleAPI(req: Request, env: Env, url: URL): Promise<Response> {
         validateRequired(body.message, 'message');
         
         if (!validateEmail(body.email)) {
-          return errorResponse('Invalid email format', 400);
+          return errorResponse('Invalid email format', 400, origin);
         }
         
         const submission = await Storage.createContactSubmission(env, body);
         return jsonResponse({
           message: 'Contact form submitted successfully',
           id: submission.id,
-        }, 201);
+        }, 201, {}, origin);
       } catch (error) {
-        return errorResponse(error instanceof Error ? error.message : 'Failed to submit contact form', 400);
+        return errorResponse(error instanceof Error ? error.message : 'Failed to submit contact form', 400, origin);
       }
     }
 
     if (method === 'GET') {
       const submissions = await Storage.getContactSubmissions(env);
-      return jsonResponse(submissions);
+      return jsonResponse(submissions, 200, {}, origin);
     }
   }
 
   // 404 for unmatched routes
-  return errorResponse('Not Found', 404);
+  return errorResponse('Not Found', 404, origin);
 }
 
 // Main fetch handler
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
+    const requestOrigin = request.headers.get('Origin') || '*';
     
     // Handle CORS preflight requests
     if (request.method === 'OPTIONS') {
       return new Response(null, {
         status: 204,
         headers: {
-          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Origin': requestOrigin,
           'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
           'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+          'Access-Control-Allow-Credentials': 'true',
           'Access-Control-Max-Age': '86400',
         },
       });
@@ -371,11 +375,11 @@ export default {
       }
 
       // In development, return 404 for non-API routes
-      return errorResponse('Not Found', 404);
+      return errorResponse('Not Found', 404, requestOrigin);
       
     } catch (error) {
       console.error('Worker error:', error);
-      return errorResponse('Internal Server Error', 500);
+      return errorResponse('Internal Server Error', 500, requestOrigin);
     }
   },
 };
