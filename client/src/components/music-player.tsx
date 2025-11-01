@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Play, Pause, Volume2, VolumeX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
+import { audioManager } from "@/lib/audioManager";
 
 const audioBase = import.meta.env.VITE_AUDIO_BASE || "";
 
@@ -34,6 +35,8 @@ export function MusicPlayer({ audioPath, title, artist, compact = false }: Music
   const [isMuted, setIsMuted] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
   const audioUrl = buildAudioSource(audioPath);
+  // Create a unique player ID based on title, artist and audioPath
+  const playerId = `${title}-${artist}-${audioPath}`.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -54,6 +57,32 @@ export function MusicPlayer({ audioPath, title, artist, compact = false }: Music
     };
   }, []);
 
+  // Track current audio state from global manager
+  useEffect(() => {
+    const unsubscribe = audioManager.onCurrentAudioChange((currentAudio) => {
+      const audio = audioRef.current;
+      if (audio === currentAudio && audio) {
+        setIsPlaying(!audio.paused);
+      } else {
+        // If this audio is not the current one, pause it
+        setIsPlaying(false);
+      }
+    });
+
+    return unsubscribe;
+  }, []);
+
+  // Cleanup when component unmounts
+  useEffect(() => {
+    return () => {
+      const audio = audioRef.current;
+      if (audio && audioManager.isCurrentAudio(audio)) {
+        // If this was the current audio, stop it
+        audioManager.stopCurrentAudio();
+      }
+    };
+  }, []);
+
   // Handle audio source changes
   useEffect(() => {
     const audio = audioRef.current;
@@ -63,27 +92,39 @@ export function MusicPlayer({ audioPath, title, artist, compact = false }: Music
     setIsPlaying(false);
     setCurrentTime(0);
     setDuration(0);
+    
+    // Stop any currently playing audio when source changes
+    audioManager.stopCurrentAudio();
+    
     audio.load(); // Reload the audio element with new source
   }, [audioUrl]);
 
-  const togglePlay = () => {
+  const togglePlay = async () => {
     const audio = audioRef.current;
     if (!audio) return;
 
-    if (isPlaying) {
-      audio.pause();
-    } else {
-      audio.play();
+    try {
+      await audioManager.playAudio(audio, playerId);
+    } catch (error) {
+      console.error('Failed to toggle audio playback:', error);
     }
-    setIsPlaying(!isPlaying);
   };
 
   const handleSeek = (value: number[]) => {
     const audio = audioRef.current;
     if (!audio) return;
     
-    audio.currentTime = value[0];
-    setCurrentTime(value[0]);
+    const newTime = value[0];
+    
+    // If this audio is the current one, use global manager
+    if (audioManager.isCurrentAudio(audio)) {
+      audioManager.seekCurrentAudio(newTime);
+    } else {
+      // Otherwise, update directly
+      audio.currentTime = newTime;
+    }
+    
+    setCurrentTime(newTime);
   };
 
   const handleVolumeChange = (value: number[]) => {
@@ -91,7 +132,15 @@ export function MusicPlayer({ audioPath, title, artist, compact = false }: Music
     if (!audio) return;
     
     const newVolume = value[0];
-    audio.volume = newVolume;
+    
+    // If this audio is the current one, use global manager
+    if (audioManager.isCurrentAudio(audio)) {
+      audioManager.setCurrentAudioVolume(newVolume);
+    } else {
+      // Otherwise, update directly
+      audio.volume = newVolume;
+    }
+    
     setVolume(newVolume);
     setIsMuted(newVolume === 0);
   };
@@ -101,10 +150,24 @@ export function MusicPlayer({ audioPath, title, artist, compact = false }: Music
     if (!audio) return;
 
     if (isMuted) {
-      audio.volume = volume;
+      // Restore volume
+      const targetVolume = audio.volume > 0 ? audio.volume : 1;
+      
+      if (audioManager.isCurrentAudio(audio)) {
+        audioManager.setCurrentAudioVolume(targetVolume);
+      } else {
+        audio.volume = targetVolume;
+      }
+      
       setIsMuted(false);
     } else {
-      audio.volume = 0;
+      // Mute
+      if (audioManager.isCurrentAudio(audio)) {
+        audioManager.setCurrentAudioVolume(0);
+      } else {
+        audio.volume = 0;
+      }
+      
       setIsMuted(true);
     }
   };
