@@ -14,17 +14,9 @@ const buildAudioSource = (audioPath: string): string => {
     return audioPath;
   }
 
-  if (!audioBase) {
-    return audioPath;
-  }
-
-  const normalizedBase = audioBase.replace(/\/$/, "");
-  const encodedPath = audioPath
-    .split("/")
-    .map((segment) => encodeURIComponent(segment))
-    .join("/");
-
-  return `${normalizedBase}/${encodedPath}`;
+  // Check for local audio files first (for development)
+  const localPath = `/audio/${audioPath}`;
+  return localPath;
 };
 
 interface MusicPlayerProps {
