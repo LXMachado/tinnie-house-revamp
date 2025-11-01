@@ -12,13 +12,23 @@ export default function Home() {
   const [showMusicPlayer, setShowMusicPlayer] = useState(false);
   const [showUpcomingModal, setShowUpcomingModal] = useState(false);
   
-  const { data: artists = [], isLoading: artistsLoading } = useQuery<Artist[]>({
+  const { data: artists = [], isLoading: artistsLoading, error: artistsError } = useQuery<Artist[]>({
     queryKey: ["/api/artists"],
+    retry: false,
+    staleTime: Infinity,
   });
 
-  const { data: releases = [] } = useQuery<Release[]>({
+  const { data: releases = [], error: releasesError } = useQuery<Release[]>({
     queryKey: ["/api/releases"],
+    retry: false,
+    staleTime: Infinity,
   });
+
+  // Debug API calls
+  console.log("Artists data:", artists);
+  console.log("Artists error:", artistsError);
+  console.log("Releases data:", releases);
+  console.log("Releases error:", releasesError);
 
   const stormdrifterRelease = releases.find((release) => release.isLatest) ?? releases[0];
 
@@ -104,11 +114,11 @@ export default function Home() {
                       Listen
                     </>
                   ) : (
-                    "Explore Releases"
+                    <>
+                      <Play className="w-4 h-4 mr-2" />
+                      Explore Releases
+                    </>
                   )}
-                </Button>
-                <Button variant="outline" onClick={() => scrollToSection("releases")}>
-                  Explore Releases
                 </Button>
               </div>
               
