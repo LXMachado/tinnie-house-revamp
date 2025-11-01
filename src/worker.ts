@@ -100,7 +100,7 @@ async function supabaseQuery(env: Env, table: string, operation: 'select' | 'ins
   const supabaseUrl = env.SUPABASE_URL;
   const supabaseKey = env.SUPABASE_ANON_KEY;
   
-  let url = `${supabaseUrl}/rest/v1/${table}`;
+  let url = `${supabaseUrl.replace(/\/$/, '')}/rest/v1/${table}`;
   
   // Add filters for select operations
   if (operation === 'select' && filters) {
@@ -113,27 +113,40 @@ async function supabaseQuery(env: Env, table: string, operation: 'select' | 'ins
     }
   }
   
+  const method = operation === 'select' ? 'GET' : operation === 'insert' ? 'POST' : 'PATCH';
+  
   const options: RequestInit = {
-    method: operation === 'select' ? 'GET' : operation === 'insert' ? 'POST' : 'PATCH',
+    method,
     headers: {
       'apikey': supabaseKey,
       'Authorization': `Bearer ${supabaseKey}`,
       'Content-Type': 'application/json',
-      'Prefer': operation === 'insert' ? 'return=representation' : '',
     },
   };
   
-  if (data && (operation === 'insert' || operation === 'update')) {
+  if (operation === 'insert' && data) {
+    (options.headers as any)['Prefer'] = 'return=representation';
     options.body = JSON.stringify(data);
   }
   
-  const response = await fetch(url, options);
-  
-  if (!response.ok) {
-    throw new Error(`Supabase API error: ${response.status} ${response.statusText}`);
+  if (operation === 'update' && data) {
+    options.body = JSON.stringify(data);
   }
   
-  return operation === 'insert' ? await response.json() : await response.json();
+  try {
+    const response = await fetch(url, options);
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Supabase API error (${response.status}): ${response.statusText} - ${errorText}`);
+    }
+    
+    const responseText = await response.text();
+    return responseText ? JSON.parse(responseText) : [];
+  } catch (error) {
+    console.error('Supabase query error:', { url, method, error: error instanceof Error ? error.message : String(error) });
+    throw error;
+  }
 }
 
 // Storage operations (simplified for Workers)
