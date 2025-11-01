@@ -9,7 +9,7 @@ export function ReleaseCarousel() {
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const { data: releases = [], isLoading } = useQuery<Release[]>({
-    queryKey: ["/data/releases.json"],
+    queryKey: ["/api/releases"],
   });
 
   const handleShare = async (release: Release) => {

@@ -13,11 +13,11 @@ export default function Home() {
   const [showUpcomingModal, setShowUpcomingModal] = useState(false);
   
   const { data: artists = [], isLoading: artistsLoading } = useQuery<Artist[]>({
-    queryKey: ["/data/artists.json"],
+    queryKey: ["/api/artists"],
   });
 
   const { data: releases = [] } = useQuery<Release[]>({
-    queryKey: ["/data/releases.json"],
+    queryKey: ["/api/releases"],
   });
 
   const stormdrifterRelease = releases.find((release) => release.isLatest) ?? releases[0];
