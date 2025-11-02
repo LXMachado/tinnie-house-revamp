@@ -75,9 +75,3 @@ Desktop.ini
 # Temporary files
 tmp/
 temp/
-
-# Audio files (consider using Cloud storage for production)
-*.mp3
-*.wav
-*.flac
-client/public/audio/
