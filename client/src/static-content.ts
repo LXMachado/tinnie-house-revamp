@@ -1,4 +1,4 @@
-import type { Artist, Release } from "./data-mapper";
+import type { Artist, Release } from "@/types/content";
 
 export const STATIC_ARTISTS: Artist[] = [
   {

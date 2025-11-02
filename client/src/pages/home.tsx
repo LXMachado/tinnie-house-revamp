@@ -6,7 +6,7 @@ import { ReleaseCarousel } from "@/components/release-carousel";
 import { ContactForm } from "@/components/contact-form";
 import { MusicPlayer } from "@/components/music-player";
 import type { Artist, Release } from "@/types/content";
-import { STATIC_ARTISTS, STATIC_RELEASES } from "@shared/static-content";
+import { STATIC_ARTISTS, STATIC_RELEASES } from "@/static-content";
 
 export default function Home() {
   const [showMusicPlayer, setShowMusicPlayer] = useState(false);

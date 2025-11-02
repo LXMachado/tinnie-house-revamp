@@ -3,7 +3,7 @@ import { ChevronLeft, ChevronRight, Play, Share } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MusicPlayer } from "@/components/music-player";
 import type { Release } from "@/types/content";
-import { STATIC_RELEASES } from "@shared/static-content";
+import { STATIC_RELEASES } from "@/static-content";
 
 export function ReleaseCarousel() {
   const [currentSlide, setCurrentSlide] = useState(0);
