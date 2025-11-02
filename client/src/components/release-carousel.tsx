@@ -1,16 +1,20 @@
-import { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight, Play, Share } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MusicPlayer } from "@/components/music-player";
 import type { Release } from "@/types/content";
+import { STATIC_RELEASES } from "@shared/static-content";
 
 export function ReleaseCarousel() {
   const [currentSlide, setCurrentSlide] = useState(0);
 
-  const { data: releases = [], isLoading } = useQuery<Release[]>({
-    queryKey: ["/api/releases"],
-  });
+  const releases = useMemo<Release[]>(() => {
+    return [...STATIC_RELEASES].sort((a, b) => {
+      const dateA = new Date(a.digitalReleaseDate ?? 0).getTime();
+      const dateB = new Date(b.digitalReleaseDate ?? 0).getTime();
+      return dateB - dateA;
+    });
+  }, []);
 
   const handleShare = async (release: Release) => {
     const shareData = {
@@ -47,20 +51,6 @@ export function ReleaseCarousel() {
 
   // Auto-advance disabled
 
-  if (isLoading) {
-    return (
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {[...Array(3)].map((_, i) => (
-          <div key={i} className="animate-pulse">
-            <div className="bg-muted rounded-2xl h-64 mb-4"></div>
-            <div className="h-4 bg-muted rounded mb-2"></div>
-            <div className="h-4 bg-muted rounded w-2/3"></div>
-          </div>
-        ))}
-      </div>
-    );
-  }
-
   if (releases.length === 0) {
     return (
       <div className="text-center py-12">
@@ -69,11 +59,14 @@ export function ReleaseCarousel() {
     );
   }
 
+  const totalVisible = Math.min(3, releases.length);
+  const visibleReleases = Array.from({ length: totalVisible }, (_, idx) => releases[(currentSlide + idx) % releases.length]);
+
   return (
     <div className="relative">
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-        {releases.slice(currentSlide, currentSlide + 3).map((release) => (
-          <div key={release.id} className="group blur-card overflow-hidden transition-all duration-300">
+        {visibleReleases.map((release, index) => (
+          <div key={`${release.id}-${index}`} className="group blur-card overflow-hidden transition-all duration-300">
             <div className="relative">
               <img 
                 src={release.imgUrl || release.coverImageUrl || "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600"} 

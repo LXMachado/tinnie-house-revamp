@@ -1,34 +1,26 @@
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { Play, Pause, Users, MapPin, Clock, Mail, Phone, Instagram, Twitter, Music, Share, Calendar } from "lucide-react";
+import { useMemo, useState } from "react";
+import { Play, Pause, MapPin, Clock, Mail, Music, Share, Calendar } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ReleaseCarousel } from "@/components/release-carousel";
 import { ContactForm } from "@/components/contact-form";
 import { MusicPlayer } from "@/components/music-player";
 import type { Artist, Release } from "@/types/content";
+import { STATIC_ARTISTS, STATIC_RELEASES } from "@shared/static-content";
 
 export default function Home() {
   const [showMusicPlayer, setShowMusicPlayer] = useState(false);
   const [showUpcomingModal, setShowUpcomingModal] = useState(false);
-  
-  const { data: artists = [], isLoading: artistsLoading, error: artistsError } = useQuery<Artist[]>({
-    queryKey: ["/api/artists"],
-    retry: false,
-    staleTime: Infinity,
-  });
-
-  const { data: releases = [], error: releasesError } = useQuery<Release[]>({
-    queryKey: ["/api/releases"],
-    retry: false,
-    staleTime: Infinity,
-  });
-
-  // Debug API calls
-  console.log("Artists data:", artists);
-  console.log("Artists error:", artistsError);
-  console.log("Releases data:", releases);
-  console.log("Releases error:", releasesError);
+  const artists: Artist[] = STATIC_ARTISTS;
+  const releases: Release[] = useMemo(
+    () =>
+      [...STATIC_RELEASES].sort((a, b) => {
+        const dateA = new Date(a.digitalReleaseDate ?? 0).getTime();
+        const dateB = new Date(b.digitalReleaseDate ?? 0).getTime();
+        return dateB - dateA;
+      }),
+    []
+  );
 
   const stormdrifterRelease = releases.find((release) => release.isLatest) ?? releases[0];
 
@@ -259,17 +251,7 @@ export default function Home() {
             </p>
           </div>
 
-          {artistsLoading ? (
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {[...Array(4)].map((_, i) => (
-                <div key={i} className="text-center animate-pulse">
-                  <div className="w-32 h-32 rounded-full mx-auto bg-muted mb-4"></div>
-                  <div className="h-4 bg-muted rounded mb-2"></div>
-                  <div className="h-3 bg-muted rounded w-2/3 mx-auto"></div>
-                </div>
-              ))}
-            </div>
-          ) : artists.length === 0 ? (
+          {artists.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-muted-foreground">No artists available at this time.</p>
             </div>
