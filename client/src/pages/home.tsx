@@ -161,14 +161,14 @@ export default function Home() {
             </h2>
           </div>
 
-          {/* Featured Release - Rafa Kao - Stormdrifter */}
+          {/* Featured Release - G.U.R.I - Polynomic Void */}
           <div className="max-w-4xl mx-auto mb-20 fullscreen-fix">
             <div className="blur-card overflow-hidden">
               <div className="grid lg:grid-cols-2 gap-8 items-center">
                 <div className="relative aspect-square">
                   <img
-                    src="https://i.imgur.com/7HZNuFs_d.jpeg?maxwidth=520&shape=thumb&fidelity=high"
-                    alt="Rafa Kao - Stormdrifter"
+                    src="/images/artwork/polynomic-void.webp"
+                    alt="G.U.R.I - Polynomic Void"
                     className="w-full h-full object-cover rounded-lg blue-glow"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent rounded-lg"></div>
@@ -178,7 +178,7 @@ export default function Home() {
                         TH019
                       </div>
                       <div className="bg-green-600/30 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-medium">
-                        June 2025
+                        December 2025
                       </div>
                     </div>
                   </div>
@@ -186,18 +186,16 @@ export default function Home() {
                 
                 <div className="space-y-6 p-6 lg:p-8">
                   <div>
-                    <h3 className="font-orbitron text-2xl lg:text-3xl font-bold mb-2">STORMDRIFTER</h3>
-                    <p className="text-lg text-blue-400 font-medium mb-4">Rafa Kao</p>
+                    <h3 className="font-orbitron text-2xl lg:text-3xl font-bold mb-2">POLYNOMIC VOID</h3>
+                    <p className="text-lg text-blue-400 font-medium mb-4">G.U.R.I</p>
                     <div className="flex flex-wrap gap-2 mb-4">
-                      <span className="px-3 py-1 bg-blue-500/20 rounded-full text-sm">Melodic House & Techno</span>
-                      <span className="px-3 py-1 bg-blue-500/20 rounded-full text-sm">Maxi Single</span>
+                      <span className="px-3 py-1 bg-blue-500/20 rounded-full text-sm">Progressive House</span>
+                      <span className="px-3 py-1 bg-blue-500/20 rounded-full text-sm">Single</span>
                     </div>
                   </div>
                   
                   <p className="text-muted-foreground leading-relaxed">
-                    Get ready for an immersive journey through atmospheric soundscapes and driving rhythms.
-                    Rafa Kao's latest masterpiece "Stormdrifter" showcases the evolving sound of Tinnie House Records
-                    with its deep melodic progressions and hypnotic techno elements.
+                    The collapse isn't chaotic; it feels inevitable, as if all complexity is being drawn toward a singular point where meaning is stripped away and only pure abstraction remains. It's the moment before a polynomial becomes undefined, before the graph disappears into a vertical asymptote, before logic itself breaks.
                   </p>
                   
                   <div className="flex flex-col sm:flex-row gap-4">
@@ -214,7 +212,7 @@ export default function Home() {
                   <div className="grid grid-cols-2 gap-4 pt-4 border-t border-border/50">
                     <div>
                       <div className="text-sm text-muted-foreground">Release Date</div>
-                      <div className="font-medium">June 30, 2025</div>
+                      <div className="font-medium">December 26, 2025</div>
                     </div>
                     <div>
                       <div className="text-sm text-muted-foreground">Catalog</div>
