@@ -175,7 +175,7 @@ export default function Home() {
                   <div className="absolute bottom-4 left-4 right-4">
                     <div className="flex items-center justify-between">
                       <div className="bg-blue-600/30 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-medium">
-                        TH019
+                        {stormdrifterRelease?.internalReference || 'TH000'}
                       </div>
                       <div className="bg-green-600/30 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-medium">
                         December 2025
@@ -216,7 +216,7 @@ export default function Home() {
                     </div>
                     <div>
                       <div className="text-sm text-muted-foreground">Catalog</div>
-                      <div className="font-medium">TH019</div>
+                      <div className="font-medium">{stormdrifterRelease?.internalReference || 'TH000'}</div>
                     </div>
                   </div>
                 </div>
