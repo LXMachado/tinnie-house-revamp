@@ -93,7 +93,7 @@ function Footer() {
               <span className="font-orbitron font-bold tracking-wide">Tinnie House Records</span>
             </div>
             <p className="text-sm text-muted-foreground">
-              Pushing the boundaries of electronic music since 2020.
+              Pushing the boundaries of electronic music since 2015.
             </p>
           </div>
 
@@ -129,7 +129,7 @@ function Footer() {
         </div>
 
         <div className="flex flex-col md:flex-row justify-between items-center pt-8 mt-8 border-t text-sm text-muted-foreground">
-          <p>&copy; 2024 Tinnie House Records. All rights reserved.</p>
+          <p>&copy; 2025 Tinnie House Records. All rights reserved.</p>
           <div className="flex space-x-6 mt-4 md:mt-0">
             <Link href="/privacy-policy" className="hover:text-blue-500 transition-colors">Privacy Policy</Link>
             <Link href="/terms-of-service" className="hover:text-blue-500 transition-colors">Terms of Service</Link>
