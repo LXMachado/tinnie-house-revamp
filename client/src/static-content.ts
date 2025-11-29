@@ -62,7 +62,7 @@ export const STATIC_RELEASES: Release[] = [
     featured: true,
     isLatest: true,
     upcoming: true,
-    description: "The collapse isn't chaotic; it feels inevitable, as if all complexity is being drawn toward a singular point where meaning is stripped away and only pure abstraction remains. It's the moment before a polynomial becomes undefined, before the graph disappears into a vertical asymptote, before logic itself breaks.",
+    description: "The collapse isn't chaotic. It feels inevitable, as if all complexity is being drawn toward a singular point where meaning is stripped away and only pure abstraction remains.",
   },
   {
     id: 18,
