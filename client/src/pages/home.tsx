@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Play, Pause, MapPin, Clock, Mail, Music, Share, Calendar } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -6,23 +6,53 @@ import { ReleaseCarousel } from "@/components/release-carousel";
 import { ContactForm } from "@/components/contact-form";
 import { MusicPlayer } from "@/components/music-player";
 import type { Artist, Release } from "@/types/content";
-import { STATIC_ARTISTS, STATIC_RELEASES } from "@/static-content";
+import { dbFallback } from "@/lib/database-fallback";
 
 export default function Home() {
   const [showMusicPlayer, setShowMusicPlayer] = useState(false);
   const [showUpcomingModal, setShowUpcomingModal] = useState(false);
-  const artists: Artist[] = STATIC_ARTISTS;
-  const releases: Release[] = useMemo(
+  const [artists, setArtists] = useState<Artist[]>([]);
+  const [releases, setReleases] = useState<Release[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [usingDatabase, setUsingDatabase] = useState(false);
+
+  useEffect(() => {
+    async function fetchData() {
+      // Load static data immediately to prevent blank screen
+      const { STATIC_ARTISTS, STATIC_RELEASES } = await import('@/static-content');
+      setArtists(STATIC_ARTISTS);
+      setReleases(STATIC_RELEASES);
+      
+      // Try to upgrade to database data in the background
+      try {
+        const [artistsData, releasesData] = await Promise.all([
+          dbFallback.getArtists(),
+          dbFallback.getReleases()
+        ]);
+        setArtists(artistsData);
+        setReleases(releasesData);
+        setUsingDatabase(true);
+      } catch (error) {
+        console.log('Continuing with static data (database unavailable):', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchData();
+  }, []);
+
+  const sortedReleases = useMemo(
     () =>
-      [...STATIC_RELEASES].sort((a, b) => {
+      [...releases].sort((a, b) => {
         const dateA = new Date(a.digitalReleaseDate ?? 0).getTime();
         const dateB = new Date(b.digitalReleaseDate ?? 0).getTime();
         return dateB - dateA;
       }),
-    []
+    [releases]
   );
 
-  const stormdrifterRelease = releases.find((release) => release.isLatest) ?? releases[0];
+  const stormdrifterRelease = sortedReleases.find((release) => release.isLatest) ?? sortedReleases[0];
 
   const handleBuyClick = () => {
     if (!stormdrifterRelease?.purchaseLink) {

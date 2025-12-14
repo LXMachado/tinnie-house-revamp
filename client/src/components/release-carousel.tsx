@@ -1,20 +1,44 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight, Play, Share } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MusicPlayer } from "@/components/music-player";
 import type { Release } from "@/types/content";
-import { STATIC_RELEASES } from "@/static-content";
+import { dbFallback } from "@/lib/database-fallback";
 
 export function ReleaseCarousel() {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [releases, setReleases] = useState<Release[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [usingDatabase, setUsingDatabase] = useState(false);
 
-  const releases = useMemo<Release[]>(() => {
-    return [...STATIC_RELEASES].sort((a, b) => {
+  useEffect(() => {
+    async function fetchReleases() {
+      // Load static data immediately to prevent blank screen
+      const { STATIC_RELEASES } = await import('@/static-content');
+      setReleases(STATIC_RELEASES);
+      
+      // Try to upgrade to database data in the background
+      try {
+        const releasesData = await dbFallback.getReleases();
+        setReleases(releasesData);
+        setUsingDatabase(true);
+      } catch (error) {
+        console.log('Continuing with static data (database unavailable):', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchReleases();
+  }, []);
+
+  const sortedReleases = useMemo<Release[]>(() => {
+    return [...releases].sort((a, b) => {
       const dateA = new Date(a.digitalReleaseDate ?? 0).getTime();
       const dateB = new Date(b.digitalReleaseDate ?? 0).getTime();
       return dateB - dateA;
     });
-  }, []);
+  }, [releases]);
 
   const handleShare = async (release: Release) => {
     const shareData = {
@@ -42,16 +66,22 @@ export function ReleaseCarousel() {
   };
 
   const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % Math.max(1, releases.length));
+    setCurrentSlide((prev) => (prev + 1) % Math.max(1, sortedReleases.length));
   };
 
   const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + releases.length) % Math.max(1, releases.length));
+    setCurrentSlide((prev) => (prev - 1 + sortedReleases.length) % Math.max(1, sortedReleases.length));
   };
 
-  // Auto-advance disabled
+  if (loading) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-muted-foreground">Loading releases...</p>
+      </div>
+    );
+  }
 
-  if (releases.length === 0) {
+  if (sortedReleases.length === 0) {
     return (
       <div className="text-center py-12">
         <p className="text-muted-foreground">No featured releases available at this time.</p>
@@ -59,8 +89,8 @@ export function ReleaseCarousel() {
     );
   }
 
-  const totalVisible = Math.min(3, releases.length);
-  const visibleReleases = Array.from({ length: totalVisible }, (_, idx) => releases[(currentSlide + idx) % releases.length]);
+  const totalVisible = Math.min(3, sortedReleases.length);
+  const visibleReleases = Array.from({ length: totalVisible }, (_, idx) => sortedReleases[(currentSlide + idx) % sortedReleases.length]);
 
   return (
     <div className="relative">
@@ -139,7 +169,7 @@ export function ReleaseCarousel() {
         ))}
       </div>
 
-      {releases.length > 3 && (
+      {sortedReleases.length > 3 && (
         <>
           <Button
             variant="outline"
