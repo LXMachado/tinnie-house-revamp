@@ -64,7 +64,7 @@ Polished, single-page React application that showcases the Tinnie House Records 
 
 ### Audio & Media
 - **Custom Audio Manager** - Streamlined audio playback control
-- **Cloudflare R2/S3** support for external audio hosting
+- **Local Audio Storage** - Audio files served from public directory
 
 ### Development Tools
 - **TypeScript** - Static type checking
@@ -141,7 +141,7 @@ export function Component({ prop1, prop2 }: ComponentProps) {
    - Publish directory: `client/dist`
 
 2. **Environment Variables:**
-   - Optional: `VITE_AUDIO_BASE` for external audio hosting
+   - Optional: `NETLIFY_DATABASE_URL` for Neon database integration
 
 3. **Deploy:**
    - Connect your GitHub repository to Netlify
@@ -197,13 +197,10 @@ tinnie-house-revamp/
 Create a `.env` file in the client directory:
 
 ```bash
-# Optional: External audio hosting
-VITE_AUDIO_BASE=https://your-bucket-url.r2.cloudflarestorage.com/tinnie-house-records
-
 # Development port (default: 5173)
 VITE_PORT=5173
 
-# Database connection (for database migration)
+# Database connection (for Neon database integration)
 NETLIFY_DATABASE_URL=postgresql://...
 ```
 
@@ -325,15 +322,8 @@ Consider these enhancements:
 
 ### Audio Configuration
 
-#### Local Audio (Default)
-Audio files are stored in `client/public/audio/` and served statically.
-
-#### External Audio Hosting
-For better performance and scalability, configure Cloudflare R2 or S3:
-
-1. Upload audio files to your bucket
-2. Set `VITE_AUDIO_BASE` environment variable
-3. Ensure the bucket allows public reads and range requests
+#### Local Audio Storage
+Audio files are stored in `client/public/audio/` and served statically as part of the application bundle. The file paths are stored in the database's `audio_file_path` field and resolved to URLs like `/audio/artist/track.mp3`.
 
 ### Theme Customization
 
@@ -447,7 +437,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Static data sources for artists/releases with inline audio previews.
 - Tailwind-based styling with shadcn/ui components and a custom theme toggle.
 - Netlify-ready contact form (Netlify Forms) with client-side validation powered by React Hook Form + Zod.
-- Optional Cloudflare R2/S3 integration for hosting audio—otherwise the bundled `/public/audio` files are used.
+- Audio files served locally from `/public/audio` directory with database-driven path resolution.
 
 ### Tech Stack
 - **React 18 + TypeScript** bundled with **Vite**.
@@ -463,10 +453,10 @@ npm run dev
 
 The dev server runs on Vite (defaults to port `5173`). Audio files live under `client/public/audio`.
 
-Optional environment overrides live in `client/.env`:
+Optional environment variables for database integration live in `client/.env`:
 ```bash
-# Uncomment and set if you want to stream audio from a bucket instead of the bundled files
-# VITE_AUDIO_BASE=https://your-bucket-url.r2.cloudflarestorage.com/tinnie-house-records
+# Database connection for Neon PostgreSQL
+NETLIFY_DATABASE_URL=postgresql://...
 ```
 
 ### Production Build
@@ -489,6 +479,6 @@ client/
 ```
 
 ### Deployment Tips
-- Remove any unused environment variables from Netlify; only `VITE_AUDIO_BASE` is optional.
+- Set `NETLIFY_DATABASE_URL` environment variable in Netlify for database integration.
 - Netlify Forms will capture submissions automatically once the site is deployed.
-- Cloudflare R2/S3 users should make sure the bucket allows public reads and supports range requests if audio streaming is enabled.
+- Audio files are bundled with the application and served statically from `/audio/` URLs.
