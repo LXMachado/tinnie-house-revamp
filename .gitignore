@@ -72,6 +72,9 @@ Desktop.ini
 .directory
 .Trash-*
 
+# Documentation files
+DATABASE_SETUP.md
+
 # Temporary files
 tmp/
 temp/
