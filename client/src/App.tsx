@@ -1,10 +1,9 @@
 import { Switch, Route, Link } from "wouter";
-import { queryClient } from "./lib/queryClient";
-import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/lib/theme-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { Logo } from "@/components/logo";
 import { Menu } from "lucide-react";
 import { useState } from "react";
 import Home from "@/pages/home";
@@ -29,11 +28,7 @@ function Header() {
       <div className="container flex h-16 items-center justify-between">
         <div className="flex items-center space-x-4">
           <div className="flex items-center space-x-3">
-            <img 
-              src="/logo.png" 
-              alt="Tinnie House Records Logo" 
-              className="w-8 h-8 object-contain"
-            />
+            <Logo size="md" />
             <span className="font-orbitron font-bold text-xl tracking-wide">Tinnie House Records</span>
           </div>
         </div>
@@ -94,15 +89,11 @@ function Footer() {
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
           <div className="space-y-4">
             <div className="flex items-center space-x-3">
-              <img 
-                src="/logo.png" 
-                alt="Tinnie House Records Logo" 
-                className="w-6 h-6 object-contain"
-              />
+              <Logo size="sm" />
               <span className="font-orbitron font-bold tracking-wide">Tinnie House Records</span>
             </div>
             <p className="text-sm text-muted-foreground">
-              Pushing the boundaries of electronic music since 2020.
+              Pushing the boundaries of electronic music since 2015.
             </p>
           </div>
 
@@ -138,7 +129,7 @@ function Footer() {
         </div>
 
         <div className="flex flex-col md:flex-row justify-between items-center pt-8 mt-8 border-t text-sm text-muted-foreground">
-          <p>&copy; 2024 Tinnie House Records. All rights reserved.</p>
+          <p>&copy; 2025 Tinnie House Records. All rights reserved.</p>
           <div className="flex space-x-6 mt-4 md:mt-0">
             <Link href="/privacy-policy" className="hover:text-blue-500 transition-colors">Privacy Policy</Link>
             <Link href="/terms-of-service" className="hover:text-blue-500 transition-colors">Terms of Service</Link>
@@ -164,20 +155,18 @@ function Router() {
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider defaultTheme="dark" storageKey="tinnie-house-theme">
-        <TooltipProvider>
-          <div className="min-h-screen flex flex-col">
-            <Header />
-            <main className="flex-1">
-              <Router />
-            </main>
-            <Footer />
-          </div>
-          <Toaster />
-        </TooltipProvider>
-      </ThemeProvider>
-    </QueryClientProvider>
+    <ThemeProvider defaultTheme="dark" storageKey="tinnie-house-theme">
+      <TooltipProvider>
+        <div className="min-h-screen flex flex-col">
+          <Header />
+          <main className="flex-1">
+            <Router />
+          </main>
+          <Footer />
+        </div>
+        <Toaster />
+      </TooltipProvider>
+    </ThemeProvider>
   );
 }
 

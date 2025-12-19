@@ -1,16 +1,44 @@
-import { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useMemo, useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight, Play, Share } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MusicPlayer } from "@/components/music-player";
-import type { Release } from "@shared/schema";
+import type { Release } from "@/types/content";
+import { dbFallback } from "@/lib/database-fallback";
 
 export function ReleaseCarousel() {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [releases, setReleases] = useState<Release[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [usingDatabase, setUsingDatabase] = useState(false);
 
-  const { data: releases = [], isLoading } = useQuery<Release[]>({
-    queryKey: ["/api/releases/catalog"],
-  });
+  useEffect(() => {
+    async function fetchReleases() {
+      // Load static data immediately to prevent blank screen
+      const { STATIC_RELEASES } = await import('@/static-content');
+      setReleases(STATIC_RELEASES);
+      
+      // Try to upgrade to database data in the background
+      try {
+        const releasesData = await dbFallback.getReleases();
+        setReleases(releasesData);
+        setUsingDatabase(true);
+      } catch (error) {
+        console.log('Continuing with static data (database unavailable):', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchReleases();
+  }, []);
+
+  const sortedReleases = useMemo<Release[]>(() => {
+    return [...releases].sort((a, b) => {
+      const dateA = new Date(a.digitalReleaseDate ?? 0).getTime();
+      const dateB = new Date(b.digitalReleaseDate ?? 0).getTime();
+      return dateB - dateA;
+    });
+  }, [releases]);
 
   const handleShare = async (release: Release) => {
     const shareData = {
@@ -38,30 +66,22 @@ export function ReleaseCarousel() {
   };
 
   const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % Math.max(1, releases.length));
+    setCurrentSlide((prev) => (prev + 1) % Math.max(1, sortedReleases.length));
   };
 
   const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + releases.length) % Math.max(1, releases.length));
+    setCurrentSlide((prev) => (prev - 1 + sortedReleases.length) % Math.max(1, sortedReleases.length));
   };
 
-  // Auto-advance disabled
-
-  if (isLoading) {
+  if (loading) {
     return (
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {[...Array(3)].map((_, i) => (
-          <div key={i} className="animate-pulse">
-            <div className="bg-muted rounded-2xl h-64 mb-4"></div>
-            <div className="h-4 bg-muted rounded mb-2"></div>
-            <div className="h-4 bg-muted rounded w-2/3"></div>
-          </div>
-        ))}
+      <div className="text-center py-12">
+        <p className="text-muted-foreground">Loading releases...</p>
       </div>
     );
   }
 
-  if (releases.length === 0) {
+  if (sortedReleases.length === 0) {
     return (
       <div className="text-center py-12">
         <p className="text-muted-foreground">No featured releases available at this time.</p>
@@ -69,11 +89,14 @@ export function ReleaseCarousel() {
     );
   }
 
+  const totalVisible = Math.min(3, sortedReleases.length);
+  const visibleReleases = Array.from({ length: totalVisible }, (_, idx) => sortedReleases[(currentSlide + idx) % sortedReleases.length]);
+
   return (
     <div className="relative">
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-        {releases.slice(currentSlide, currentSlide + 3).map((release) => (
-          <div key={release.id} className="group blur-card overflow-hidden transition-all duration-300">
+        {visibleReleases.map((release, index) => (
+          <div key={`${release.id}-${index}`} className="group blur-card overflow-hidden transition-all duration-300">
             <div className="relative">
               <img 
                 src={release.imgUrl || release.coverImageUrl || "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600"} 
@@ -81,10 +104,10 @@ export function ReleaseCarousel() {
                 className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
               />
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors duration-300 flex items-center justify-center">
-                {release.audioFileUrl && (
+                {release.audioFilePath && (
                   <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     <MusicPlayer 
-                      audioUrl={release.audioFileUrl}
+                      audioPath={release.audioFilePath}
                       title={release.title}
                       artist={release.artist}
                       compact={true}
@@ -146,7 +169,7 @@ export function ReleaseCarousel() {
         ))}
       </div>
 
-      {releases.length > 3 && (
+      {sortedReleases.length > 3 && (
         <>
           <Button
             variant="outline"

@@ -1,25 +1,58 @@
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { Play, Pause, Users, MapPin, Clock, Mail, Phone, Instagram, Twitter, Music, Share, Calendar } from "lucide-react";
+import { useMemo, useState, useEffect } from "react";
+import { Play, Pause, MapPin, Clock, Mail, Music, Share, Calendar } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ReleaseCarousel } from "@/components/release-carousel";
 import { ContactForm } from "@/components/contact-form";
 import { MusicPlayer } from "@/components/music-player";
-import type { Artist, Release } from "@shared/schema";
+import type { Artist, Release } from "@/types/content";
+import { dbFallback } from "@/lib/database-fallback";
 
 export default function Home() {
   const [showMusicPlayer, setShowMusicPlayer] = useState(false);
   const [showUpcomingModal, setShowUpcomingModal] = useState(false);
-  
-  const { data: artists = [], isLoading: artistsLoading } = useQuery<Artist[]>({
-    queryKey: ["/api/artists"],
-  });
+  const [artists, setArtists] = useState<Artist[]>([]);
+  const [releases, setReleases] = useState<Release[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [usingDatabase, setUsingDatabase] = useState(false);
 
-  const { data: stormdrifterRelease } = useQuery<Release>({
-    queryKey: ["/api/releases/latest"],
-    staleTime: 0, // Always refetch to get latest data
-  });
+  useEffect(() => {
+    async function fetchData() {
+      // Load static data immediately to prevent blank screen
+      const { STATIC_ARTISTS, STATIC_RELEASES } = await import('@/static-content');
+      setArtists(STATIC_ARTISTS);
+      setReleases(STATIC_RELEASES);
+      
+      // Try to upgrade to database data in the background
+      try {
+        const [artistsData, releasesData] = await Promise.all([
+          dbFallback.getArtists(),
+          dbFallback.getReleases()
+        ]);
+        setArtists(artistsData);
+        setReleases(releasesData);
+        setUsingDatabase(true);
+      } catch (error) {
+        console.log('Continuing with static data (database unavailable):', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchData();
+  }, []);
+
+  const sortedReleases = useMemo(
+    () =>
+      [...releases].sort((a, b) => {
+        const dateA = new Date(a.digitalReleaseDate ?? 0).getTime();
+        const dateB = new Date(b.digitalReleaseDate ?? 0).getTime();
+        return dateB - dateA;
+      }),
+    [releases]
+  );
+
+  const stormdrifterRelease = sortedReleases.find((release) => release.isLatest) ?? sortedReleases[0];
 
   const handleBuyClick = () => {
     if (!stormdrifterRelease?.purchaseLink) {
@@ -65,7 +98,7 @@ export default function Home() {
   };
 
   const handleListenClick = () => {
-    if (stormdrifterRelease?.audioFileUrl) {
+    if (stormdrifterRelease?.audioFilePath) {
       setShowMusicPlayer(!showMusicPlayer);
     } else {
       scrollToSection("releases");
@@ -75,11 +108,11 @@ export default function Home() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative overflow-hidden min-h-screen flex items-center">
+      <section className="hero-section relative overflow-hidden min-h-screen">
         <div className="absolute inset-0 grid-overlay opacity-20"></div>
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-500/5 to-blue-500/20"></div>
-        <div className="container relative py-24 lg:py-32">
-          <div className="max-w-4xl mx-auto text-center">
+        <div className="content-wrapper container relative py-24 lg:py-32">
+          <div className="max-w-4xl mx-auto text-center fullscreen-fix">
             <div className="space-y-8 animate-fade-in">
               <div className="space-y-6">
                 <h1 className="font-orbitron text-5xl lg:text-7xl font-bold tracking-tight leading-tight">
@@ -96,23 +129,27 @@ export default function Home() {
               </div>
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button onClick={handleListenClick}>
-                  {stormdrifterRelease?.audioFileUrl ? (
-                    <>
+                {stormdrifterRelease?.audioFilePath ? (
+                  <>
+                    <Button onClick={handleListenClick}>
                       {showMusicPlayer ? <Pause className="w-4 h-4 mr-2" /> : <Play className="w-4 h-4 mr-2" />}
                       Listen
-                    </>
-                  ) : (
-                    "Explore Releases"
-                  )}
-                </Button>
-                <Button variant="outline" onClick={() => scrollToSection("releases")}>
-                  Explore Releases
-                </Button>
+                    </Button>
+                    <Button variant="outline" onClick={() => scrollToSection("releases")}>
+                      <Music className="w-4 h-4 mr-2" />
+                      Explore Releases
+                    </Button>
+                  </>
+                ) : (
+                  <Button onClick={() => scrollToSection("releases")}>
+                    <Play className="w-4 h-4 mr-2" />
+                    Explore Releases
+                  </Button>
+                )}
               </div>
               
               {/* Inline Music Player */}
-              {showMusicPlayer && stormdrifterRelease?.audioFileUrl && (
+              {showMusicPlayer && stormdrifterRelease?.audioFilePath && (
                 <div className="mt-8 max-w-md mx-auto">
                   <div className="blur-card p-6 rounded-2xl">
                     <div className="text-center mb-4">
@@ -124,8 +161,8 @@ export default function Home() {
                         </p>
                       )}
                     </div>
-                    <MusicPlayer 
-                      audioUrl={stormdrifterRelease.audioFileUrl}
+                    <MusicPlayer
+                      audioPath={stormdrifterRelease.audioFilePath}
                       title={stormdrifterRelease.title}
                       artist={stormdrifterRelease.artist}
                       compact={true}
@@ -133,8 +170,6 @@ export default function Home() {
                   </div>
                 </div>
               )}
-
-
             </div>
           </div>
         </div>
@@ -143,7 +178,7 @@ export default function Home() {
       {/* Featured Upcoming Release Section */}
       <section id="releases" className="py-16 lg:py-24 relative">
         <div className="absolute inset-0 bg-gradient-to-b from-blue-500/5 to-transparent"></div>
-        <div className="container relative">
+        <div className="content-wrapper container relative fullscreen-fix">
           <div className="text-center mb-16">
             {stormdrifterRelease && stormdrifterRelease.upcoming && (
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/20 text-blue-400 text-sm font-medium mb-4">
@@ -156,24 +191,24 @@ export default function Home() {
             </h2>
           </div>
 
-          {/* Featured Release - Rafa Kao - Stormdrifter */}
-          <div className="max-w-4xl mx-auto mb-20">
+          {/* Featured Release - G.U.R.I - Polynomic Void */}
+          <div className="max-w-4xl mx-auto mb-20 fullscreen-fix">
             <div className="blur-card overflow-hidden">
               <div className="grid lg:grid-cols-2 gap-8 items-center">
                 <div className="relative aspect-square">
-                  <img 
-                    src="https://i.imgur.com/7HZNuFs_d.jpeg?maxwidth=520&shape=thumb&fidelity=high" 
-                    alt="Rafa Kao - Stormdrifter"
+                  <img
+                    src="/images/artwork/polynomic-void.webp"
+                    alt="G.U.R.I - Polynomic Void"
                     className="w-full h-full object-cover rounded-lg blue-glow"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent rounded-lg"></div>
                   <div className="absolute bottom-4 left-4 right-4">
                     <div className="flex items-center justify-between">
                       <div className="bg-blue-600/30 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-medium">
-                        TH019
+                        {stormdrifterRelease?.internalReference || 'TH000'}
                       </div>
                       <div className="bg-green-600/30 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-medium">
-                        June 2025
+                        December 2025
                       </div>
                     </div>
                   </div>
@@ -181,18 +216,16 @@ export default function Home() {
                 
                 <div className="space-y-6 p-6 lg:p-8">
                   <div>
-                    <h3 className="font-orbitron text-2xl lg:text-3xl font-bold mb-2">STORMDRIFTER</h3>
-                    <p className="text-lg text-blue-400 font-medium mb-4">Rafa Kao</p>
+                    <h3 className="font-orbitron text-2xl lg:text-3xl font-bold mb-2">POLYNOMIC VOID</h3>
+                    <p className="text-lg text-blue-400 font-medium mb-4">G.U.R.I</p>
                     <div className="flex flex-wrap gap-2 mb-4">
-                      <span className="px-3 py-1 bg-blue-500/20 rounded-full text-sm">Melodic House & Techno</span>
-                      <span className="px-3 py-1 bg-blue-500/20 rounded-full text-sm">Maxi Single</span>
+                      <span className="px-3 py-1 bg-blue-500/20 rounded-full text-sm">Progressive House</span>
+                      <span className="px-3 py-1 bg-blue-500/20 rounded-full text-sm">Single</span>
                     </div>
                   </div>
                   
                   <p className="text-muted-foreground leading-relaxed">
-                    Get ready for an immersive journey through atmospheric soundscapes and driving rhythms. 
-                    Rafa Kao's latest masterpiece "Stormdrifter" showcases the evolving sound of Tinnie House Records 
-                    with its deep melodic progressions and hypnotic techno elements.
+                    The collapse isn't chaotic. It feels inevitable, as if all complexity is being drawn toward a singular point where meaning is stripped away and only pure abstraction remains.
                   </p>
                   
                   <div className="flex flex-col sm:flex-row gap-4">
@@ -209,11 +242,11 @@ export default function Home() {
                   <div className="grid grid-cols-2 gap-4 pt-4 border-t border-border/50">
                     <div>
                       <div className="text-sm text-muted-foreground">Release Date</div>
-                      <div className="font-medium">June 30, 2025</div>
+                      <div className="font-medium">December 26, 2025</div>
                     </div>
                     <div>
                       <div className="text-sm text-muted-foreground">Catalog</div>
-                      <div className="font-medium">TH019</div>
+                      <div className="font-medium">{stormdrifterRelease?.internalReference || 'TH000'}</div>
                     </div>
                   </div>
                 </div>
@@ -232,7 +265,7 @@ export default function Home() {
           <ReleaseCarousel />
 
           <div className="text-center mt-12">
-            <Button 
+            <Button
               variant="outline"
               onClick={() => window.open('https://www.beatport.com/label/tinnie-house-records/50650', '_blank')}
             >
@@ -244,7 +277,7 @@ export default function Home() {
 
       {/* Featured Artists Section */}
       <section id="artists" className="py-16 lg:py-24">
-        <div className="container">
+        <div className="content-wrapper container relative fullscreen-fix">
           <div className="text-center mb-12">
             <h2 className="font-orbitron text-3xl lg:text-4xl font-bold mb-4">Featured Artists</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
@@ -252,37 +285,54 @@ export default function Home() {
             </p>
           </div>
 
-          {artistsLoading ? (
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {[...Array(4)].map((_, i) => (
-                <div key={i} className="text-center animate-pulse">
-                  <div className="w-32 h-32 rounded-full mx-auto bg-muted mb-4"></div>
-                  <div className="h-4 bg-muted rounded mb-2"></div>
-                  <div className="h-3 bg-muted rounded w-2/3 mx-auto"></div>
-                </div>
-              ))}
-            </div>
-          ) : artists.length === 0 ? (
+          {artists.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-muted-foreground">No artists available at this time.</p>
             </div>
           ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {artists.slice(0, 4).map((artist) => (
-                <div key={artist.id} className="group text-center">
-                  <div className="relative mb-4">
-                    <img 
-                      src={artist.imageUrl || "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=400"} 
-                      alt={`${artist.name} artist photo`}
-                      className="w-32 h-32 rounded-full mx-auto object-cover border-4 border-blue-500/20 group-hover:border-blue-500/50 transition-colors"
-                    />
-                    <div className="absolute inset-0 w-32 h-32 rounded-full mx-auto bg-blue-500/0 group-hover:bg-blue-500/10 transition-colors"></div>
+              {artists.slice(0, 4).map((artist) => {
+                const soundcloudLink = artist.socialLinks?.soundcloud;
+                return (
+                  <div key={artist.id} className="group text-center">
+                    <div className="relative mb-4">
+                      {soundcloudLink ? (
+                        <button
+                          onClick={() => window.open(soundcloudLink, '_blank')}
+                          className="relative focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-background rounded-full"
+                          aria-label={`Visit ${artist.name} on SoundCloud`}
+                        >
+                          <img
+                            src={artist.imageUrl || "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=400"}
+                            alt={`${artist.name} artist photo`}
+                            className="w-32 h-32 rounded-full mx-auto object-cover border-4 border-blue-500/20 group-hover:border-blue-500/50 transition-all duration-300 hover:scale-105 cursor-pointer"
+                          />
+                          <div className="absolute inset-0 w-32 h-32 rounded-full mx-auto bg-blue-500/0 group-hover:bg-blue-500/20 transition-colors duration-300"></div>
+                          <div className="absolute inset-0 w-32 h-32 rounded-full mx-auto flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <div className="bg-black/50 rounded-full p-2">
+                              <Music className="w-5 h-5 text-white" />
+                            </div>
+                          </div>
+                        </button>
+                      ) : (
+                        <img
+                          src={artist.imageUrl || "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=400"}
+                          alt={`${artist.name} artist photo`}
+                          className="w-32 h-32 rounded-full mx-auto object-cover border-4 border-blue-500/20"
+                        />
+                      )}
+                    </div>
+                    <h3 className="font-orbitron font-semibold text-lg mb-1">{artist.name}</h3>
+                    <p className="text-sm text-muted-foreground mb-2">{artist.genre || "Electronic"}</p>
+                    <p className="text-xs text-muted-foreground">{artist.bio || "Innovative electronic music artist"}</p>
+                    {soundcloudLink && (
+                      <p className="text-xs text-blue-400 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        Click image to visit SoundCloud
+                      </p>
+                    )}
                   </div>
-                  <h3 className="font-orbitron font-semibold text-lg mb-1">{artist.name}</h3>
-                  <p className="text-sm text-muted-foreground mb-2">{artist.genre || "Electronic"}</p>
-                  <p className="text-xs text-muted-foreground">{artist.bio || "Innovative electronic music artist"}</p>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
@@ -290,8 +340,8 @@ export default function Home() {
 
       {/* About Section */}
       <section id="about" className="py-16 lg:py-24 bg-muted/30">
-        <div className="container">
-          <div className="text-center max-w-4xl mx-auto">
+        <div className="content-wrapper container relative fullscreen-fix">
+          <div className="text-center max-w-4xl mx-auto fullscreen-fix">
             <h2 className="font-orbitron text-3xl lg:text-4xl font-bold mb-6">About Tinnie House Records</h2>
             <div className="space-y-4 text-muted-foreground">
               <p className="text-lg">
@@ -309,7 +359,7 @@ export default function Home() {
       {/* Contact Section */}
       <section id="contact" className="py-16 lg:py-24 relative">
         <div className="absolute inset-0 bg-gradient-to-t from-blue-500/10 to-transparent"></div>
-        <div className="container max-w-6xl relative">
+        <div className="content-wrapper container max-w-6xl relative fullscreen-fix">
           <div className="text-center mb-12">
             <h2 className="font-orbitron text-3xl lg:text-4xl font-bold mb-4 tracking-wide">BECOME PART OF OUR LABEL FAMILY</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
@@ -329,8 +379,8 @@ export default function Home() {
                     Sign up for exclusive updates on releases, events, and special announcements.
                   </p>
                   <div className="flex gap-3">
-                    <input 
-                      type="email" 
+                    <input
+                      type="email"
                       placeholder="Your Email"
                       className="flex-1 px-4 py-3 rounded-md bg-background/20 border border-white/10 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors backdrop-blur-sm"
                     />

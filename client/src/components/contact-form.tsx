@@ -1,11 +1,9 @@
 import { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
 
 const contactFormSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -16,9 +14,15 @@ const contactFormSchema = z.object({
 
 type ContactFormData = z.infer<typeof contactFormSchema>;
 
+function encodeNetlifyForm(data: Record<string, string>) {
+  return Object.keys(data)
+    .map((key) => encodeURIComponent(key) + "=" + encodeURIComponent(data[key]))
+    .join("&");
+}
+
 export function ContactForm() {
   const { toast } = useToast();
-  const queryClient = useQueryClient();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<ContactFormData>({
     resolver: zodResolver(contactFormSchema),
@@ -30,35 +34,60 @@ export function ContactForm() {
     },
   });
 
-  const contactMutation = useMutation({
-    mutationFn: async (data: ContactFormData) => {
-      return await apiRequest("POST", "/api/contact", data);
-    },
-    onSuccess: () => {
+  const onSubmit = async (data: ContactFormData) => {
+    try {
+      setIsSubmitting(true);
+      const encodedBody = encodeNetlifyForm({
+        "form-name": "contact",
+        "bot-field": "",
+        ...data,
+      });
+
+      const response = await fetch("/", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: encodedBody,
+      });
+
+      if (!response.ok) {
+        throw new Error(`Form submission failed with status ${response.status}`);
+      }
+
       toast({
         title: "Message sent!",
         description: "We'll get back to you within 24-48 hours.",
       });
       form.reset();
-      queryClient.invalidateQueries({ queryKey: ["/api/contact"] });
-    },
-    onError: (error) => {
+    } catch (error) {
+      console.error("Contact form submission error:", error);
       toast({
         title: "Error",
         description: "Failed to send message. Please try again.",
         variant: "destructive",
       });
-      console.error("Contact form error:", error);
-    },
-  });
-
-  const onSubmit = (data: ContactFormData) => {
-    contactMutation.mutate(data);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <div className="blur-card p-8">
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form
+        name="contact"
+        method="POST"
+        data-netlify="true"
+        netlify-honeypot="bot-field"
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="space-y-6"
+      >
+        <input type="hidden" name="form-name" value="contact" />
+        <p className="hidden">
+          <label>
+            Don’t fill this out if you're human:
+            <input name="bot-field" />
+          </label>
+        </p>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label htmlFor="name" className="block text-sm font-medium mb-2">
@@ -139,9 +168,9 @@ export function ContactForm() {
         <Button
           type="submit"
           className="w-full"
-          disabled={contactMutation.isPending}
+          disabled={isSubmitting}
         >
-          {contactMutation.isPending ? "Sending..." : "Send Message"}
+          {isSubmitting ? "Sending..." : "Send Message"}
         </Button>
       </form>
     </div>
