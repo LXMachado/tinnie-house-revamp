@@ -48,7 +48,7 @@ export const dbFallback = {
     // For local development, always use static data
     if (!this.shouldUseDatabase()) {
       console.log('Using static data for releases (database not configured)');
-      return STATIC_RELEASES;
+      return this.processReleases(STATIC_RELEASES);
     }
 
     try {
@@ -82,11 +82,32 @@ export const dbFallback = {
         ORDER BY digital_release_date DESC NULLS LAST
       `;
       console.log('Using database data for releases');
-      return releases as Release[];
+      return this.processReleases(releases as Release[]);
     } catch (error) {
       console.warn('Database connection failed, using fallback static data for releases:', error);
-      return STATIC_RELEASES;
+      return this.processReleases(STATIC_RELEASES);
     }
+  },
+
+  // Process releases to automatically set upcoming based on current date
+  processReleases(releases: Release[]): Release[] {
+    const now = new Date();
+    return releases.map(release => {
+      const isUpcoming = release.digitalReleaseDate ? new Date(release.digitalReleaseDate) > now : release.upcoming;
+      let updatedRelease = {
+        ...release,
+        upcoming: isUpcoming
+      };
+
+      // Fill in links for released tracks that have empty links
+      if (!isUpcoming && release.slug === 'polynomic-void' && !updatedRelease.purchaseLink) {
+        updatedRelease.beatportSaleUrl = 'https://www.beatport.com/release/polynomic-void/5657786';
+        updatedRelease.purchaseLink = 'https://www.beatport.com/release/polynomic-void/5657786';
+        updatedRelease.shareLink = 'https://www.beatport.com/release/polynomic-void/5657786';
+      }
+
+      return updatedRelease;
+    });
   },
 
   // Get featured releases with fallback

@@ -23,8 +23,8 @@ INSERT INTO releases (
   'Tinnie House Records', 'Single', 'Progressive House',
   '2025-12-26', 'TH020', 1, 
   '/images/artwork/polynomic-void.webp', '/images/artwork/polynomic-void.webp',
-  '', '', '', 'guri/polynomic-void.mp3', 
-  true, true, true,
+  'https://www.beatport.com/release/polynomic-void/5657786', 'https://www.beatport.com/release/polynomic-void/5657786', 'https://www.beatport.com/release/polynomic-void/5657786', 'guri/polynomic-void.mp3', 
+  true, false, true,
   'The collapse isn''t chaotic; it feels inevitable, as if all complexity is being drawn toward a singular point where meaning is stripped away and only pure abstraction remains. It''s the moment before a polynomial becomes undefined, before the graph disappears into a vertical asymptote, before logic itself breaks.'
 ),
 (

@@ -14,13 +14,13 @@
     "trackCount": 1,
     "coverImageUrl": "/images/artwork/polynomic-void.webp",
     "imgUrl": "/images/artwork/polynomic-void.webp",
-    "beatportSaleUrl": "",
-    "purchaseLink": "",
-    "shareLink": "",
+    "beatportSaleUrl": "https://www.beatport.com/release/polynomic-void/5657786",
+    "purchaseLink": "https://www.beatport.com/release/polynomic-void/5657786",
+    "shareLink": "https://www.beatport.com/release/polynomic-void/5657786",
     "audioFilePath": "guri/polynomic-void.mp3",
     "featured": true,
+    "upcoming": false,
     "isLatest": true,
-    "upcoming": true,
     "description": "The collapse isn't chaotic; it feels inevitable, as if all complexity is being drawn toward a singular point where meaning is stripped away and only pure abstraction remains. It's the moment before a polynomial becomes undefined, before the graph disappears into a vertical asymptote, before logic itself breaks."
   },
   {
