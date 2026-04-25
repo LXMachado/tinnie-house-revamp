@@ -109,13 +109,15 @@ export default function Home() {
     <div className="min-h-screen">
       {/* Hero Section */}
       <section className="hero-section relative overflow-hidden min-h-screen">
+        <div className="absolute inset-0 hero-background"></div>
         <div className="absolute inset-0 grid-overlay opacity-20"></div>
+        <div className="absolute inset-0 hero-content-overlay"></div>
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-500/5 to-blue-500/20"></div>
-        <div className="content-wrapper container relative py-24 lg:py-32">
-          <div className="max-w-4xl mx-auto text-center fullscreen-fix">
+        <div className="content-wrapper container relative py-20 lg:py-24">
+          <div className="hero-copy max-w-4xl mx-auto text-center lg:text-left fullscreen-fix lg:mx-0">
             <div className="space-y-8 animate-fade-in">
               <div className="space-y-6">
-                <h1 className="font-orbitron text-5xl lg:text-7xl font-bold tracking-tight leading-tight">
+                <h1 className="font-orbitron text-[clamp(2.8rem,6vw,6.2rem)] font-bold tracking-tight leading-[0.96]">
                   PUSHING THE
                   <span className="block">BOUNDARIES OF</span>
                   <span className="block text-transparent bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text">
@@ -123,19 +125,26 @@ export default function Home() {
                   </span>
                   <span className="block">ELECTRONIC MUSIC</span>
                 </h1>
-                <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+                <p className="text-lg text-muted-foreground max-w-2xl mx-auto lg:mx-0 leading-relaxed">
                   Tinnie House Records is an independent label dedicated to showcasing innovative techno, melodic techno, and progressive house from Australia and beyond.
                 </p>
               </div>
               
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 {stormdrifterRelease?.audioFilePath ? (
                   <>
-                    <Button onClick={handleListenClick}>
+                    <Button
+                      onClick={handleListenClick}
+                      className="h-14 px-9 text-[1.05rem] tracking-[0.08em] uppercase rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 border border-blue-400/60 shadow-[0_12px_30px_rgba(37,99,235,0.45)]"
+                    >
                       {showMusicPlayer ? <Pause className="w-4 h-4 mr-2" /> : <Play className="w-4 h-4 mr-2" />}
                       Listen
                     </Button>
-                    <Button variant="outline" onClick={() => scrollToSection("releases")}>
+                    <Button
+                      variant="outline"
+                      onClick={() => scrollToSection("releases")}
+                      className="h-14 px-9 text-[1.05rem] tracking-[0.08em] uppercase rounded-lg bg-blue-900/10 border-blue-500/70 text-blue-400 shadow-[inset_0_0_24px_rgba(30,64,175,0.2)]"
+                    >
                       <Music className="w-4 h-4 mr-2" />
                       Explore Releases
                     </Button>
@@ -150,7 +159,7 @@ export default function Home() {
               
               {/* Inline Music Player */}
               {showMusicPlayer && stormdrifterRelease?.audioFilePath && (
-                <div className="mt-8 max-w-md mx-auto">
+                <div className="mt-8 max-w-md mx-auto lg:mx-0">
                   <div className="blur-card p-6 rounded-2xl">
                     <div className="text-center mb-4">
                       <h3 className="font-orbitron font-bold text-lg">{stormdrifterRelease.title}</h3>

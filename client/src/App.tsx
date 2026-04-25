@@ -2,9 +2,8 @@ import { Switch, Route, Link } from "wouter";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/lib/theme-provider";
-import { ThemeToggle } from "@/components/theme-toggle";
 import { Logo } from "@/components/logo";
-import { Menu } from "lucide-react";
+import { Menu, UserRound } from "lucide-react";
 import { useState } from "react";
 import Home from "@/pages/home";
 import NotFound from "@/pages/not-found";
@@ -24,32 +23,34 @@ function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b backdrop-blur-md bg-background/10 supports-[backdrop-filter]:bg-background/10">
+    <header className="sticky top-0 z-50 w-full border-b border-blue-500/20 backdrop-blur-md bg-slate-950/60 supports-[backdrop-filter]:bg-slate-950/50">
       <div className="container flex h-16 items-center justify-between">
         <div className="flex items-center space-x-4">
           <div className="flex items-center space-x-3">
-            <Logo size="md" />
-            <span className="font-orbitron font-bold text-xl tracking-wide">Tinnie House Records</span>
+            <Logo size="lg" className="w-12 h-12" />
+            <span className="font-orbitron font-bold text-xl lg:text-2xl tracking-tight text-slate-100">Tinnie House Records</span>
           </div>
         </div>
         
-        <nav className="hidden md:flex items-center space-x-6">
-          <button onClick={() => scrollToSection("releases")} className="text-sm font-medium hover:text-blue-500 transition-colors">
+        <nav className="hidden md:flex items-center space-x-10">
+          <button onClick={() => scrollToSection("releases")} className="text-xl font-medium text-slate-100 hover:text-blue-400 transition-colors">
             Releases
           </button>
-          <button onClick={() => scrollToSection("artists")} className="text-sm font-medium hover:text-blue-500 transition-colors">
+          <button onClick={() => scrollToSection("artists")} className="text-xl font-medium text-slate-100 hover:text-blue-400 transition-colors">
             Artists
           </button>
-          <button onClick={() => scrollToSection("about")} className="text-sm font-medium hover:text-blue-500 transition-colors">
+          <button onClick={() => scrollToSection("about")} className="text-xl font-medium text-slate-100 hover:text-blue-400 transition-colors">
             About
           </button>
-          <button onClick={() => scrollToSection("contact")} className="text-sm font-medium hover:text-blue-500 transition-colors">
+          <button onClick={() => scrollToSection("contact")} className="text-xl font-medium text-slate-100 hover:text-blue-400 transition-colors">
             Contact
           </button>
         </nav>
 
         <div className="flex items-center space-x-4">
-          <ThemeToggle />
+          <button className="hidden md:inline-flex p-2 rounded-md text-blue-500/90 hover:text-blue-400 transition-colors">
+            <UserRound className="w-6 h-6" />
+          </button>
           
           <button 
             className="md:hidden p-2 rounded-md hover:bg-accent transition-colors" 

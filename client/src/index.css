@@ -107,9 +107,24 @@
   .hero-section {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     width: 100%;
     max-width: 100%;
+  }
+
+  .hero-background {
+    background-image: url("/images/hero/tinnie-house-hero.webp");
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: 72% center;
+  }
+
+  .hero-content-overlay {
+    background: linear-gradient(90deg, rgba(2, 8, 23, 0.92) 0%, rgba(2, 8, 23, 0.82) 38%, rgba(2, 8, 23, 0.34) 68%, rgba(2, 8, 23, 0.1) 100%);
+  }
+
+  .hero-copy {
+    max-width: 48rem;
   }
 
   /* Fix grid overlay positioning */
@@ -252,6 +267,24 @@
 
   .blue-glow:hover {
     box-shadow: 0 0 50px rgba(59, 130, 246, 0.6);
+  }
+
+  @media (max-width: 1023px) {
+    .hero-section {
+      justify-content: center;
+    }
+
+    .hero-background {
+      background-position: 64% center;
+    }
+
+    .hero-content-overlay {
+      background: linear-gradient(180deg, rgba(2, 8, 23, 0.8) 0%, rgba(2, 8, 23, 0.66) 42%, rgba(2, 8, 23, 0.82) 100%);
+    }
+
+    .hero-copy {
+      max-width: 64rem;
+    }
   }
 
   /* Floating animation */
