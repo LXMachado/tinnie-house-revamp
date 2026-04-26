@@ -113,10 +113,10 @@ export default function Home() {
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-500/5 to-blue-500/20"></div>
         <div className="content-wrapper container relative py-20 lg:py-24">
           <div className="hero-layout fullscreen-fix">
-            <div className="hero-copy max-w-4xl mx-auto text-center lg:text-left lg:mx-0">
+            <div className="hero-copy min-w-0 max-w-4xl mx-auto text-center lg:text-left lg:mx-0">
               <div className="space-y-8 animate-fade-in">
                 <div className="space-y-6">
-                  <h1 className="font-orbitron text-[clamp(2.8rem,6vw,6.2rem)] font-bold tracking-tight leading-[0.96]">
+                  <h1 className="font-orbitron text-[clamp(2.2rem,5.2vw,5.6rem)] font-bold tracking-tight leading-[0.96]">
                     PUSHING THE
                     <span className="block">BOUNDARIES OF</span>
                     <span className="block text-transparent bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text">
@@ -181,7 +181,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="hero-icon-wrap hidden lg:flex" aria-hidden="true">
+            <div className="hero-icon-wrap hidden xl:flex" aria-hidden="true">
               <img
                 src="/images/hero/hero-icon.png"
                 alt=""

@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/lib/theme-provider";
 import { Logo } from "@/components/logo";
-import { Menu, UserRound } from "lucide-react";
+import { Menu } from "lucide-react";
 import { useState } from "react";
 import Home from "@/pages/home";
 import NotFound from "@/pages/not-found";
@@ -48,10 +48,6 @@ function Header() {
         </nav>
 
         <div className="flex items-center space-x-4">
-          <button className="hidden md:inline-flex p-2 rounded-md text-blue-500/90 hover:text-blue-400 transition-colors">
-            <UserRound className="w-6 h-6" />
-          </button>
-          
           <button 
             className="md:hidden p-2 rounded-md hover:bg-accent transition-colors" 
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
