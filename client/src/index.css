@@ -107,24 +107,34 @@
   .hero-section {
     display: flex;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: center;
     width: 100%;
     max-width: 100%;
   }
 
-  .hero-background {
-    background-image: url("/images/hero/bg-img.webp");
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-position: 72% center;
-  }
-
-  .hero-content-overlay {
-    background: linear-gradient(90deg, rgba(2, 8, 23, 0.92) 0%, rgba(2, 8, 23, 0.82) 38%, rgba(2, 8, 23, 0.34) 68%, rgba(2, 8, 23, 0.1) 100%);
+  .hero-layout {
+    display: grid;
+    gap: 2rem;
+    align-items: center;
   }
 
   .hero-copy {
-    max-width: 48rem;
+    max-width: 52rem;
+  }
+
+  .hero-icon-wrap {
+    justify-content: flex-end;
+    align-items: flex-end;
+    min-height: 480px;
+    width: 100%;
+  }
+
+  .hero-icon-image {
+    width: min(40vw, 620px);
+    max-height: 72vh;
+    object-fit: contain;
+    object-position: right center;
+    filter: drop-shadow(0 18px 48px rgba(2, 8, 23, 0.55));
   }
 
   /* Fix grid overlay positioning */
@@ -270,20 +280,15 @@
   }
 
   @media (max-width: 1023px) {
-    .hero-section {
-      justify-content: center;
-    }
-
-    .hero-background {
-      background-position: 64% center;
-    }
-
-    .hero-content-overlay {
-      background: linear-gradient(180deg, rgba(2, 8, 23, 0.8) 0%, rgba(2, 8, 23, 0.66) 42%, rgba(2, 8, 23, 0.82) 100%);
-    }
-
     .hero-copy {
       max-width: 64rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .hero-layout {
+      grid-template-columns: minmax(0, 1fr) minmax(320px, 42%);
+      column-gap: 2.5rem;
     }
   }
 
