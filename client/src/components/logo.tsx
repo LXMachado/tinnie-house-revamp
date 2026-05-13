@@ -10,7 +10,7 @@ export function Logo({ className = "", size = "md" }: LogoProps) {
   
   // Use enhanced logo for dark theme, regular logo for light theme
   const isDarkTheme = theme === "dark";
-  const logoSrc = isDarkTheme ? "/logo-dark.png" : "/logo.png";
+  const logoSrc = isDarkTheme ? "/logo-dark.webp" : "/logo.webp";
   
   // Size mapping
   const sizeClasses = {
@@ -20,8 +20,8 @@ export function Logo({ className = "", size = "md" }: LogoProps) {
   };
 
   return (
-    <img
-      src={logoSrc}
+<img loading="lazy"
+       src={logoSrc}
       alt="Tinnie House Records Logo"
       className={`object-contain ${sizeClasses[size]} ${className}`}
     />
@@ -33,8 +33,8 @@ export function Favicon() {
   return (
     <link
       rel="icon"
-      type="image/png"
-      href="/logo-dark.png"
+      type="image/webp"
+      href="/logo-dark.webp"
     />
   );
 }

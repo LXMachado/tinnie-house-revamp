@@ -6,7 +6,7 @@ export const STATIC_ARTISTS: Artist[] = [
     slug: "guri",
     name: "G.U.R.I",
     genre: "Progressive-House, Melodic-Techno",
-    imageUrl: "/images/artists/guri/guri.png",
+    imageUrl: "/images/artists/guri/guri.webp",
     bio: "G.U.R.I delivers deep hypnotic grooves anchored by ethereal pads and dark atmospheres.",
     socialLinks: {
       instagram: "https://gate.sc/?url=https%3A%2F%2Fwww.instagram.com%2Fgur_music%2F&token=a0bb9c-1-1761971723711",
@@ -18,7 +18,7 @@ export const STATIC_ARTISTS: Artist[] = [
     slug: "rafa-kao",
     name: "Rafa Kao",
     genre: "Melodic Techno",
-    imageUrl: "/images/artists/rafa-kao/rafa-kao.png",
+    imageUrl: "/images/artists/rafa-kao/rafa-kao.webp",
     bio: "Rafa Kao crafts cinematic melodic techno that balances dancefloor power with emotive storytelling and intricate soundscapes.",
     socialLinks: {
       instagram: "https://instagram.com/rafakao",
@@ -30,7 +30,7 @@ export const STATIC_ARTISTS: Artist[] = [
     slug: "gabriel-samy",
     name: "Gabriel Samy",
     genre: "Melodic Techno",
-    imageUrl: "/images/artists/gabriel-samy/gabriel-samy.png",
+    imageUrl: "/images/artists/gabriel-samy/gabriel-samy.webp",
     bio: "A fixture of the Brazilian underground scene, Gabriel Samy integrates organic instrumentation with modern club sonics.",
     socialLinks: {
       instagram: "https://instagram.com/gabrielsamy",

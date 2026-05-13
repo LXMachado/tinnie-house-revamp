@@ -182,8 +182,8 @@ export default function Home() {
             </div>
 
             <div className="hero-icon-wrap hidden xl:flex" aria-hidden="true">
-              <img
-                src="/images/hero/hero-icon.png"
+<img loading="lazy"
+                 src="/images/hero/hero-icon.webp"
                 alt=""
                 className="hero-icon-image"
               />
@@ -213,8 +213,8 @@ export default function Home() {
             <div className="blur-card overflow-hidden">
               <div className="grid lg:grid-cols-2 gap-8 items-center">
                 <div className="relative aspect-square">
-                  <img
-                    src="/images/artwork/polynomic-void.webp"
+<img loading="lazy"
+                     src="/images/artwork/polynomic-void.webp"
                     alt="G.U.R.I - Polynomic Void"
                     className="w-full h-full object-cover rounded-lg blue-glow"
                   />
@@ -319,8 +319,8 @@ export default function Home() {
                           className="relative focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-background rounded-full"
                           aria-label={`Visit ${artist.name} on SoundCloud`}
                         >
-                          <img
-                            src={artist.imageUrl || "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=400"}
+<img loading="lazy"
+                             src={artist.imageUrl || "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=400"}
                             alt={`${artist.name} artist photo`}
                             className="w-32 h-32 rounded-full mx-auto object-cover border-4 border-blue-500/20 group-hover:border-blue-500/50 transition-all duration-300 hover:scale-105 cursor-pointer"
                           />
@@ -332,8 +332,8 @@ export default function Home() {
                           </div>
                         </button>
                       ) : (
-                        <img
-                          src={artist.imageUrl || "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=400"}
+<img loading="lazy"
+                           src={artist.imageUrl || "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=400"}
                           alt={`${artist.name} artist photo`}
                           className="w-32 h-32 rounded-full mx-auto object-cover border-4 border-blue-500/20"
                         />
