@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { Calendar, ChevronRight, Mail, Pause, Play, Share } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { MusicPlayer } from "@/components/music-player";
 import { CatalogWall } from "@/components/catalog-wall";
+import { RedesignPlayer } from "@/components/redesign-player";
 import { Visualizer } from "@/components/visualizer";
 import { dbFallback } from "@/lib/database-fallback";
 import type { Artist, Release } from "@/types/content";
@@ -79,11 +79,12 @@ function MarqueeStrip({ release }: { release: Release | undefined }) {
 }
 
 export default function Home() {
-  const [showMusicPlayer, setShowMusicPlayer] = useState(false);
   const [showUpcomingModal, setShowUpcomingModal] = useState(false);
   const [artists, setArtists] = useState<Artist[]>([]);
   const [releases, setReleases] = useState<Release[]>([]);
   const [email, setEmail] = useState("");
+  const [activeTrack, setActiveTrack] = useState<Release | null>(null);
+  const [autoplayNonce, setAutoplayNonce] = useState(0);
 
   useReveal();
 
@@ -153,11 +154,17 @@ export default function Home() {
 
   const handleListenClick = () => {
     if (featuredRelease?.audioFilePath) {
-      setShowMusicPlayer((current) => !current);
+      setActiveTrack(featuredRelease);
+      setAutoplayNonce((current) => current + 1);
     } else {
       scrollToSection("releases");
     }
   };
+
+  const playableReleases = useMemo(
+    () => sortedReleases.filter((release) => Boolean(release.audioFilePath)),
+    [sortedReleases]
+  );
 
   return (
     <>
@@ -208,8 +215,8 @@ export default function Home() {
 
             <div className="hero__cta rv in d3">
               <button className="hud hud--solid" onClick={handleListenClick}>
-                {showMusicPlayer ? <Pause size={15} /> : <Play size={15} fill="currentColor" />}
-                {showMusicPlayer ? "Pause" : "Listen Now"}
+                <Play size={15} fill="currentColor" />
+                Listen Now
               </button>
 
               <button className="hud hud--ghost" onClick={() => scrollToSection("releases")}>
@@ -219,57 +226,22 @@ export default function Home() {
               </button>
             </div>
 
-            {showMusicPlayer && featuredRelease?.audioFilePath && (
-              <div
-                style={{
-                  marginTop: 32,
-                  maxWidth: 420,
-                  background: "rgba(7,11,18,0.7)",
-                  border: "1px solid var(--line)",
-                  padding: "20px 24px",
-                  backdropFilter: "blur(12px)",
-                }}
-              >
-                <div style={{ marginBottom: 12 }}>
-                  <div
-                    style={{
-                      fontFamily: "var(--f-disp)",
-                      fontWeight: 700,
-                      fontSize: 14,
-                      textTransform: "uppercase",
-                      letterSpacing: ".04em",
-                    }}
-                  >
-                    {featuredRelease.title}
-                  </div>
-                  <div style={{ fontFamily: "var(--f-mono)", fontSize: 11, color: "var(--ac-ink)", marginTop: 2 }}>
-                    {featuredRelease.artist}
-                  </div>
-                </div>
-                <MusicPlayer
-                  audioPath={featuredRelease.audioFilePath}
-                  title={featuredRelease.title}
-                  artist={featuredRelease.artist}
-                  compact={true}
-                />
-              </div>
-            )}
           </div>
         </div>
 
         <div className="hero__meta">
           <div style={{ display: "flex", gap: 40, alignItems: "flex-end" }}>
             <div className="hero__stat">
-              <b>019</b>
+              <b>020</b>
               <span>Catalog Releases</span>
             </div>
             <div className="hero__stat">
-              <b>08</b>
-              <span>Resident Artists</span>
+              <b>TH021</b>
+              <span>Cabarita · Jul 2026</span>
             </div>
             <div className="hero__stat">
-              <b>∞</b>
-              <span>BPM / Energy</span>
+              <b>20+</b>
+              <span>Countries Reached</span>
             </div>
           </div>
           <div className="hero__scroll">SCROLL</div>
@@ -334,8 +306,8 @@ export default function Home() {
                 <div className="spot__cta">
                   {featuredRelease.audioFilePath && (
                     <button className="hud hud--solid" onClick={handleListenClick}>
-                      {showMusicPlayer ? <Pause size={15} /> : <Play size={15} fill="currentColor" />}
-                      {showMusicPlayer ? "Pause" : "Preview"}
+                      <Play size={15} fill="currentColor" />
+                      Play Release
                     </button>
                   )}
                   {featuredRelease.purchaseLink ? (
@@ -471,7 +443,7 @@ export default function Home() {
             <div className="about__stats">
               <div className="about__stat">
                 <b>
-                  19<span className="u">+</span>
+                  20<span className="u">+</span>
                 </b>
                 <span>Catalog Releases</span>
               </div>
@@ -483,7 +455,7 @@ export default function Home() {
               </div>
               <div className="about__stat">
                 <b>
-                  12<span className="u">+</span>
+                  20<span className="u">+</span>
                 </b>
                 <span>Countries Reached</span>
               </div>
@@ -619,6 +591,17 @@ export default function Home() {
           </div>
         </DialogContent>
       </Dialog>
+
+      <RedesignPlayer
+        autoplayNonce={autoplayNonce}
+        onClose={() => setActiveTrack(null)}
+        onTrackChange={(release) => {
+          setActiveTrack(release);
+          setAutoplayNonce((current) => current + 1);
+        }}
+        playlist={playableReleases}
+        track={activeTrack}
+      />
     </>
   );
 }
