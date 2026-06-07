@@ -268,7 +268,7 @@ export default function Home() {
                 <div className="corner br" />
                 <div className="play">
                   <button onClick={handleListenClick} aria-label="Play preview">
-                    {showMusicPlayer ? <Pause size={24} /> : <Play size={24} fill="currentColor" />}
+                    <Play size={24} fill="currentColor" />
                   </button>
                 </div>
                 <div className="ovl">
