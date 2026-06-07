@@ -2,9 +2,8 @@ import { Switch, Route, Link } from "wouter";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/lib/theme-provider";
-import { Logo } from "@/components/logo";
-import { Menu } from "lucide-react";
-import { useState } from "react";
+import { Menu, X } from "lucide-react";
+import { useEffect, useState } from "react";
 import Home from "@/pages/home";
 import NotFound from "@/pages/not-found";
 import PrivacyPolicy from "@/pages/privacy-policy";
@@ -13,124 +12,147 @@ import CookiePolicy from "@/pages/cookie-policy";
 
 function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 40);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
-    }
+    document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth" });
     setMobileMenuOpen(false);
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-blue-500/20 backdrop-blur-md bg-slate-950/60 supports-[backdrop-filter]:bg-slate-950/50">
-      <div className="container flex h-16 items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <div className="flex items-center space-x-3">
-            <Logo size="lg" className="w-12 h-12" />
-            <span className="font-orbitron font-bold text-xl lg:text-2xl tracking-tight text-slate-100">Tinnie House Records</span>
-          </div>
+    <header className={`nav${scrolled ? " scrolled" : ""}`}>
+      <div className="nav__brand">
+        <div className="nav__logo">
+          <img
+            src="/logo-dark.webp"
+            alt="Tinnie House Records"
+            style={{ width: 30, height: 30, objectFit: "contain" }}
+            loading="lazy"
+          />
         </div>
-        
-        <nav className="hidden md:flex items-center space-x-10">
-          <button onClick={() => scrollToSection("releases")} className="text-xl font-medium text-slate-100 hover:text-blue-400 transition-colors">
-            Releases
-          </button>
-          <button onClick={() => scrollToSection("artists")} className="text-xl font-medium text-slate-100 hover:text-blue-400 transition-colors">
-            Artists
-          </button>
-          <button onClick={() => scrollToSection("about")} className="text-xl font-medium text-slate-100 hover:text-blue-400 transition-colors">
-            About
-          </button>
-          <button onClick={() => scrollToSection("contact")} className="text-xl font-medium text-slate-100 hover:text-blue-400 transition-colors">
-            Contact
-          </button>
-        </nav>
+        <span className="nav__name">
+          Tinnie&nbsp;<b>House</b>&nbsp;<span className="nav__name-rec">Records</span>
+        </span>
+      </div>
 
-        <div className="flex items-center space-x-4">
-          <button 
-            className="md:hidden p-2 rounded-md hover:bg-accent transition-colors" 
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          >
-            <Menu className="w-5 h-5" />
-          </button>
-        </div>
+      <nav className="nav__links">
+        <button onClick={() => scrollToSection("releases")}>Releases</button>
+        <button onClick={() => scrollToSection("artists")}>Artists</button>
+        <button onClick={() => scrollToSection("about")}>About</button>
+        <button onClick={() => scrollToSection("contact")}>Contact</button>
+      </nav>
+
+      <div className="nav__right">
+        <button
+          className="hud hud--ghost hud--sm"
+          onClick={() => scrollToSection("contact")}
+          style={{ display: "none" } as React.CSSProperties}
+        >
+          <span className="hud__in">Demo Submission</span>
+        </button>
+
+        <button
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          style={{
+            display: "none",
+            color: "var(--ink-2)",
+            padding: "8px",
+          }}
+          className="md-menu-btn"
+          aria-label="Toggle menu"
+        >
+          {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+        </button>
+
+        <button
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          style={{ color: "var(--ink-2)", padding: "8px" }}
+          className="mobile-toggle"
+          aria-label="Toggle menu"
+        >
+          {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+        </button>
       </div>
 
       {mobileMenuOpen && (
-        <div className="md:hidden border-t backdrop-blur-md bg-background/10">
-          <div className="container py-4 space-y-2">
-            <button onClick={() => scrollToSection("releases")} className="block py-2 text-sm font-medium hover:text-blue-500 transition-colors w-full text-left">
-              Releases
-            </button>
-            <button onClick={() => scrollToSection("artists")} className="block py-2 text-sm font-medium hover:text-blue-500 transition-colors w-full text-left">
-              Artists
-            </button>
-            <button onClick={() => scrollToSection("about")} className="block py-2 text-sm font-medium hover:text-blue-500 transition-colors w-full text-left">
-              About
-            </button>
-            <button onClick={() => scrollToSection("contact")} className="block py-2 text-sm font-medium hover:text-blue-500 transition-colors w-full text-left">
-              Contact
-            </button>
-          </div>
+        <div className="nav__mobile-menu">
+          <button onClick={() => scrollToSection("releases")}>Releases</button>
+          <button onClick={() => scrollToSection("artists")}>Artists</button>
+          <button onClick={() => scrollToSection("about")}>About</button>
+          <button onClick={() => scrollToSection("contact")}>Contact</button>
         </div>
       )}
+
+      <style>{`
+        @media (min-width: 821px) {
+          .mobile-toggle { display: none !important; }
+        }
+        @media (max-width: 820px) {
+          .mobile-toggle { display: grid !important; place-items: center; }
+        }
+      `}</style>
     </header>
   );
 }
 
 function Footer() {
   return (
-    <footer className="border-t bg-muted/30">
-      <div className="container py-12">
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-          <div className="space-y-4">
-            <div className="flex items-center space-x-3">
-              <Logo size="sm" />
-              <span className="font-orbitron font-bold tracking-wide">Tinnie House Records</span>
+    <footer className="foot">
+      <div className="wrap">
+        <div className="foot__top">
+          <div className="foot__brand">
+            <div className="nav__brand" style={{ marginBottom: 16 }}>
+              <img
+                src="/logo-dark.webp"
+                alt="THR"
+                style={{ width: 28, height: 28, objectFit: "contain" }}
+                loading="lazy"
+              />
+              <span className="nav__name" style={{ fontSize: 18 }}>
+                Tinnie&nbsp;<b>House</b>&nbsp;<span className="nav__name-rec">Records</span>
+              </span>
             </div>
-            <p className="text-sm text-muted-foreground">
-              Pushing the boundaries of electronic music since 2015.
+            <p>
+              Pushing the boundaries of underground electronic music from the Gold Coast, Australia.
             </p>
           </div>
 
-          <div>
-            <h3 className="font-semibold mb-4">Music</h3>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><a href="#releases" className="hover:text-blue-500 transition-colors">Latest Releases</a></li>
-              <li><a href="#artists" className="hover:text-blue-500 transition-colors">Artists</a></li>
-            </ul>
+          <div className="foot__col">
+            <h5>Label</h5>
+            <a href="#about" onClick={(e) => { e.preventDefault(); document.getElementById("about")?.scrollIntoView({ behavior: "smooth" }); }}>About</a>
+            <a href="#contact" onClick={(e) => { e.preventDefault(); document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" }); }}>Contact</a>
+            <a href="#releases" onClick={(e) => { e.preventDefault(); document.getElementById("releases")?.scrollIntoView({ behavior: "smooth" }); }}>Releases</a>
+            <a href="#artists" onClick={(e) => { e.preventDefault(); document.getElementById("artists")?.scrollIntoView({ behavior: "smooth" }); }}>Artists</a>
           </div>
 
-          <div>
-            <h3 className="font-semibold mb-4">Label</h3>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><a href="#about" className="hover:text-blue-500 transition-colors">About Us</a></li>
-              <li><a href="#contact" className="hover:text-blue-500 transition-colors">Contact</a></li>
-              <li><a href="#" className="hover:text-blue-500 transition-colors">Demo Policy</a></li>
-            </ul>
+          <div className="foot__col">
+            <h5>Listen</h5>
+            <a href="https://www.beatport.com/label/tinnie-house-records/50650" target="_blank" rel="noopener noreferrer">Beatport</a>
+            <a href="https://soundcloud.com/tinniehouserecords" target="_blank" rel="noopener noreferrer">SoundCloud</a>
+            <a href="https://www.junodownload.com/labels/Tinnie+House/" target="_blank" rel="noopener noreferrer">Juno Download</a>
+            <a href="https://www.youtube.com/@tinniehouserecords3141" target="_blank" rel="noopener noreferrer">YouTube</a>
           </div>
 
-          <div>
-            <h3 className="font-semibold mb-4">Connect</h3>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><a href="https://www.beatport.com/label/tinnie-house-records/50650" target="_blank" rel="noopener noreferrer" className="hover:text-blue-500 transition-colors">Beatport</a></li>
-              <li><a href="https://soundcloud.com/tinniehouserecords" target="_blank" rel="noopener noreferrer" className="hover:text-blue-500 transition-colors">SoundCloud</a></li>
-              <li><a href="https://www.youtube.com/@tinniehouserecords3141" target="_blank" rel="noopener noreferrer" className="hover:text-blue-500 transition-colors">YouTube</a></li>
-              <li><a href="https://www.instagram.com/tinnie_house_records/" target="_blank" rel="noopener noreferrer" className="hover:text-blue-500 transition-colors">Instagram</a></li>
-              <li><a href="https://x.com/Tinnie_House" target="_blank" rel="noopener noreferrer" className="hover:text-blue-500 transition-colors">Twitter</a></li>
-              <li><a href="https://www.facebook.com/TinnieHouse/" target="_blank" rel="noopener noreferrer" className="hover:text-blue-500 transition-colors">Facebook</a></li>
-              <li><a href="https://www.junodownload.com/labels/Tinnie+House/" target="_blank" rel="noopener noreferrer" className="hover:text-blue-500 transition-colors">Juno Download</a></li>
-            </ul>
+          <div className="foot__col">
+            <h5>Connect</h5>
+            <a href="https://www.instagram.com/tinnie_house_records/" target="_blank" rel="noopener noreferrer">Instagram</a>
+            <a href="https://x.com/Tinnie_House" target="_blank" rel="noopener noreferrer">Twitter / X</a>
+            <a href="https://www.facebook.com/TinnieHouse/" target="_blank" rel="noopener noreferrer">Facebook</a>
           </div>
         </div>
 
-        <div className="flex flex-col md:flex-row justify-between items-center pt-8 mt-8 border-t text-sm text-muted-foreground">
-          <p>&copy; 2025 Tinnie House Records. All rights reserved.</p>
-          <div className="flex space-x-6 mt-4 md:mt-0">
-            <Link href="/privacy-policy" className="hover:text-blue-500 transition-colors">Privacy Policy</Link>
-            <Link href="/terms-of-service" className="hover:text-blue-500 transition-colors">Terms of Service</Link>
-            <Link href="/cookie-policy" className="hover:text-blue-500 transition-colors">Cookie Policy</Link>
+        <div className="foot__bot">
+          <span>© 2026 Tinnie House Records. All rights reserved.</span>
+          <div className="links">
+            <Link href="/privacy-policy">Privacy Policy</Link>
+            <Link href="/terms-of-service">Terms of Service</Link>
+            <Link href="/cookie-policy">Cookie Policy</Link>
           </div>
         </div>
       </div>
@@ -154,9 +176,13 @@ function App() {
   return (
     <ThemeProvider defaultTheme="dark" storageKey="tinnie-house-theme">
       <TooltipProvider>
-        <div className="min-h-screen flex flex-col">
+        <div className="fx-vignette" />
+        <div className="fx-scan" />
+        <div className="fx-grain" />
+
+        <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", background: "var(--bg-1)" }}>
           <Header />
-          <main className="flex-1">
+          <main style={{ flex: 1 }}>
             <Router />
           </main>
           <Footer />

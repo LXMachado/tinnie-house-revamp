@@ -1,41 +1,107 @@
-import { useMemo, useState, useEffect } from "react";
-import { Play, Pause, MapPin, Clock, Mail, Music, Share, Calendar } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { ReleaseCarousel } from "@/components/release-carousel";
-import { ContactForm } from "@/components/contact-form";
+import { useEffect, useMemo, useState } from "react";
+import { Calendar, ChevronRight, Mail, Pause, Play, Share } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { MusicPlayer } from "@/components/music-player";
-import type { Artist, Release } from "@/types/content";
+import { CatalogWall } from "@/components/catalog-wall";
+import { Visualizer } from "@/components/visualizer";
 import { dbFallback } from "@/lib/database-fallback";
+import type { Artist, Release } from "@/types/content";
+
+function useReveal() {
+  useEffect(() => {
+    const elements = document.querySelectorAll<HTMLElement>(".rv");
+    if (!elements.length) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("in");
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.12 }
+    );
+
+    elements.forEach((element) => observer.observe(element));
+    return () => observer.disconnect();
+  }, []);
+}
+
+function MarqueeStrip({ release }: { release: Release | undefined }) {
+  if (!release) return null;
+
+  const releaseDate = release.digitalReleaseDate ? new Date(release.digitalReleaseDate) : null;
+  const isOut = releaseDate ? new Date() >= releaseDate : false;
+  const label = isOut ? "OUT NOW" : "UPCOMING";
+
+  const item = (
+    <span className="tick">
+      <span className="tick__tag fill">
+        <span className="tick__live" />
+        {label}
+      </span>
+      <span className="tick__main">{release.title}</span>
+      <span className="tick__meta">{release.artist}</span>
+      {release.internalReference && (
+        <>
+          <span className="dot">◆</span>
+          <span className="tick__meta">{release.internalReference}</span>
+        </>
+      )}
+      {releaseDate && (
+        <>
+          <span className="dot">◆</span>
+          <span className="tick__meta">
+            {releaseDate.toLocaleDateString("en-AU", { month: "short", day: "numeric", year: "numeric" })}
+          </span>
+        </>
+      )}
+    </span>
+  );
+
+  const items = Array.from({ length: 8 }, (_, index) => (
+    <span key={index} style={{ display: "inline-flex", alignItems: "center", gap: 38 }}>
+      {item}
+      <span style={{ color: "var(--ac)", fontSize: 9, margin: "0 4px" }}>◆◆</span>
+    </span>
+  ));
+
+  return (
+    <div className="marq">
+      <div className="marq__track">
+        {items}
+        {items}
+      </div>
+    </div>
+  );
+}
 
 export default function Home() {
   const [showMusicPlayer, setShowMusicPlayer] = useState(false);
   const [showUpcomingModal, setShowUpcomingModal] = useState(false);
   const [artists, setArtists] = useState<Artist[]>([]);
   const [releases, setReleases] = useState<Release[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [usingDatabase, setUsingDatabase] = useState(false);
+  const [email, setEmail] = useState("");
+
+  useReveal();
 
   useEffect(() => {
     async function fetchData() {
-      // Load static data immediately to prevent blank screen
-      const { STATIC_ARTISTS, STATIC_RELEASES } = await import('@/static-content');
+      const { STATIC_ARTISTS, STATIC_RELEASES } = await import("@/static-content");
       setArtists(STATIC_ARTISTS);
       setReleases(STATIC_RELEASES);
-      
-      // Try to upgrade to database data in the background
+
       try {
         const [artistsData, releasesData] = await Promise.all([
           dbFallback.getArtists(),
-          dbFallback.getReleases()
+          dbFallback.getReleases(),
         ]);
         setArtists(artistsData);
         setReleases(releasesData);
-        setUsingDatabase(true);
       } catch (error) {
-        console.log('Continuing with static data (database unavailable):', error);
-      } finally {
-        setLoading(false);
+        console.log("Continuing with static data (database unavailable):", error);
       }
     }
 
@@ -52,27 +118,18 @@ export default function Home() {
     [releases]
   );
 
-  const stormdrifterRelease = sortedReleases.find((release) => release.isLatest) ?? sortedReleases[0];
-
-  const handleBuyClick = () => {
-    if (!stormdrifterRelease?.purchaseLink) {
-      setShowUpcomingModal(true);
-      return;
-    }
-    
-    window.open(stormdrifterRelease.purchaseLink, '_blank');
-  };
+  const featuredRelease = sortedReleases.find((release) => release.isLatest) ?? sortedReleases[0];
 
   const handleShareClick = async () => {
-    if (!stormdrifterRelease?.shareLink) {
+    if (!featuredRelease?.shareLink) {
       setShowUpcomingModal(true);
       return;
     }
 
     const shareData = {
-      title: `${stormdrifterRelease.title} by ${stormdrifterRelease.artist}`,
-      text: `Check out this release from Tinnie House Records`,
-      url: stormdrifterRelease.shareLink,
+      title: `${featuredRelease.title} by ${featuredRelease.artist}`,
+      text: "Check out this release from Tinnie House Records",
+      url: featuredRelease.shareLink,
     };
 
     try {
@@ -81,272 +138,304 @@ export default function Home() {
       } else {
         await navigator.clipboard.writeText(shareData.url);
       }
-    } catch (error) {
+    } catch {
       try {
-        await navigator.clipboard.writeText(shareData.url);
-      } catch (clipboardError) {
-        console.error('Failed to share or copy to clipboard');
+        await navigator.clipboard.writeText(shareData.url ?? "");
+      } catch {
+        console.error("Failed to share or copy to clipboard");
       }
     }
   };
 
   const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
-    }
+    document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth" });
   };
 
   const handleListenClick = () => {
-    if (stormdrifterRelease?.audioFilePath) {
-      setShowMusicPlayer(!showMusicPlayer);
+    if (featuredRelease?.audioFilePath) {
+      setShowMusicPlayer((current) => !current);
     } else {
       scrollToSection("releases");
     }
   };
 
   return (
-    <div className="min-h-screen">
-      {/* Hero Section */}
-      <section className="hero-section relative overflow-hidden min-h-screen">
-        <div className="absolute inset-0 grid-overlay opacity-20"></div>
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-500/5 to-blue-500/20"></div>
-        <div className="content-wrapper container relative py-20 lg:py-24">
-          <div className="hero-layout fullscreen-fix">
-            <div className="hero-copy min-w-0 max-w-4xl mx-auto text-center lg:text-left lg:mx-0">
-              <div className="space-y-8 animate-fade-in">
-                <div className="space-y-6">
-                  <h1 className="font-orbitron text-[clamp(2.2rem,5.2vw,5.6rem)] font-bold tracking-tight leading-[0.96]">
-                    PUSHING THE
-                    <span className="block">BOUNDARIES OF</span>
-                    <span className="block text-transparent bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text">
-                      UNDERGROUND
-                    </span>
-                    <span className="block">ELECTRONIC MUSIC</span>
-                  </h1>
-                  <p className="text-lg text-muted-foreground max-w-2xl mx-auto lg:mx-0 leading-relaxed">
-                    Tinnie House Records is an independent label dedicated to showcasing innovative techno, melodic techno, and progressive house from Australia and beyond.
-                  </p>
-                </div>
-                
-                <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                  {stormdrifterRelease?.audioFilePath ? (
-                    <>
-                      <Button
-                        onClick={handleListenClick}
-                        className="h-14 px-9 text-[1.05rem] tracking-[0.08em] uppercase rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 border border-blue-400/60 shadow-[0_12px_30px_rgba(37,99,235,0.45)]"
-                      >
-                        {showMusicPlayer ? <Pause className="w-4 h-4 mr-2" /> : <Play className="w-4 h-4 mr-2" />}
-                        Listen
-                      </Button>
-                      <Button
-                        variant="outline"
-                        onClick={() => scrollToSection("releases")}
-                        className="h-14 px-9 text-[1.05rem] tracking-[0.08em] uppercase rounded-lg bg-blue-900/10 border-blue-500/70 text-blue-400 shadow-[inset_0_0_24px_rgba(30,64,175,0.2)]"
-                      >
-                        <Music className="w-4 h-4 mr-2" />
-                        Explore Releases
-                      </Button>
-                    </>
-                  ) : (
-                    <Button onClick={() => scrollToSection("releases")}>
-                      <Play className="w-4 h-4 mr-2" />
-                      Explore Releases
-                    </Button>
-                  )}
-                </div>
-                
-                {/* Inline Music Player */}
-                {showMusicPlayer && stormdrifterRelease?.audioFilePath && (
-                  <div className="mt-8 max-w-md mx-auto lg:mx-0">
-                    <div className="blur-card p-6 rounded-2xl">
-                      <div className="text-center mb-4">
-                        <h3 className="font-orbitron font-bold text-lg">{stormdrifterRelease.title}</h3>
-                        <p className="text-blue-400 font-orbitron">{stormdrifterRelease.artist}</p>
-                        {stormdrifterRelease.digitalReleaseDate && (
-                          <p className="text-xs text-muted-foreground">
-                            {stormdrifterRelease.purchaseLink ? 'Available Now' : `Coming ${stormdrifterRelease.digitalReleaseDate}`}
-                          </p>
-                        )}
-                      </div>
-                      <MusicPlayer
-                        audioPath={stormdrifterRelease.audioFilePath}
-                        title={stormdrifterRelease.title}
-                        artist={stormdrifterRelease.artist}
-                        compact={true}
-                      />
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div className="hero-icon-wrap hidden xl:flex" aria-hidden="true">
-<img loading="lazy"
-                 src="/images/hero/hero-icon.webp"
-                alt=""
-                className="hero-icon-image"
-              />
-            </div>
-          </div>
+    <>
+      <section className="hero" style={{ background: "var(--bg-0)" }}>
+        <div className="hero__viz">
+          <Visualizer />
         </div>
-      </section>
+        <div className="hero__fade" />
+        <div className="hero__grid" />
 
-      {/* Featured Upcoming Release Section */}
-      <section id="releases" className="py-16 lg:py-24 relative">
-        <div className="absolute inset-0 bg-gradient-to-b from-blue-500/5 to-transparent"></div>
-        <div className="content-wrapper container relative fullscreen-fix">
-          <div className="text-center mb-16">
-            {stormdrifterRelease && stormdrifterRelease.upcoming && (
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/20 text-blue-400 text-sm font-medium mb-4">
-                <Clock className="w-4 h-4" />
-                Coming Soon
+        <img
+          src="/logo.webp"
+          alt=""
+          aria-hidden="true"
+          style={{
+            position: "absolute",
+            inset: 0,
+            margin: "auto",
+            width: "min(60vw, 540px)",
+            height: "min(60vw, 540px)",
+            objectFit: "contain",
+            opacity: 0.035,
+            zIndex: 1,
+            pointerEvents: "none",
+          }}
+        />
+
+        <div className="hero__in">
+          <div className="wrap">
+            <div className="hero__cat rv in">
+              <span className="chip chip--ac">
+                <span className="chip-dot" />
+                EST. 2020 · GOLD COAST AU
+              </span>
+            </div>
+
+            <h1 className="rv in d1">
+              <span className="ln">PUSHING THE</span>
+              <span className="ln">BOUNDARIES OF</span>
+              <span className="ln ac">UNDERGROUND</span>
+              <span className="ln">ELECTRONIC MUSIC</span>
+            </h1>
+
+            <p className="hero__sub rv in d2">
+              Tinnie House Records is an independent label dedicated to showcasing innovative techno,
+              melodic techno, and progressive house from Australia and beyond.
+            </p>
+
+            <div className="hero__cta rv in d3">
+              <button className="hud hud--solid" onClick={handleListenClick}>
+                {showMusicPlayer ? <Pause size={15} /> : <Play size={15} fill="currentColor" />}
+                {showMusicPlayer ? "Pause" : "Listen Now"}
+              </button>
+
+              <button className="hud hud--ghost" onClick={() => scrollToSection("releases")}>
+                <span className="hud__in">
+                  Explore Releases <ChevronRight size={13} />
+                </span>
+              </button>
+            </div>
+
+            {showMusicPlayer && featuredRelease?.audioFilePath && (
+              <div
+                style={{
+                  marginTop: 32,
+                  maxWidth: 420,
+                  background: "rgba(7,11,18,0.7)",
+                  border: "1px solid var(--line)",
+                  padding: "20px 24px",
+                  backdropFilter: "blur(12px)",
+                }}
+              >
+                <div style={{ marginBottom: 12 }}>
+                  <div
+                    style={{
+                      fontFamily: "var(--f-disp)",
+                      fontWeight: 700,
+                      fontSize: 14,
+                      textTransform: "uppercase",
+                      letterSpacing: ".04em",
+                    }}
+                  >
+                    {featuredRelease.title}
+                  </div>
+                  <div style={{ fontFamily: "var(--f-mono)", fontSize: 11, color: "var(--ac-ink)", marginTop: 2 }}>
+                    {featuredRelease.artist}
+                  </div>
+                </div>
+                <MusicPlayer
+                  audioPath={featuredRelease.audioFilePath}
+                  title={featuredRelease.title}
+                  artist={featuredRelease.artist}
+                  compact={true}
+                />
               </div>
             )}
-            <h2 className="font-orbitron text-3xl lg:text-4xl font-bold mb-4 tracking-wide">
-              {stormdrifterRelease && stormdrifterRelease.upcoming ? "UPCOMING RELEASE" : "SPOTLIGHT"}
-            </h2>
+          </div>
+        </div>
+
+        <div className="hero__meta">
+          <div style={{ display: "flex", gap: 40, alignItems: "flex-end" }}>
+            <div className="hero__stat">
+              <b>019</b>
+              <span>Catalog Releases</span>
+            </div>
+            <div className="hero__stat">
+              <b>08</b>
+              <span>Resident Artists</span>
+            </div>
+            <div className="hero__stat">
+              <b>∞</b>
+              <span>BPM / Energy</span>
+            </div>
+          </div>
+          <div className="hero__scroll">SCROLL</div>
+        </div>
+      </section>
+
+      <MarqueeStrip release={featuredRelease} />
+
+      <section id="spotlight" className="spot sec-pad">
+        <div className="wrap">
+          <div className="eyebrow rv">
+            {featuredRelease?.upcoming ? "UPCOMING RELEASE" : "LATEST RELEASE"}
           </div>
 
-          {/* Featured Release - G.U.R.I - Polynomic Void */}
-          <div className="max-w-4xl mx-auto mb-20 fullscreen-fix">
-            <div className="blur-card overflow-hidden">
-              <div className="grid lg:grid-cols-2 gap-8 items-center">
-                <div className="relative aspect-square">
-<img loading="lazy"
-                     src="/images/artwork/polynomic-void.webp"
-                    alt="G.U.R.I - Polynomic Void"
-                    className="w-full h-full object-cover rounded-lg blue-glow"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent rounded-lg"></div>
-                  <div className="absolute bottom-4 left-4 right-4">
-                    <div className="flex items-center justify-between">
-                      <div className="bg-blue-600/30 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-medium">
-                        {stormdrifterRelease?.internalReference || 'TH000'}
-                      </div>
-                      <div className="bg-green-600/30 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-medium">
-                        December 2025
-                      </div>
-                    </div>
-                  </div>
+          {featuredRelease && (
+            <div className="spot__grid rv in d1">
+              <div className="spot__art">
+                <img
+                  src={featuredRelease.coverImageUrl || featuredRelease.imgUrl || ""}
+                  alt={featuredRelease.title}
+                  loading="lazy"
+                />
+                <div className="corner tl" />
+                <div className="corner br" />
+                <div className="play">
+                  <button onClick={handleListenClick} aria-label="Play preview">
+                    {showMusicPlayer ? <Pause size={24} /> : <Play size={24} fill="currentColor" />}
+                  </button>
                 </div>
-                
-                <div className="space-y-6 p-6 lg:p-8">
+                <div className="ovl">
+                  <span className="spot__cat-tag">{featuredRelease.internalReference}</span>
+                  {featuredRelease.digitalReleaseDate && (
+                    <span style={{ fontFamily: "var(--f-mono)", fontSize: 11, color: "var(--ink-3)" }}>
+                      {new Date(featuredRelease.digitalReleaseDate).toLocaleDateString("en-AU", {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      })}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <div className="spot__info">
+                <div className="eyebrow">SPOTLIGHT</div>
+                <h3>{featuredRelease.title}</h3>
+                <div className="spot__artist">{featuredRelease.artist}</div>
+
+                <div className="spot__tags">
+                  {featuredRelease.musicStyle && (
+                    <span className="chip chip--ac">
+                      <span className="chip-dot" />
+                      {featuredRelease.musicStyle}
+                    </span>
+                  )}
+                  {featuredRelease.bundleType && <span className="chip">{featuredRelease.bundleType}</span>}
+                  {featuredRelease.upcoming && <span className="chip chip--ac">Upcoming</span>}
+                </div>
+
+                {featuredRelease.description && <p className="spot__desc">{featuredRelease.description}</p>}
+
+                <div className="spot__cta">
+                  {featuredRelease.audioFilePath && (
+                    <button className="hud hud--solid" onClick={handleListenClick}>
+                      {showMusicPlayer ? <Pause size={15} /> : <Play size={15} fill="currentColor" />}
+                      {showMusicPlayer ? "Pause" : "Preview"}
+                    </button>
+                  )}
+                  {featuredRelease.purchaseLink ? (
+                    <a
+                      href={featuredRelease.purchaseLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hud hud--ghost"
+                    >
+                      <span className="hud__in">Buy on Beatport</span>
+                    </a>
+                  ) : (
+                    <button className="hud hud--ghost" onClick={handleShareClick}>
+                      <span className="hud__in">
+                        <Share size={13} /> Share
+                      </span>
+                    </button>
+                  )}
+                </div>
+
+                <div className="spot__meta">
                   <div>
-                    <h3 className="font-orbitron text-2xl lg:text-3xl font-bold mb-2">POLYNOMIC VOID</h3>
-                    <p className="text-lg text-blue-400 font-medium mb-4">G.U.R.I</p>
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      <span className="px-3 py-1 bg-blue-500/20 rounded-full text-sm">Progressive House</span>
-                      <span className="px-3 py-1 bg-blue-500/20 rounded-full text-sm">Single</span>
-                    </div>
+                    <span>Release Date</span>
+                    <b>
+                      {featuredRelease.digitalReleaseDate
+                        ? new Date(featuredRelease.digitalReleaseDate).toLocaleDateString("en-AU", {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                          })
+                        : "TBA"}
+                    </b>
                   </div>
-                  
-                  <p className="text-muted-foreground leading-relaxed">
-                    The collapse isn't chaotic. It feels inevitable, as if all complexity is being drawn toward a singular point where meaning is stripped away and only pure abstraction remains.
-                  </p>
-                  
-                  <div className="flex flex-col sm:flex-row gap-4">
-                    <Button className="flex-1" onClick={handleBuyClick}>
-                      <Play className="w-4 h-4 mr-2" />
-                      BUY
-                    </Button>
-                    <Button variant="outline" className="flex-1" onClick={handleShareClick}>
-                      <Share className="w-4 h-4 mr-2" />
-                      SHARE
-                    </Button>
+                  <div>
+                    <span>Catalog</span>
+                    <b>{featuredRelease.internalReference || "—"}</b>
                   </div>
-                  
-                  <div className="grid grid-cols-2 gap-4 pt-4 border-t border-border/50">
-                    <div>
-                      <div className="text-sm text-muted-foreground">Release Date</div>
-                      <div className="font-medium">December 26, 2025</div>
-                    </div>
-                    <div>
-                      <div className="text-sm text-muted-foreground">Catalog</div>
-                      <div className="font-medium">{stormdrifterRelease?.internalReference || 'TH000'}</div>
-                    </div>
+                  <div>
+                    <span>Tracks</span>
+                    <b>{featuredRelease.trackCount ?? "—"}</b>
                   </div>
                 </div>
               </div>
             </div>
+          )}
+        </div>
+      </section>
+
+      <section id="releases" className="wall sec-pad">
+        <div className="wrap">
+          <div className="wall__head rv">
+            <div>
+              <div className="eyebrow" style={{ marginBottom: 12 }}>DISCOGRAPHY</div>
+              <h2 className="h-sec">Catalog Releases</h2>
+            </div>
           </div>
 
-          {/* Other Releases Carousel */}
-          <div className="text-center mb-12">
-            <h3 className="font-orbitron text-2xl lg:text-3xl font-bold mb-4 tracking-wide">CATALOG RELEASES</h3>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Explore our complete catalog of electronic music releases from our talented roster of artists.
-            </p>
-          </div>
-
-          <ReleaseCarousel />
-
-          <div className="text-center mt-12">
-            <Button
-              variant="outline"
-              onClick={() => window.open('https://www.beatport.com/label/tinnie-house-records/50650', '_blank')}
-            >
-              View Complete Catalog
-            </Button>
+          <div className="rv in d1">
+            <CatalogWall releases={sortedReleases} />
           </div>
         </div>
       </section>
 
-      {/* Featured Artists Section */}
-      <section id="artists" className="py-16 lg:py-24">
-        <div className="content-wrapper container relative fullscreen-fix">
-          <div className="text-center mb-12">
-            <h2 className="font-orbitron text-3xl lg:text-4xl font-bold mb-4">Featured Artists</h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Meet the talented electronic music producers and artists shaping the sound of Tinnie House Records.
-            </p>
+      <section id="artists" className="artists sec-pad">
+        <div className="wrap">
+          <div className="rv" style={{ marginBottom: 42 }}>
+            <div className="eyebrow" style={{ marginBottom: 12 }}>ROSTER</div>
+            <h2 className="h-sec">Artists</h2>
           </div>
 
           {artists.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-muted-foreground">No artists available at this time.</p>
-            </div>
+            <p style={{ color: "var(--ink-3)", fontFamily: "var(--f-mono)" }}>
+              No artists available at this time.
+            </p>
           ) : (
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {artists.slice(0, 4).map((artist) => {
+            <div className="art-grid rv in">
+              {artists.slice(0, 4).map((artist, index) => {
                 const soundcloudLink = artist.socialLinks?.soundcloud;
                 return (
-                  <div key={artist.id} className="group text-center">
-                    <div className="relative mb-4">
-                      {soundcloudLink ? (
-                        <button
-                          onClick={() => window.open(soundcloudLink, '_blank')}
-                          className="relative focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-background rounded-full"
-                          aria-label={`Visit ${artist.name} on SoundCloud`}
-                        >
-<img loading="lazy"
-                             src={artist.imageUrl || "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=400"}
-                            alt={`${artist.name} artist photo`}
-                            className="w-32 h-32 rounded-full mx-auto object-cover border-4 border-blue-500/20 group-hover:border-blue-500/50 transition-all duration-300 hover:scale-105 cursor-pointer"
-                          />
-                          <div className="absolute inset-0 w-32 h-32 rounded-full mx-auto bg-blue-500/0 group-hover:bg-blue-500/20 transition-colors duration-300"></div>
-                          <div className="absolute inset-0 w-32 h-32 rounded-full mx-auto flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                            <div className="bg-black/50 rounded-full p-2">
-                              <Music className="w-5 h-5 text-white" />
-                            </div>
-                          </div>
-                        </button>
-                      ) : (
-<img loading="lazy"
-                           src={artist.imageUrl || "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=400"}
-                          alt={`${artist.name} artist photo`}
-                          className="w-32 h-32 rounded-full mx-auto object-cover border-4 border-blue-500/20"
-                        />
-                      )}
+                  <div
+                    key={artist.id}
+                    className={`artist rv in d${Math.min(index + 1, 3)}`}
+                    onClick={() => soundcloudLink && window.open(soundcloudLink, "_blank")}
+                    style={{ cursor: soundcloudLink ? "pointer" : "default" }}
+                  >
+                    <div className="artist__n">0{index + 1}</div>
+                    <div className="artist__art">
+                      <img
+                        src={
+                          artist.imageUrl ||
+                          "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=500"
+                        }
+                        alt={artist.name}
+                        loading="lazy"
+                      />
                     </div>
-                    <h3 className="font-orbitron font-semibold text-lg mb-1">{artist.name}</h3>
-                    <p className="text-sm text-muted-foreground mb-2">{artist.genre || "Electronic"}</p>
-                    <p className="text-xs text-muted-foreground">{artist.bio || "Innovative electronic music artist"}</p>
-                    {soundcloudLink && (
-                      <p className="text-xs text-blue-400 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        Click image to visit SoundCloud
-                      </p>
-                    )}
+                    <div className="artist__body">
+                      <div className="artist__name">{artist.name}</div>
+                      <div className="artist__role">{artist.genre || "Electronic"}</div>
+                    </div>
                   </div>
                 );
               })}
@@ -355,114 +444,150 @@ export default function Home() {
         </div>
       </section>
 
-      {/* About Section */}
-      <section id="about" className="py-16 lg:py-24 bg-muted/30">
-        <div className="content-wrapper container relative fullscreen-fix">
-          <div className="text-center max-w-4xl mx-auto fullscreen-fix">
-            <h2 className="font-orbitron text-3xl lg:text-4xl font-bold mb-6">About Tinnie House Records</h2>
-            <div className="space-y-4 text-muted-foreground">
-              <p className="text-lg">
-                Tinnie House Records is a cutting-edge electronic music label rooted in Australia's vibrant Gold Coast scene, championing the underground sounds that define tomorrow's dancefloors.
+      <section id="about" className="about sec-pad">
+        <div className="wrap">
+          <div className="about__grid rv in">
+            <div>
+              <div className="eyebrow" style={{ marginBottom: 20 }}>ABOUT THE LABEL</div>
+              <h2 className="about__big">
+                Underground sounds that define <em>tomorrow&apos;s dancefloors</em>
+              </h2>
+              <p>
+                Tinnie House Records is a cutting-edge electronic music label rooted in Australia&apos;s vibrant
+                Gold Coast scene, championing the underground sounds that define tomorrow&apos;s dancefloors.
               </p>
-              <p className="text-lg">
-                While we celebrate Australia's rich electronic heritage, we champion artists from every corner of the globe. Our passion spans techno, melodic techno, and progressive house, always seeking groundbreaking sounds that transcend borders and move both body and soul.
+              <p style={{ marginTop: 16 }}>
+                While we celebrate Australia&apos;s rich electronic heritage, we champion artists from every corner
+                of the globe. Our passion spans techno, melodic techno, and progressive house, always seeking
+                groundbreaking sounds that transcend borders and move both body and soul.
               </p>
-
+              <div style={{ marginTop: 32 }}>
+                <button className="hud hud--ghost" onClick={() => scrollToSection("contact")}>
+                  <span className="hud__in">Our Story</span>
+                </button>
+              </div>
             </div>
-          </div>
-        </div>
-      </section>
 
-      {/* Contact Section */}
-      <section id="contact" className="py-16 lg:py-24 relative">
-        <div className="absolute inset-0 bg-gradient-to-t from-blue-500/10 to-transparent"></div>
-        <div className="content-wrapper container max-w-6xl relative fullscreen-fix">
-          <div className="text-center mb-12">
-            <h2 className="font-orbitron text-3xl lg:text-4xl font-bold mb-4 tracking-wide">BECOME PART OF OUR LABEL FAMILY</h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              At Tinnie House Records, we're always hunting for the next breakthrough artist. Whether you're an established producer or just starting your journey, we want to hear what you've created. Send us your demos – your sound could be exactly what the world needs to hear next.
-            </p>
-          </div>
-
-          <div className="grid lg:grid-cols-2 gap-12">
-            <ContactForm />
-
-            <div className="space-y-8">
-              <div className="blur-card p-8">
-                <h3 className="font-orbitron font-semibold text-lg mb-6 tracking-wide">JOIN OUR COMMUNITY</h3>
-                
-                <div className="space-y-4 mb-8">
-                  <p className="text-sm text-muted-foreground">
-                    Sign up for exclusive updates on releases, events, and special announcements.
-                  </p>
-                  <div className="flex gap-3">
-                    <input
-                      type="email"
-                      placeholder="Your Email"
-                      className="flex-1 px-4 py-3 rounded-md bg-background/20 border border-white/10 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors backdrop-blur-sm"
-                    />
-                    <Button variant="default">Subscribe</Button>
-                  </div>
-                </div>
+            <div className="about__stats">
+              <div className="about__stat">
+                <b>
+                  19<span className="u">+</span>
+                </b>
+                <span>Catalog Releases</span>
               </div>
-
-              <div className="blur-card p-8">
-                <h3 className="font-orbitron font-semibold text-lg mb-6 tracking-wide">Contact Information</h3>
-                
-                <div className="space-y-4">
-                  <div className="flex items-start space-x-3">
-                    <Mail className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
-                    <div>
-                      <div className="font-medium">Email</div>
-                      <div className="text-sm text-muted-foreground">contact@tinniehouserecords.com</div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start space-x-3">
-                    <MapPin className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
-                    <div>
-                      <div className="font-medium">Location</div>
-                      <div className="text-sm text-muted-foreground">Gold Coast, Australia</div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start space-x-3">
-                    <Clock className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
-                    <div>
-                      <div className="font-medium">Response Time</div>
-                      <div className="text-sm text-muted-foreground">24-48 hours</div>
-                    </div>
-                  </div>
-                </div>
+              <div className="about__stat">
+                <b>
+                  8<span className="u">+</span>
+                </b>
+                <span>Resident Artists</span>
               </div>
-
-
-              <div className="blur-card p-8">
-                <h3 className="font-orbitron font-semibold text-lg mb-4 tracking-wide">Demo Submissions</h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Ready to share your electronic music with us? Please include:
-                </p>
-                <ul className="text-sm text-muted-foreground space-y-2">
-                  <li className="flex items-center space-x-2">
-                    <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
-                    <span>2-3 of your best unreleased tracks</span>
-                  </li>
-                  <li className="flex items-center space-x-2">
-                    <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
-                    <span>Brief artist bio and social media links</span>
-                  </li>
-                  <li className="flex items-center space-x-2">
-                    <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
-                    <span>SoundCloud links to get started – if your tracks catch our attention, we'll reach out for WAV files</span>
-                  </li>
-                </ul>
+              <div className="about__stat">
+                <b>
+                  12<span className="u">+</span>
+                </b>
+                <span>Countries Reached</span>
+              </div>
+              <div className="about__stat">
+                <b>2020</b>
+                <span>Founded</span>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Upcoming Release Modal */}
+      <section id="contact" className="demo sec-pad">
+        <div className="wrap">
+          <div className="rv" style={{ textAlign: "center", marginBottom: 42 }}>
+            <div className="eyebrow center" style={{ marginBottom: 14 }}>GET INVOLVED</div>
+            <h2 className="h-sec">Send Us Your Sound</h2>
+          </div>
+
+          <div className="demo__grid rv in">
+            <div className="panel">
+              <h4>Demo Submissions</h4>
+              <ul className="demo__list">
+                <li>
+                  <span className="n">01</span>
+                  <span>Submit 2-3 of your best unreleased tracks via SoundCloud links</span>
+                </li>
+                <li>
+                  <span className="n">02</span>
+                  <span>Include a brief artist bio and your social media links</span>
+                </li>
+                <li>
+                  <span className="n">03</span>
+                  <span>
+                    If your tracks catch our attention, we&apos;ll reach out for WAV files. No attachments in the
+                    initial submission.
+                  </span>
+                </li>
+                <li>
+                  <span className="n">04</span>
+                  <span>
+                    We accept all genres of electronic music with a focus on Techno, Melodic Techno and Progressive
+                    House
+                  </span>
+                </li>
+              </ul>
+              <div style={{ marginTop: 28 }}>
+                <a
+                  href="mailto:contact@tinniehouserecords.com"
+                  className="hud hud--solid"
+                  style={{ display: "inline-flex" }}
+                >
+                  <Mail size={14} />
+                  Submit Your Demo
+                </a>
+              </div>
+            </div>
+
+            <div className="panel">
+              <h4>Join the Frequency</h4>
+              <p style={{ color: "var(--ink-2)", marginTop: 16, fontSize: 14.5 }}>
+                Sign up for exclusive updates on releases, events, and special announcements from Tinnie House
+                Records.
+              </p>
+              <div className="demo__sub" style={{ marginTop: 24 }}>
+                <input
+                  type="email"
+                  placeholder="your@email.com"
+                  className="inp"
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
+                />
+                <button className="hud hud--solid" style={{ whiteSpace: "nowrap" }}>
+                  Subscribe
+                </button>
+              </div>
+
+              <div className="demo__chans">
+                <a href="https://bandcamp.com" target="_blank" rel="noopener noreferrer" className="chan" style={{ textDecoration: "none" }}>
+                  <span>Bandcamp</span>
+                  <b>Follow</b>
+                </a>
+                <a href="https://soundcloud.com/tinniehouserecords" target="_blank" rel="noopener noreferrer" className="chan" style={{ textDecoration: "none" }}>
+                  <span>SoundCloud</span>
+                  <b>Follow</b>
+                </a>
+                <a href="https://open.spotify.com" target="_blank" rel="noopener noreferrer" className="chan" style={{ textDecoration: "none" }}>
+                  <span>Spotify</span>
+                  <b>Follow</b>
+                </a>
+                <a href="https://www.instagram.com/tinnie_house_records/" target="_blank" rel="noopener noreferrer" className="chan" style={{ textDecoration: "none" }}>
+                  <span>Instagram</span>
+                  <b>Follow</b>
+                </a>
+                <a href="https://www.youtube.com/@tinniehouserecords3141" target="_blank" rel="noopener noreferrer" className="chan" style={{ textDecoration: "none" }}>
+                  <span>YouTube</span>
+                  <b>Subscribe</b>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <Dialog open={showUpcomingModal} onOpenChange={setShowUpcomingModal}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
@@ -475,27 +600,25 @@ export default function Home() {
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
-            {stormdrifterRelease && (
+            {featuredRelease && (
               <>
                 <div className="text-center">
-                  <h3 className="font-semibold text-lg">{stormdrifterRelease.title}</h3>
-                  <p className="text-sm text-muted-foreground">by {stormdrifterRelease.artist}</p>
+                  <h3 className="text-lg font-semibold">{featuredRelease.title}</h3>
+                  <p className="text-sm text-muted-foreground">by {featuredRelease.artist}</p>
                 </div>
-                <div className="text-center p-4 bg-muted/50 rounded-lg">
-                  <p className="text-sm">
-                    This release will be available soon
-                  </p>
+                <div className="rounded-lg bg-muted/50 p-4 text-center">
+                  <p className="text-sm">This release will be available soon</p>
                 </div>
                 <div className="flex justify-center">
-                  <Button onClick={() => setShowUpcomingModal(false)}>
+                  <button className="hud hud--solid" onClick={() => setShowUpcomingModal(false)}>
                     Got it
-                  </Button>
+                  </button>
                 </div>
               </>
             )}
           </div>
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 }
