@@ -166,6 +166,12 @@ export default function Home() {
     [sortedReleases]
   );
 
+  const handlePlayRelease = (release: Release) => {
+    if (!release.audioFilePath) return;
+    setActiveTrack(release);
+    setAutoplayNonce((current) => current + 1);
+  };
+
   return (
     <>
       <section className="hero" style={{ background: "var(--bg-0)" }}>
@@ -366,7 +372,7 @@ export default function Home() {
           </div>
 
           <div className="rv in d1">
-            <CatalogWall releases={sortedReleases} />
+            <CatalogWall onPlayRelease={handlePlayRelease} releases={sortedReleases} />
           </div>
         </div>
       </section>
@@ -596,8 +602,7 @@ export default function Home() {
         autoplayNonce={autoplayNonce}
         onClose={() => setActiveTrack(null)}
         onTrackChange={(release) => {
-          setActiveTrack(release);
-          setAutoplayNonce((current) => current + 1);
+          handlePlayRelease(release);
         }}
         playlist={playableReleases}
         track={activeTrack}

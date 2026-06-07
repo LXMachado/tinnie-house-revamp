@@ -3,10 +3,11 @@ import { Play } from "lucide-react";
 import type { Release } from "@/types/content";
 
 interface CatalogWallProps {
+  onPlayRelease?: (release: Release) => void;
   releases: Release[];
 }
 
-export function CatalogWall({ releases }: CatalogWallProps) {
+export function CatalogWall({ onPlayRelease, releases }: CatalogWallProps) {
   const [activeFilter, setActiveFilter] = useState("ALL");
 
   const genres = useMemo(() => {
@@ -60,9 +61,19 @@ export function CatalogWall({ releases }: CatalogWallProps) {
                 loading="lazy"
               />
               <div className="rel__cat">{release.internalReference}</div>
-              <div className="rel__play">
+              <button
+                className="rel__play"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  if (release.audioFilePath) {
+                    onPlayRelease?.(release);
+                  }
+                }}
+                title={release.audioFilePath ? `Play ${release.title}` : `${release.title} preview unavailable`}
+                type="button"
+              >
                 <Play size={16} fill="currentColor" />
-              </div>
+              </button>
               {release.musicStyle && (
                 <div className="rel__genre">
                   <span className="chip chip--ac" style={{ fontSize: "9px" }}>
