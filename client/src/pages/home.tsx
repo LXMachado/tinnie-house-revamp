@@ -398,7 +398,6 @@ export default function Home() {
                     </div>
                     <div className="artist__body">
                       <div className="artist__name">{artist.name}</div>
-                      <div className="artist__role">{artist.genre || "Electronic"}</div>
                     </div>
                   </div>
                 );
@@ -526,16 +525,8 @@ export default function Home() {
               </div>
 
               <div className="demo__chans">
-                <a href="https://bandcamp.com" target="_blank" rel="noopener noreferrer" className="chan" style={{ textDecoration: "none" }}>
-                  <span>Bandcamp</span>
-                  <b>Follow</b>
-                </a>
                 <a href="https://soundcloud.com/tinniehouserecords" target="_blank" rel="noopener noreferrer" className="chan" style={{ textDecoration: "none" }}>
                   <span>SoundCloud</span>
-                  <b>Follow</b>
-                </a>
-                <a href="https://open.spotify.com" target="_blank" rel="noopener noreferrer" className="chan" style={{ textDecoration: "none" }}>
-                  <span>Spotify</span>
                   <b>Follow</b>
                 </a>
                 <a href="https://www.instagram.com/tinnie_house_records/" target="_blank" rel="noopener noreferrer" className="chan" style={{ textDecoration: "none" }}>
