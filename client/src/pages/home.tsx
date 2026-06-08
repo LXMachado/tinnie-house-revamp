@@ -5,6 +5,7 @@ import { CatalogWall } from "@/components/catalog-wall";
 import { RedesignPlayer } from "@/components/redesign-player";
 import { Visualizer } from "@/components/visualizer";
 import { dbFallback } from "@/lib/database-fallback";
+import { usePlayback } from "@/lib/playback-context";
 import type { Artist, Release } from "@/types/content";
 
 function useReveal() {
@@ -79,6 +80,7 @@ function MarqueeStrip({ release }: { release: Release | undefined }) {
 }
 
 export default function Home() {
+  const { isPlaying } = usePlayback();
   const [showUpcomingModal, setShowUpcomingModal] = useState(false);
   const [artists, setArtists] = useState<Artist[]>([]);
   const [releases, setReleases] = useState<Release[]>([]);
@@ -176,7 +178,7 @@ export default function Home() {
     <>
       <section className="hero" style={{ background: "var(--bg-0)" }}>
         <div className="hero__viz">
-          <Visualizer />
+          <Visualizer isActive={isPlaying} />
         </div>
         <div className="hero__fade" />
         <div className="hero__grid" />

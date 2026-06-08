@@ -1,6 +1,7 @@
 import { Switch, Route, Link } from "wouter";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { PlaybackProvider, usePlayback } from "@/lib/playback-context";
 import { ThemeProvider } from "@/lib/theme-provider";
 import { Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -11,6 +12,7 @@ import TermsOfService from "@/pages/terms-of-service";
 import CookiePolicy from "@/pages/cookie-policy";
 
 function Header() {
+  const { currentTrack, isPlaying } = usePlayback();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -49,6 +51,22 @@ function Header() {
       </nav>
 
       <div className="nav__right">
+        <div className={`np${currentTrack ? " on" : ""}`}>
+          <div className="np__eq" aria-hidden="true">
+            <i style={{ animationPlayState: isPlaying ? "running" : "paused" }} />
+            <i style={{ animationPlayState: isPlaying ? "running" : "paused" }} />
+            <i style={{ animationPlayState: isPlaying ? "running" : "paused" }} />
+            <i style={{ animationPlayState: isPlaying ? "running" : "paused" }} />
+          </div>
+          <span>Now Playing</span>
+          <b>{currentTrack?.title ?? ""}</b>
+        </div>
+
+        <button className="nav-mute" type="button">
+          <span className="nav-mute__icon">⇆</span>
+          MUTED
+        </button>
+
         <button
           className="hud hud--ghost hud--sm"
           onClick={() => scrollToSection("contact")}
@@ -175,20 +193,22 @@ function Router() {
 function App() {
   return (
     <ThemeProvider defaultTheme="dark" storageKey="tinnie-house-theme">
-      <TooltipProvider>
-        <div className="fx-vignette" />
-        <div className="fx-scan" />
-        <div className="fx-grain" />
+      <PlaybackProvider>
+        <TooltipProvider>
+          <div className="fx-vignette" />
+          <div className="fx-scan" />
+          <div className="fx-grain" />
 
-        <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", background: "var(--bg-1)" }}>
-          <Header />
-          <main style={{ flex: 1 }}>
-            <Router />
-          </main>
-          <Footer />
-        </div>
-        <Toaster />
-      </TooltipProvider>
+          <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", background: "var(--bg-1)" }}>
+            <Header />
+            <main style={{ flex: 1 }}>
+              <Router />
+            </main>
+            <Footer />
+          </div>
+          <Toaster />
+        </TooltipProvider>
+      </PlaybackProvider>
     </ThemeProvider>
   );
 }

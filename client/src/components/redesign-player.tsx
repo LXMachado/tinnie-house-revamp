@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Pause, Play, SkipBack, SkipForward, Volume2, VolumeX, X } from "lucide-react";
 import { audioManager } from "@/lib/audioManager";
+import { usePlayback } from "@/lib/playback-context";
 import type { Release } from "@/types/content";
 
 const audioBase = import.meta.env.VITE_AUDIO_BASE || "";
@@ -112,6 +113,7 @@ export function RedesignPlayer({
   playlist,
   track,
 }: RedesignPlayerProps) {
+  const { setPlaybackState } = usePlayback();
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -137,10 +139,17 @@ export function RedesignPlayer({
 
     const updateTime = () => setCurrentTime(audio.currentTime);
     const updateDuration = () => setDuration(audio.duration || 0);
-    const handlePlay = () => setIsPlaying(true);
-    const handlePause = () => setIsPlaying(false);
+    const handlePlay = () => {
+      setIsPlaying(true);
+      setPlaybackState({ currentTrack: track, isPlaying: true });
+    };
+    const handlePause = () => {
+      setIsPlaying(false);
+      setPlaybackState({ isPlaying: false });
+    };
     const handleEnded = () => {
       setIsPlaying(false);
+      setPlaybackState({ isPlaying: false });
       if (playlistIndex >= 0 && playlist.length > 1) {
         const nextTrack = playlist[(playlistIndex + 1) % playlist.length];
         onTrackChange(nextTrack);
@@ -152,6 +161,7 @@ export function RedesignPlayer({
       setAudioError(true);
       setAudioLoading(false);
       setIsPlaying(false);
+      setPlaybackState({ isPlaying: false });
     };
 
     audio.addEventListener("timeupdate", updateTime);
@@ -173,7 +183,7 @@ export function RedesignPlayer({
       audio.removeEventListener("canplay", handleCanPlay);
       audio.removeEventListener("error", handleError);
     };
-  }, [onTrackChange, playlist, playlistIndex]);
+  }, [onTrackChange, playlist, playlistIndex, setPlaybackState, track]);
 
   useEffect(() => {
     const unsubscribe = audioManager.onCurrentAudioChange((currentAudio) => {
@@ -181,11 +191,12 @@ export function RedesignPlayer({
       if (!audio) return;
       if (currentAudio !== audio) {
         setIsPlaying(false);
+        setPlaybackState({ isPlaying: false });
       }
     });
 
     return unsubscribe;
-  }, []);
+  }, [setPlaybackState]);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -196,16 +207,25 @@ export function RedesignPlayer({
     setCurrentTime(0);
     setDuration(0);
     setIsPlaying(false);
+    setPlaybackState({ currentTrack: track, isPlaying: false });
+    audio.pause();
+    audio.currentTime = 0;
+    audio.src = audioUrl;
     audio.load();
 
     if (!audioUrl) return;
 
-    const timer = window.setTimeout(() => {
-      void audioManager.playAudio(audio, playerId);
-    }, 40);
+    const timer = window.setTimeout(async () => {
+      try {
+        await audioManager.playAudio(audio, playerId);
+      } catch (error) {
+        console.error("Failed to autoplay track:", error);
+        setAudioError(true);
+      }
+    }, 10);
 
     return () => window.clearTimeout(timer);
-  }, [audioUrl, autoplayNonce, playerId]);
+  }, [audioUrl, autoplayNonce, playerId, setPlaybackState, track]);
 
   useEffect(() => {
     return () => {
@@ -213,8 +233,9 @@ export function RedesignPlayer({
       if (audio && audioManager.isCurrentAudio(audio)) {
         audioManager.stopCurrentAudio();
       }
+      setPlaybackState({ isPlaying: false });
     };
-  }, []);
+  }, [setPlaybackState]);
 
   if (!track) return null;
 
@@ -244,14 +265,13 @@ export function RedesignPlayer({
     if (audio && audioManager.isCurrentAudio(audio)) {
       audioManager.stopCurrentAudio();
     }
+    setPlaybackState({ isPlaying: false, currentTrack: null });
     onClose();
   };
 
   return (
     <div className={`player${track ? " on" : ""}`}>
-      <audio ref={audioRef} preload="metadata">
-        {audioUrl && <source src={audioUrl} type="audio/mpeg" />}
-      </audio>
+      <audio ref={audioRef} preload="metadata" />
       <div className="player__in">
         <div className="player__art">
           <img

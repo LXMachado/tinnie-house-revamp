@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 
-export function Visualizer() {
+export function Visualizer({ isActive = false }: { isActive?: boolean }) {
   const ref = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -43,14 +43,16 @@ export function Visualizer() {
       const t = performance.now() / 1000;
       const beat = (t * (124 / 60)) % 1;
       const kickEnvelope = Math.pow(1 - beat, 2.4);
+      const activity = isActive ? 1 : 0.18;
 
       for (let i = 0; i < bins.length; i += 1) {
         const freq = i / bins.length;
-        let value = Math.exp(-freq * 2.3) * (0.45 + 0.55 * kickEnvelope);
-        value += 0.18 * Math.exp(-Math.pow((freq - 0.32) / 0.12, 2)) * (0.5 + 0.5 * Math.sin(t * 3 + freq * 20));
-        value += 0.14 * freq * (0.4 + 0.6 * Math.abs(Math.sin(t * 7 + i)));
-        value *= 0.6 + 0.4 * Math.sin(t * 0.6 + freq * 4);
-        bins[i] = Math.max(0, Math.min(1, value * (0.7 + 0.3 * Math.random())));
+        let value = Math.exp(-freq * 2.3) * (0.12 + 0.88 * kickEnvelope * activity);
+        value += 0.18 * Math.exp(-Math.pow((freq - 0.32) / 0.12, 2)) * (0.15 + 0.85 * Math.sin(t * 3 + freq * 20) ** 2) * activity;
+        value += 0.14 * freq * (0.2 + 0.8 * Math.abs(Math.sin(t * 7 + i))) * activity;
+        value *= 0.82 + (0.18 + 0.22 * Math.sin(t * 0.6 + freq * 4)) * activity;
+        const idleFloor = 0.018 * Math.exp(-freq * 3.4);
+        bins[i] = Math.max(0, Math.min(1, idleFloor + value * (0.82 + 0.18 * Math.random())));
       }
     };
 
@@ -64,7 +66,7 @@ export function Visualizer() {
 
       let energy = 0;
       for (let i = 0; i < binCount; i += 1) {
-        smooth[i] += (bins[i] - smooth[i]) * 0.28;
+        smooth[i] += (bins[i] - smooth[i]) * (isActive ? 0.28 : 0.08);
         energy += smooth[i];
       }
       energy /= binCount;
@@ -73,19 +75,19 @@ export function Visualizer() {
       const centerX = width / 2;
       const centerY = height * 0.46;
       const baseRadius = Math.min(width, height) * 0.16;
-      rotation += 0.0018 + energy * 0.01;
+      rotation += 0.0005 + energy * (isActive ? 0.01 : 0.0015);
 
       ctx.globalCompositeOperation = "lighter";
       for (const particle of particles) {
-        particle.y -= (0.0006 + particle.z * 0.0016) * (0.5 + energy * 1.6);
+        particle.y -= (0.00018 + particle.z * 0.0004) * (0.5 + energy * (isActive ? 1.6 : 0.25));
         if (particle.y < 0) {
           particle.y = 1;
           particle.x = Math.random();
         }
         const px = particle.x * width;
         const py = particle.y * height;
-        const radius = (0.4 + particle.z * 1.6) * (1 + energy);
-        ctx.fillStyle = `hsla(${hue + particle.z * 20} 90% ${60 + particle.z * 20}% / ${0.10 + particle.z * 0.22})`;
+        const radius = (0.35 + particle.z * (isActive ? 1.6 : 0.8)) * (0.6 + energy);
+        ctx.fillStyle = `hsla(${hue + particle.z * 20} 90% ${54 + particle.z * 14}% / ${isActive ? 0.1 + particle.z * 0.22 : 0.035 + particle.z * 0.08})`;
         ctx.beginPath();
         ctx.arc(px, py, radius, 0, Math.PI * 2);
         ctx.fill();
@@ -97,14 +99,14 @@ export function Visualizer() {
         const value = smooth[binIndex];
         const angle = (i / bars) * Math.PI * 2 + rotation;
         const startRadius = baseRadius;
-        const endRadius = baseRadius + value * Math.min(width, height) * 0.26 + 4;
+        const endRadius = baseRadius + value * Math.min(width, height) * (isActive ? 0.26 : 0.09) + 2;
         const x0 = centerX + Math.cos(angle) * startRadius;
         const y0 = centerY + Math.sin(angle) * startRadius;
         const x1 = centerX + Math.cos(angle) * endRadius;
         const y1 = centerY + Math.sin(angle) * endRadius;
         ctx.strokeStyle = `hsla(${hue + value * 40} 95% ${55 + value * 30}% / ${0.5 + value * 0.5})`;
-        ctx.lineWidth = 2.2;
-        if (value > 0.55) {
+        ctx.lineWidth = isActive ? 2.2 : 1.35;
+        if (isActive && value > 0.55) {
           ctx.shadowColor = `hsl(${hue} 100% 65%)`;
           ctx.shadowBlur = 14;
         } else {
@@ -117,7 +119,7 @@ export function Visualizer() {
       }
 
       ctx.shadowBlur = 0;
-      ctx.strokeStyle = `hsla(${hue} 90% 65% / ${0.25 + energy * 0.5})`;
+      ctx.strokeStyle = `hsla(${hue} 90% 65% / ${isActive ? 0.25 + energy * 0.5 : 0.12 + energy * 0.16})`;
       ctx.lineWidth = 1.5;
       ctx.beginPath();
       ctx.arc(centerX, centerY, baseRadius - 6, 0, Math.PI * 2);
@@ -128,11 +130,11 @@ export function Visualizer() {
       for (let i = 0; i < cols; i += 1) {
         const binIndex = Math.floor((i / cols) * binCount);
         const value = smooth[binIndex];
-        const barHeight = value * height * 0.34;
+        const barHeight = value * height * (isActive ? 0.34 : 0.12);
         const x = i * 9;
         const gradient = ctx.createLinearGradient(0, height, 0, height - barHeight);
         gradient.addColorStop(0, `hsla(${hue} 90% 55% / 0.0)`);
-        gradient.addColorStop(1, `hsla(${hue + value * 30} 95% ${55 + value * 25}% / ${0.35 + value * 0.5})`);
+        gradient.addColorStop(1, `hsla(${hue + value * 30} 95% ${55 + value * 25}% / ${isActive ? 0.35 + value * 0.5 : 0.08 + value * 0.14})`);
         ctx.fillStyle = gradient;
         ctx.fillRect(x, height - barHeight, 6, barHeight);
       }
@@ -148,7 +150,7 @@ export function Visualizer() {
       cancelAnimationFrame(raf);
       observer.disconnect();
     };
-  }, []);
+  }, [isActive]);
 
   return <canvas ref={ref} style={{ width: "100%", height: "100%", display: "block" }} />;
 }
