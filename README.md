@@ -32,6 +32,12 @@
 
 Polished, single-page React application that showcases the Tinnie House Records catalog, artists, and audio previews. Built as a static Vite application optimized for performance and can be deployed directly to Netlify or any static hosting platform without requiring a custom backend or database.
 
+## Screenshot
+
+<p align="center">
+  <img src="attached_assets/tinniehouserecords-screenshot.png" alt="Tinnie House Records homepage screenshot" width="320" />
+</p>
+
 ## ✨ Features
 - **🎨 Modern UI**: Responsive design with Tailwind CSS and shadcn/ui components
 - **🎵 Audio Playback**: Built-in music player with smooth controls and streaming support
@@ -175,9 +181,11 @@ tinnie-house-revamp/
 │   └── 📁 src/
 │       ├── 📁 components/    # Reusable UI components
 │       │   ├── 📁 ui/        # shadcn/ui components
-│       │   ├── music-player.tsx
-│       │   ├── release-carousel.tsx
-│       │   └── contact-form.tsx
+│       │   ├── catalog-wall.tsx
+│       │   ├── contact-form.tsx
+│       │   ├── logo.tsx
+│       │   ├── redesign-player.tsx
+│       │   └── visualizer.tsx
 │       ├── 📁 hooks/         # Custom React hooks
 │       ├── 📁 lib/           # Utility functions
 │       ├── 📁 pages/         # Page components
