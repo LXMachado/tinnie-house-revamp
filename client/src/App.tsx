@@ -62,11 +62,6 @@ function Header() {
           <b>{currentTrack?.title ?? ""}</b>
         </div>
 
-        <button className="nav-mute" type="button">
-          <span className="nav-mute__icon">⇆</span>
-          MUTED
-        </button>
-
         <button
           className="hud hud--ghost hud--sm"
           onClick={() => scrollToSection("contact")}

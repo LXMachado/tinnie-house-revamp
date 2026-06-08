@@ -237,23 +237,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="hero__meta">
-          <div style={{ display: "flex", gap: 40, alignItems: "flex-end" }}>
-            <div className="hero__stat">
-              <b>020</b>
-              <span>Catalog Releases</span>
-            </div>
-            <div className="hero__stat">
-              <b>TH021</b>
-              <span>Cabarita · Jul 2026</span>
-            </div>
-            <div className="hero__stat">
-              <b>20+</b>
-              <span>Countries Reached</span>
-            </div>
-          </div>
-          <div className="hero__scroll">SCROLL</div>
-        </div>
+       
       </section>
 
       <MarqueeStrip release={featuredRelease} />

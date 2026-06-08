@@ -524,24 +524,6 @@ section {
   text-transform: uppercase;
 }
 
-.nav-mute {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 18px;
-  border: 1px solid rgba(56, 214, 255, 0.45);
-  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
-  font-family: var(--f-disp);
-  font-size: 11px;
-  letter-spacing: 0.16em;
-  color: var(--ac-2);
-}
-
-.nav-mute__icon {
-  font-size: 12px;
-  line-height: 1;
-}
-
 .nav__mobile-menu {
   position: absolute;
   top: 68px;
@@ -1744,8 +1726,7 @@ section {
     display: none;
   }
 
-  .np,
-  .nav-mute {
+  .np {
     display: none;
   }
 
