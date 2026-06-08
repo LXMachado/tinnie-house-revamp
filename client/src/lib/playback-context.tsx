@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
 import type { Release } from "@/types/content";
 
 interface PlaybackContextValue {
@@ -13,20 +13,25 @@ export function PlaybackProvider({ children }: { children: ReactNode }) {
   const [currentTrack, setCurrentTrack] = useState<Release | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
+  const setPlaybackState = useCallback(
+    ({ currentTrack: nextTrack, isPlaying: nextPlaying }: { currentTrack?: Release | null; isPlaying?: boolean }) => {
+      if (nextTrack !== undefined) {
+        setCurrentTrack(nextTrack);
+      }
+      if (nextPlaying !== undefined) {
+        setIsPlaying(nextPlaying);
+      }
+    },
+    []
+  );
+
   const value = useMemo<PlaybackContextValue>(
     () => ({
       currentTrack,
       isPlaying,
-      setPlaybackState: ({ currentTrack: nextTrack, isPlaying: nextPlaying }) => {
-        if (nextTrack !== undefined) {
-          setCurrentTrack(nextTrack);
-        }
-        if (nextPlaying !== undefined) {
-          setIsPlaying(nextPlaying);
-        }
-      },
+      setPlaybackState,
     }),
-    [currentTrack, isPlaying]
+    [currentTrack, isPlaying, setPlaybackState]
   );
 
   return <PlaybackContext.Provider value={value}>{children}</PlaybackContext.Provider>;

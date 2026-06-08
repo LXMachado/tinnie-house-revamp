@@ -219,8 +219,8 @@ export function RedesignPlayer({
       try {
         await audioManager.playAudio(audio, playerId);
       } catch (error) {
-        console.error("Failed to autoplay track:", error);
-        setAudioError(true);
+        console.warn("Autoplay was blocked or interrupted:", error);
+        setAudioLoading(false);
       }
     }, 10);
 
@@ -242,7 +242,13 @@ export function RedesignPlayer({
   const togglePlayback = async () => {
     const audio = audioRef.current;
     if (!audio || audioError) return;
-    await audioManager.playAudio(audio, playerId);
+
+    try {
+      await audioManager.playAudio(audio, playerId);
+    } catch (error) {
+      console.error("Failed to toggle playback:", error);
+      setAudioLoading(false);
+    }
   };
 
   const goToOffset = (offset: number) => {
