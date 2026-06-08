@@ -10,6 +10,10 @@ interface CatalogWallProps {
 export function CatalogWall({ onPlayRelease, releases }: CatalogWallProps) {
   const [activeFilter, setActiveFilter] = useState("ALL");
 
+  const openRelease = (url: string) => {
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
+
   const genres = useMemo(() => {
     const values = new Set<string>();
     releases.forEach((release) => {
@@ -50,7 +54,7 @@ export function CatalogWall({ onPlayRelease, releases }: CatalogWallProps) {
             className="rel"
             onClick={() => {
               if (release.beatportSaleUrl) {
-                window.open(release.beatportSaleUrl, "_blank");
+                openRelease(release.beatportSaleUrl);
               }
             }}
           >

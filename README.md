@@ -30,7 +30,7 @@
 
 ## Overview
 
-Polished, single-page React application that showcases the Tinnie House Records catalog, artists, and audio previews. Built as a static Vite application optimized for performance and can be deployed directly to Netlify or any static hosting platform without requiring a custom backend or database.
+Polished, single-page React application that showcases the Tinnie House Records catalog, artists, and audio previews. Built as a static Vite application optimized for performance and deployable to Netlify or any static hosting platform without requiring a custom backend or live database connection.
 
 ## Screenshot
 
@@ -44,7 +44,7 @@ Polished, single-page React application that showcases the Tinnie House Records 
 - **🌙 Dark Mode**: System-aware theme switching with local storage persistence
 - **📱 Mobile Optimized**: Fully responsive design for all device sizes
 - **⚡ Fast Loading**: Static site generation with Vite for optimal performance
-- **📧 Contact Form**: Netlify Forms integration with client-side validation
+- **📧 Contact CTA**: Direct demo submission and newsletter request flows via email
 - **🎯 SEO Ready**: Proper meta tags and semantic HTML structure
 - **♿ Accessible**: WCAG compliant with keyboard navigation support
 
@@ -146,9 +146,6 @@ export function Component({ prop1, prop2 }: ComponentProps) {
    - Build command: `npm run build`
    - Publish directory: `client/dist`
 
-2. **Environment Variables:**
-   - Optional: `NETLIFY_DATABASE_URL` for Neon database integration
-
 3. **Deploy:**
    - Connect your GitHub repository to Netlify
    - Automatic deployments on every push to main branch
@@ -175,15 +172,12 @@ tinnie-house-revamp/
 ├── 📁 client/                 # Frontend application
 │   ├── 📁 public/            # Static assets
 │   │   ├── 📁 audio/         # Music files & previews
-│   │   ├── 📁 data/          # JSON data (artists, releases)
 │   │   ├── 📁 images/        # Images & artwork
 │   │   └── favicon.png       # Site favicon
 │   └── 📁 src/
 │       ├── 📁 components/    # Reusable UI components
 │       │   ├── 📁 ui/        # shadcn/ui components
 │       │   ├── catalog-wall.tsx
-│       │   ├── contact-form.tsx
-│       │   ├── logo.tsx
 │       │   ├── redesign-player.tsx
 │       │   └── visualizer.tsx
 │       ├── 📁 hooks/         # Custom React hooks
@@ -208,125 +202,7 @@ Create a `.env` file in the client directory:
 # Development port (default: 5173)
 VITE_PORT=5173
 
-# Database connection (for Neon database integration)
-NETLIFY_DATABASE_URL=postgresql://...
 ```
-
-### Database Setup (Optional)
-
-The application can optionally use a Neon Postgres database instead of static JSON files for better performance and dynamic content management.
-
-#### Prerequisites
-
-- Neon account (sign up at https://neon.tech)
-- Netlify project connected to your Neon database
-- The `NETLIFY_DATABASE_URL` environment variable set in your Netlify project
-
-#### Database Migration Steps
-
-**Step 1: Create Database Schema**
-1. Go to your Neon dashboard
-2. Navigate to your database
-3. Open the SQL Editor
-4. Copy and paste the contents of `database/schema.sql`
-5. Execute the SQL to create the tables
-
-**Step 2: Migrate Static Data**
-1. In the same SQL Editor, copy and paste the contents of `database/migration.sql`
-2. Execute the SQL to populate the tables with your existing static data
-
-**Step 3: Environment Setup**
-Make sure your Netlify project has the `NETLIFY_DATABASE_URL` environment variable set. This should be automatically configured when you connect your Neon database to Netlify.
-
-**Step 4: Test the Integration**
-Your components are now updated to use the database instead of static data:
-
-- **Home Page**: Uses `dbQueries.getArtists()` and `dbQueries.getReleases()`
-- **Release Carousel**: Uses `dbQueries.getReleases()`
-
-#### Database Functions Available
-
-The `dbQueries` object provides these functions:
-
-**Artists:**
-- `getArtists()` - Get all artists
-- `getArtistBySlug(slug)` - Get artist by slug
-
-**Releases:**
-- `getReleases()` - Get all releases
-- `getReleaseBySlug(slug)` - Get release by slug
-- `getFeaturedReleases()` - Get featured releases only
-- `getUpcomingReleases()` - Get upcoming releases only
-- `getLatestReleases()` - Get latest releases
-- `getReleasesByArtist(artistSlug)` - Get releases by artist
-
-#### Database Schema
-
-**Artists Table:**
-```sql
-- id (SERIAL PRIMARY KEY)
-- slug (VARCHAR(255) UNIQUE)
-- name (VARCHAR(255))
-- genre (VARCHAR(255))
-- image_url (VARCHAR(500))
-- bio (TEXT)
-- social_links (JSONB)
-- created_at, updated_at (TIMESTAMP)
-```
-
-**Releases Table:**
-```sql
-- id (SERIAL PRIMARY KEY)
-- slug (VARCHAR(255) UNIQUE)
-- title (VARCHAR(255))
-- artist_id (INTEGER, FK to artists)
-- artist_name (VARCHAR(255))
-- artist_slug (VARCHAR(255))
-- label (VARCHAR(255))
-- bundle_type (VARCHAR(100))
-- music_style (VARCHAR(255))
-- digital_release_date (DATE)
-- internal_reference (VARCHAR(50))
-- track_count (INTEGER)
-- cover_image_url (VARCHAR(500))
-- img_url (VARCHAR(500))
-- beatport_sale_url (VARCHAR(500))
-- purchase_link (VARCHAR(500))
-- share_link (VARCHAR(500))
-- audio_file_path (VARCHAR(500))
-- featured (BOOLEAN)
-- upcoming (BOOLEAN)
-- is_latest (BOOLEAN)
-- description (TEXT)
-- created_at, updated_at (TIMESTAMP)
-```
-
-#### Benefits of Database Migration
-
-1. **Dynamic Content**: Update releases and artists without code deployments
-2. **Better Performance**: Database queries vs loading entire JSON files
-3. **Scalability**: Easy to add search, filtering, pagination
-4. **Data Integrity**: Foreign key relationships prevent orphaned data
-5. **Future Features**: Foundation for user accounts, analytics, admin panels
-
-#### Database Troubleshooting
-
-If you encounter issues:
-
-1. **Database Connection**: Check that `NETLIFY_DATABASE_URL` is set correctly
-2. **CORS Issues**: Ensure your Neon database allows connections from your Netlify domain
-3. **Missing Data**: Verify the migration script ran successfully in the SQL editor
-4. **Performance**: Check the database query performance and consider adding indexes
-
-#### Next Steps for Database
-
-Consider these enhancements:
-
-1. **Admin Interface**: Create a simple admin panel for managing content
-2. **Analytics**: Track release plays, downloads, user engagement
-3. **Search**: Add search functionality using database queries
-4. **User Features**: User accounts, favorites, playlists
-5. **API Endpoints**: Create RESTful API endpoints for mobile apps or third-party integrations
 
 ### Audio Configuration
 
@@ -461,12 +337,6 @@ npm run dev
 
 The dev server runs on Vite (defaults to port `5173`). Audio files live under `client/public/audio`.
 
-Optional environment variables for database integration live in `client/.env`:
-```bash
-# Database connection for Neon PostgreSQL
-NETLIFY_DATABASE_URL=postgresql://...
-```
-
 ### Production Build
 ```bash
 npm run build
@@ -477,7 +347,7 @@ The command outputs to `client/dist`. Point Netlify (or your host) at that direc
 ### Project Structure
 ```
 client/
-  public/           # static assets (audio, images, data)
+  public/           # static assets (audio, images)
   src/
     components/     # shadcn/ui wrappers + feature components
     lib/            # utilities (audio manager, theme provider, etc.)
@@ -487,6 +357,5 @@ client/
 ```
 
 ### Deployment Tips
-- Set `NETLIFY_DATABASE_URL` environment variable in Netlify for database integration.
-- Netlify Forms will capture submissions automatically once the site is deployed.
 - Audio files are bundled with the application and served statically from `/audio/` URLs.
+- The demo submission link and newsletter request use the visitor's email client, so they work on any static host.

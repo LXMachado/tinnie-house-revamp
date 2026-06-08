@@ -1,11 +1,12 @@
-import { useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import { Calendar, ChevronRight, Mail, Pause, Play, Share } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { CatalogWall } from "@/components/catalog-wall";
 import { RedesignPlayer } from "@/components/redesign-player";
 import { Visualizer } from "@/components/visualizer";
-import { dbFallback } from "@/lib/database-fallback";
+import { getStaticDataFallback } from "@/lib/database-fallback";
 import { usePlayback } from "@/lib/playback-context";
+import { useToast } from "@/hooks/use-toast";
 import type { Artist, Release } from "@/types/content";
 
 function useReveal() {
@@ -81,35 +82,16 @@ function MarqueeStrip({ release }: { release: Release | undefined }) {
 
 export default function Home() {
   const { isPlaying } = usePlayback();
+  const { toast } = useToast();
   const [showUpcomingModal, setShowUpcomingModal] = useState(false);
-  const [artists, setArtists] = useState<Artist[]>([]);
-  const [releases, setReleases] = useState<Release[]>([]);
+  const { artists: initialArtists, releases: initialReleases } = getStaticDataFallback();
+  const [artists] = useState<Artist[]>(initialArtists);
+  const [releases] = useState<Release[]>(initialReleases);
   const [email, setEmail] = useState("");
   const [activeTrack, setActiveTrack] = useState<Release | null>(null);
   const [autoplayNonce, setAutoplayNonce] = useState(0);
 
   useReveal();
-
-  useEffect(() => {
-    async function fetchData() {
-      const { STATIC_ARTISTS, STATIC_RELEASES } = await import("@/static-content");
-      setArtists(STATIC_ARTISTS);
-      setReleases(STATIC_RELEASES);
-
-      try {
-        const [artistsData, releasesData] = await Promise.all([
-          dbFallback.getArtists(),
-          dbFallback.getReleases(),
-        ]);
-        setArtists(artistsData);
-        setReleases(releasesData);
-      } catch (error) {
-        console.log("Continuing with static data (database unavailable):", error);
-      }
-    }
-
-    fetchData();
-  }, []);
 
   const sortedReleases = useMemo(
     () =>
@@ -172,6 +154,31 @@ export default function Home() {
     if (!release.audioFilePath) return;
     setActiveTrack(release);
     setAutoplayNonce((current) => current + 1);
+  };
+
+  const handleArtistClick = (artist: Artist) => {
+    const soundcloudLink = artist.socialLinks?.soundcloud;
+    if (!soundcloudLink) return;
+    window.open(soundcloudLink, "_blank", "noopener,noreferrer");
+  };
+
+  const handleSubscribeSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    const trimmedEmail = email.trim();
+    if (!trimmedEmail) {
+      toast({
+        title: "Email required",
+        description: "Enter an email address to open a subscription request.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const mailto = new URL("mailto:contact@tinniehouserecords.com");
+    mailto.searchParams.set("subject", "Newsletter subscription");
+    mailto.searchParams.set("body", `Please subscribe this email address: ${trimmedEmail}`);
+    window.location.href = mailto.toString();
   };
 
   return (
@@ -382,7 +389,7 @@ export default function Home() {
                   <div
                     key={artist.id}
                     className={`artist rv in d${Math.min(index + 1, 3)}`}
-                    onClick={() => soundcloudLink && window.open(soundcloudLink, "_blank")}
+                    onClick={() => handleArtistClick(artist)}
                     style={{ cursor: soundcloudLink ? "pointer" : "default" }}
                   >
                     <div className="artist__n">0{index + 1}</div>
@@ -511,18 +518,22 @@ export default function Home() {
                 Sign up for exclusive updates on releases, events, and special announcements from Tinnie House
                 Records.
               </p>
-              <div className="demo__sub" style={{ marginTop: 24 }}>
+              <form className="demo__sub" style={{ marginTop: 24 }} onSubmit={handleSubscribeSubmit}>
                 <input
                   type="email"
                   placeholder="your@email.com"
                   className="inp"
                   value={email}
                   onChange={(event) => setEmail(event.target.value)}
+                  required
                 />
-                <button className="hud hud--solid" style={{ whiteSpace: "nowrap" }}>
+                <button className="hud hud--solid" style={{ whiteSpace: "nowrap" }} type="submit">
                   Subscribe
                 </button>
-              </div>
+              </form>
+              <p style={{ color: "var(--ink-3)", marginTop: 10, fontSize: 12 }}>
+                Opens your email app to request the newsletter.
+              </p>
 
               <div className="demo__chans">
                 <a href="https://soundcloud.com/tinniehouserecords" target="_blank" rel="noopener noreferrer" className="chan" style={{ textDecoration: "none" }}>
