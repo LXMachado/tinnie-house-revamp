@@ -17,6 +17,17 @@ INSERT INTO releases (
   beatport_sale_url, purchase_link, share_link, audio_file_path, featured, upcoming, is_latest, description
 ) VALUES
 (
+  'cabarita', 'Cabarita',
+  NULL,
+  'Rafa Kao & Gabriel Samy', 'rafa-kao-gabriel-samy',
+  'Tinnie House Records', 'Single', 'Melodic House & Techno',
+  '2026-07-01', 'TH021', 1,
+  '/images/artwork/cabarita.webp', '/images/artwork/cabarita.webp',
+  '', '', '', 'rafa-kao-gabriel-samy/cabarita.mp3',
+  true, true, true,
+  'Rafa Kao and Gabriel Samy return with a melodic club cut built around luminous synth tension, driving percussion, and a late-night progressive arc.'
+),
+(
   'polynomic-void', 'Polynomic Void', 
   (SELECT id FROM artists WHERE slug = 'guri'), 
   'G.U.R.I', 'guri', 
@@ -24,7 +35,7 @@ INSERT INTO releases (
   '2025-12-26', 'TH020', 1, 
   '/images/artwork/polynomic-void.webp', '/images/artwork/polynomic-void.webp',
   'https://www.beatport.com/release/polynomic-void/5657786', 'https://www.beatport.com/release/polynomic-void/5657786', 'https://www.beatport.com/release/polynomic-void/5657786', 'guri/polynomic-void.mp3', 
-  true, false, true,
+  false, false, false,
   'The collapse isn''t chaotic; it feels inevitable, as if all complexity is being drawn toward a singular point where meaning is stripped away and only pure abstraction remains. It''s the moment before a polynomial becomes undefined, before the graph disappears into a vertical asymptote, before logic itself breaks.'
 ),
 (
