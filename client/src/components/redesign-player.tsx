@@ -318,7 +318,7 @@ export function RedesignPlayer({
         </div>
         <span className="player__time">{formatTime(duration)}</span>
         <button
-          className="player__btn"
+          className="player__btn player__volume"
           title={volume > 0 ? "Mute" : "Unmute"}
           onClick={handleVolumeToggle}
         >

@@ -1338,6 +1338,7 @@ section {
 
 .foot__brand .nav__name {
   font-size: 18px;
+  line-height: 1.35;
 }
 
 .foot__brand p {
@@ -1414,7 +1415,7 @@ section {
   display: flex;
   align-items: center;
   gap: 18px;
-  padding: 10px 26px;
+  padding: 10px 26px calc(10px + env(safe-area-inset-bottom));
   max-width: var(--maxw);
   margin: 0 auto;
 }
@@ -1434,6 +1435,7 @@ section {
 }
 
 .player__meta {
+  flex: 1;
   min-width: 160px;
 }
 
@@ -1444,12 +1446,18 @@ section {
   text-transform: uppercase;
   letter-spacing: 0.04em;
   display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .player__meta span {
   font-family: var(--f-mono);
   font-size: 11px;
   color: var(--ink-3);
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
@@ -1457,6 +1465,7 @@ section {
   display: flex;
   align-items: center;
   gap: 10px;
+  flex: none;
 }
 
 .player__btn {
@@ -1744,6 +1753,80 @@ section {
     display: none;
   }
 
+  .foot {
+    padding: 56px 0 24px;
+  }
+
+  .foot__top {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .foot__brand .nav__brand {
+    flex-wrap: wrap;
+    row-gap: 10px;
+  }
+
+  .foot__brand .nav__name {
+    font-size: 16px;
+    letter-spacing: 0.12em;
+  }
+
+  .foot__brand p {
+    max-width: none;
+  }
+
+  .foot__bot {
+    margin-top: 36px;
+    align-items: flex-start;
+  }
+
+  .foot__bot .links {
+    flex-wrap: wrap;
+    gap: 10px 18px;
+  }
+
+  .player__in {
+    gap: 12px;
+    padding-inline: 16px;
+  }
+
+  .player__art {
+    width: 42px;
+    height: 42px;
+  }
+
+  .player__meta {
+    min-width: 0;
+  }
+
+  .player__meta b {
+    font-size: 13px;
+  }
+
+  .player__meta span {
+    font-size: 10px;
+  }
+
+  .player__ctrls {
+    gap: 6px;
+    margin-left: auto;
+  }
+
+  .player__btn {
+    width: 32px;
+    height: 32px;
+  }
+
+  .player__play {
+    width: 40px;
+    height: 40px;
+  }
+
+  .player__volume {
+    display: none;
+  }
+
   .player__wave,
   .player__time {
     display: none;
@@ -1769,5 +1852,44 @@ section {
 
   .about__stats {
     grid-template-columns: 1fr;
+  }
+
+  .foot__brand .nav__name {
+    font-size: 14px;
+    letter-spacing: 0.1em;
+  }
+
+  .foot__col a,
+  .foot__bot span,
+  .foot__bot a {
+    font-size: 12px;
+  }
+
+  .player__in {
+    gap: 10px;
+    padding-inline: 12px;
+  }
+
+  .player__art {
+    width: 38px;
+    height: 38px;
+  }
+
+  .player__ctrls {
+    gap: 4px;
+  }
+
+  .player__btn {
+    width: 30px;
+    height: 30px;
+  }
+
+  .player__play {
+    width: 36px;
+    height: 36px;
+  }
+
+  .player__close {
+    color: var(--ink-2);
   }
 }
