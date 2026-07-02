@@ -23,8 +23,10 @@ INSERT INTO releases (
   'Tinnie House Records', 'Single', 'Melodic House & Techno',
   '2026-07-01', 'TH021', 1,
   '/images/artwork/cabarita.webp', '/images/artwork/cabarita.webp',
-  '', '', '', 'rafa-kao-gabriel-samy/cabarita.mp3',
-  true, true, true,
+  'https://www.beatport.com/release/cabarita/7053595',
+  'https://www.beatport.com/release/cabarita/7053595',
+  'https://www.beatport.com/release/cabarita/7053595', 'rafa-kao-gabriel-samy/cabarita.mp3',
+  true, false, true,
   'Rafa Kao and Gabriel Samy return with a melodic club cut built around luminous synth tension, driving percussion, and a late-night progressive arc.'
 ),
 (
