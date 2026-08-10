@@ -7,6 +7,8 @@ export default {
     extend: {
       fontFamily: {
         orbitron: ['Orbitron', 'monospace'],
+        mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
+        body: ['Archivo', 'system-ui', 'sans-serif'],
       },
       borderRadius: {
         lg: "var(--radius)",
